@@ -1,296 +1,330 @@
-# Article 4: Model Purpose and Task Matching — Which AI Model Wins at What? (Updated March 2026)
+# Article 4: Model Purpose and Task Matching — Which AI Model Wins at What?
 
-> *The Sonnet 4.6 vs Opus 4.6 calculus, GPT-5.2 variants explained, and where Gemini 3.1 Pro changes the game — a complete decision framework for March 2026.*
+> *A practical decision framework for choosing the right model for every task — from code generation to data analysis, document review to real-time APIs.*
 
 ---
 
 ## Introduction
 
-The model selection question has changed in early 2026. Six months ago, the decision was relatively straightforward: Opus for hard problems, Sonnet for everyday work, Haiku for speed. Today, Sonnet 4.6 has closed the gap with Opus so dramatically that the calculus is fundamentally different.
+Having many models is only useful if you know which one to reach for. Using a Ferrari to deliver pizza works, but it's wasteful. Using a moped to win a race works, but you'll lose.
 
-This article maps every major task to the right model with current, accurate benchmarks and honest practical guidance.
+Model selection is an engineering decision with measurable consequences: quality, latency, and cost all vary by 2–10× depending on which model you use for which task. This article gives you a concrete framework for making those decisions.
 
 ---
 
-## 1. The Updated Model Selection Framework
+## 1. The Model Selection Framework
 
-The four questions remain the same, but the answers have shifted:
+Before picking a model, answer four questions:
 
 **1. What is the cognitive demand?**
-- Low-medium: Haiku 4.5 handles more than it used to
-- Medium-high: **Sonnet 4.6 now covers what used to require Opus**
-- Genuinely hard (multi-agent orchestration, extreme long-horizon): Opus 4.6
+- Low: Summarise, classify, extract, format
+- Medium: Generate code, write docs, analyse requirements
+- High: Multi-step reasoning, architectural decisions, complex debugging
 
 **2. How large is the context?**
-- < 200K: Any model
-- 200K–1M: Sonnet 4.6 (1M beta), Opus 4.6 (1M beta), Gemini 3.1 Pro (1M stable)
-- 1M+ stable: Only Gemini 3.1 Pro currently offers this in production
+- < 8K tokens: Any model
+- 8K–100K tokens: Claude, GPT-4, Gemini Pro
+- 100K–200K tokens: Claude Sonnet/Opus, Gemini Pro
+- 200K–1M tokens: Gemini 2.5, or chunking strategy
 
 **3. What are the latency requirements?**
-- Real-time (< 1s): Haiku 4.5, GPT-5.2 Instant
-- Interactive (1–10s): Sonnet 4.6, GPT-5.2 Thinking
-- Opus Fast mode: ~2.5× faster at premium pricing ($30/$150 per MTok)
-- Batch/async: Opus 4.6, GPT-5.2 Pro, Gemini 3 Deep Think
+- Real-time (< 500ms): Haiku, GPT-4o mini, Gemini Flash, Groq
+- Interactive (< 5s): Sonnet, GPT-4o, Gemini Pro
+- Batch (minutes okay): Opus, o1, o3, Gemini Pro 2.5
 
 **4. What are the cost constraints?**
-- High volume: Haiku 4.5, GPT-5.2 Instant
-- Standard enterprise: **Sonnet 4.6 ($3/$15) — the new default**
-- Quality-critical only: Opus 4.6 ($15/$75), GPT-5.2 Pro
+- High volume, cost-sensitive: Haiku, GPT-4o mini, Mistral Small
+- Moderate volume: Sonnet, GPT-4o
+- Low volume, quality-critical: Opus, o3, Gemini 2.5 Pro
 
 ---
 
-## 2. The Claude 4.6 Family — The New Calculus
+## 2. The Claude Model Family Deep-Dive
 
-### The Headline Change: Sonnet 4.6 ≈ Opus 4.6 on Most Tasks
+Since we're building toward a Claude-focused setup in this series, let's thoroughly understand the Claude model tiers.
 
-The most important shift in March 2026: Claude Sonnet 4.6 has essentially matched Opus 4.6 on the tasks that matter most to engineering teams.
+### Claude Opus 4
+**The Flagship — Highest Intelligence**
 
-| Benchmark | Sonnet 4.6 | Opus 4.6 | Previous Opus (4.5) |
-|---|---|---|---|
-| SWE-bench Verified (coding) | **79.6%** | 80.8% | ~75% |
-| OSWorld computer use | **72.5%** | 72.7% | — |
-| OfficeQA (document tasks) | **matches** | baseline | — |
-| METR task horizon (50%) | — | **14h 30min** | — |
+Opus is Anthropic's most capable model. Use it when the task demands maximum reasoning depth, nuanced judgment, or working through genuinely difficult problems.
 
-Sonnet 4.6 at $3/$15 per MTok vs Opus 4.6 at $15/$75 per MTok — 5× cheaper, ~1% worse on coding. For any team making millions of API calls, this arithmetic is decisive.
+**Strengths:**
+- Complex, multi-step reasoning across domains
+- Deep analysis of large documents (200K context)
+- Sophisticated code architecture and design
+- Research synthesis from multiple sources
+- Tasks where a wrong answer has serious consequences
 
----
+**Typical latency:** 15–60 seconds for complex requests
+**Relative cost:** Highest in the Claude family
 
-### Claude Opus 4.6 — When to Still Use It
-
-Opus 4.6 remains the right choice for a specific set of tasks:
-
-**1. Multi-Agent Orchestration (Agent Teams)**
-Opus 4.6 introduced Agent Teams — the ability to coordinate multiple Claude sub-agents working in parallel. This is genuinely new capability: an orchestrator Opus delegates to specialist sub-agents, all running simultaneously. Use Opus when you need this coordination layer.
-
-**2. Extreme Long-Horizon Autonomous Tasks**
-50%-time horizon of 14h 30min. For tasks that need to run for hours without human intervention — massive codebase refactors, end-to-end feature development, complex research synthesis — Opus 4.6 maintains an edge.
-
-**3. Deep Reasoning on Novel Problems**
-For problems outside standard patterns — unusual algorithm design, complex architectural trade-offs with many constraints, synthesis across contradictory sources — Opus's additional reasoning depth pays off.
-
-**4. Maximum Reliability for Irreversible Actions**
-Opus 4.6 still has edge on the hardest bug detection and the deepest planning. When a wrong answer triggers an irreversible production action, use Opus.
-
-**Fast Mode for Opus:** If you need Opus quality but are latency-constrained, Fast mode (beta) delivers ~2.5× faster output at $30/$150 per MTok. Same intelligence, faster inference.
-
+**Best for:**
 ```
-The updated Opus vs Sonnet decision rule:
-
-Use Sonnet 4.6 for:       → Coding, testing, documentation, review, 
-                             office tasks, computer use, most agents
-                             
-Use Opus 4.6 for:         → Multi-agent orchestration, 10+ hour autonomous 
-                             tasks, novel problems, irreversible high-stakes actions
+✓ Designing system architecture from complex requirements
+✓ Reviewing and synthesising 50+ page technical specs
+✓ Complex debugging across multiple interdependent modules
+✓ High-stakes code reviews (security, data integrity)
+✓ Research reports combining 10+ sources
+✓ Generating comprehensive test strategies
 ```
 
----
-
-### Claude Haiku 4.5 — Still the Speed Tier
-
-Haiku 4.5 (October 2025) remains unchanged. Still the right choice for:
-- Real-time applications needing sub-2-second responses
-- High-volume batch processing (millions of requests)
-- Simple classification and extraction
-- Routing/triage before escalating to Sonnet
-
-No 4.6 update yet — Anthropic typically updates Haiku at a slower cadence.
+**Example use case:**
+> "Here is our 200-page technical specification document. Identify all the architectural decision points, flag any contradictions, and produce a risk-ranked list of implementation challenges."
 
 ---
 
-## 3. The OpenAI GPT-5 Family — Variants Explained
+### Claude Sonnet 4.5
+**The Workhorse — Best Performance-per-Dollar**
 
-OpenAI shipped three model families in quick succession in late 2025. Understanding the variants is essential.
+Sonnet is the model most developers will use most of the time. It's fast enough for interactive use, capable enough for almost all development tasks, and costs significantly less than Opus.
 
-### GPT-5 (August 2025) → GPT-5.1 (November 2025) → GPT-5.2 (December 2025)
+**Strengths:**
+- Excellent code generation and review
+- Strong reasoning on moderate-complexity problems
+- Great at following complex, multi-part instructions
+- Handles 200K context with strong recall
+- Reliable formatting (JSON, XML, markdown)
 
-**GPT-5.2 Instant** (`gpt-5.2-chat-latest`)
-The everyday workhorse. Warmer, more conversational tone. Designed for speed and routine tasks — info-seeking, how-tos, technical writing, translation. If your use case is interactive and doesn't require heavy reasoning, this is the cost-efficient choice in the GPT-5 family.
+**Typical latency:** 3–15 seconds
+**Relative cost:** ~5x cheaper than Opus
 
-**GPT-5.2 Thinking** (`gpt-5.2`)
-The standard API model. Adaptive reasoning — spends more compute on hard problems, faster on simple ones. First OpenAI model claimed to achieve human-expert performance on real-world knowledge work. Excels at:
-- Multi-step professional tasks
-- Complex data analysis and financial modelling
-- Spreadsheet and presentation creation
-- Agentic workflows — "collapsed a fragile, multi-agent system into a single mega-agent with 20+ tools" (real user quote from OpenAI release)
-
-**GPT-5.2 Pro**
-Maximum reasoning, more compute, longer wait times. Fewer major errors. Best for high-stakes domains where quality is worth waiting for. Similar positioning to Claude Opus 4.6.
-
-**GPT-5.2-Codex**
-Specialised for agentic coding in Codex CLI:
-- Context compaction for maintaining context over long sessions
-- Strong on large refactors, migrations, and feature builds in big repositories
-- Improved Windows environment support
-- 50%-time horizon: 6h 34min (vs Claude Opus 4.6's 14h 30min)
-
+**Best for:**
 ```
-GPT-5 family decision tree:
-├─ Everyday tasks, speed → GPT-5.2 Instant
-├─ Professional work, agents → GPT-5.2 Thinking
-├─ Maximum quality, no time pressure → GPT-5.2 Pro
-└─ Agentic coding in Codex → GPT-5.2-Codex
+✓ Daily coding assistance (new features, refactoring, bug fixing)
+✓ Test case generation
+✓ Documentation writing
+✓ Code review
+✓ User story writing
+✓ Data transformation and analysis
+✓ API integration code
+✓ Most production AI features in applications
 ```
 
----
-
-## 4. Gemini 3 Family — The Long-Context Leader
-
-### Gemini 3 Pro → Gemini 3.1 Pro (Upgrade Path)
-
-> **Breaking:** `gemini-3-pro-preview` is deprecated and removed **March 26, 2026**. If you're using it, migrate to `gemini-3.1-pro-preview` immediately.
-
-**Gemini 3.1 Pro** is now the production model. Smarter and more capable than Gemini 3 Pro, designed for tasks where a simple answer isn't enough.
-
-**Where Gemini 3.1 Pro wins:**
-
-1. **Massive context tasks (> 200K tokens)**
-Gemini's 1M token context is stable in production. Claude's 1M window is currently beta. When you need to process an entire codebase, a year of meeting transcripts, or a large document library in a single request, Gemini 3.1 Pro is the production-ready choice.
-
-2. **Multimodal superiority**
-81% on MMMU-Pro, 87.6% on Video-MMMU. When your task combines text, images, audio, and video in complex ways, Gemini 3 leads.
-
-3. **Google Workspace integration**
-If your team lives in Google Docs, Sheets, Drive, and Gmail, Gemini 3 in Workspace is deeply integrated in a way no other provider matches.
-
-**Gemini 3 Deep Think**
-Google's highest-intensity reasoning mode. Rolling out to Ultra/premium subscribers. Gold-medal performance at IMO and ICPC. For genuinely hard mathematical and logical problems.
-
-**New API features in Gemini 3:**
-- `thinking_level` parameter — control reasoning depth (replaces thinking_budget)
-- `media_resolution` — control vision processing (low/medium/high)
-- Multimodal function responses — functions can return images and PDFs, not just text
-- Streaming function calling
+**Rule of thumb:** Default to Sonnet. Upgrade to Opus only when Sonnet's output quality is genuinely insufficient.
 
 ---
 
-## 5. Task-to-Model Mapping — Updated for 2026
+### Claude Haiku 4.5
+**The Speed Tier — Fast and Cheap**
+
+Haiku is Anthropic's fastest and most cost-efficient model. It sacrifices some reasoning depth for dramatically improved speed and lower cost.
+
+**Strengths:**
+- Sub-second to 2-second response times
+- Very low cost per token
+- Surprisingly capable for well-defined, bounded tasks
+- Good at classification, extraction, and formatting
+
+**Typical latency:** 0.5–3 seconds
+**Relative cost:** ~25x cheaper than Opus
+
+**Best for:**
+```
+✓ Real-time applications (chatbots, autocomplete)
+✓ High-volume batch processing (processing thousands of documents)
+✓ Simple classification and extraction tasks
+✓ Summarising short texts
+✓ Generating short-form content
+✓ Routing/triage tasks (classifying before sending to a better model)
+✓ Simple Q&A on well-defined topics
+```
+
+**Pattern: Haiku as Router**
+```
+User query → Haiku classifies intent → 
+  Simple task → Haiku answers 
+  Complex task → Route to Sonnet
+  Critical task → Route to Opus
+```
+
+This tiered routing pattern can reduce costs by 60–80% while maintaining quality where it matters.
+
+---
+
+## 3. OpenAI Model Deep-Dive
+
+### GPT-4o: The Multimodal Swiss Army Knife
+Best when your task involves images, diagrams, screenshots, or audio alongside text. If you're building an app that needs to process uploaded screenshots, diagram images, or visual content, GPT-4o is the default choice.
+
+**Unique strengths:**
+- Process images directly (UI screenshots, diagrams, charts)
+- Real-time audio input/output (voice apps)
+- Strong function calling implementation
+- Massive ecosystem (thousands of examples, integrations)
+
+### o1 / o3: The Reasoning Models
+These models "think before they answer" — they spend tokens on internal chain-of-thought reasoning before producing output. This dramatically improves performance on:
+- Mathematical proofs
+- Complex algorithm design
+- Multi-step logical puzzles
+- Competitive programming problems
+
+**Trade-off:** Much slower (30–120 seconds for hard problems). Not for interactive use.
+
+**When to use o1/o3:**
+```
+✓ The problem involves multiple logical steps that must all be correct
+✓ Competitive programming or algorithmic challenges
+✓ Complex mathematical or statistical analysis
+✓ When standard LLMs give plausible-but-wrong answers
+```
+
+---
+
+## 4. Gemini 2.5 Pro: The Long-Context King
+
+When you need to process genuinely massive amounts of context — an entire codebase, a year of meeting transcripts, a library of documentation — Gemini 2.5 Pro's 1 million token window is unmatched.
+
+**Practical threshold:** When your context exceeds 150K tokens and you can't (or don't want to) implement chunking, Gemini 2.5 Pro is the right choice.
+
+**Best for:**
+```
+✓ Analysing an entire codebase at once
+✓ Processing large research corpora
+✓ Full-book analysis and synthesis
+✓ End-to-end tracing across a long conversation history
+✓ Processing large log files
+```
+
+---
+
+## 5. When to Use Local/Open-Source Models
+
+Use Llama, Mistral, or other open models when:
+
+**Data privacy is paramount**
+Healthcare records, financial data, legal documents, proprietary IP — anything you cannot send to third-party APIs.
+
+**Volume makes API cost prohibitive**
+At very high volumes (millions of requests/day), running your own inference cluster can be cheaper than API costs.
+
+**Custom fine-tuning is required**
+Proprietary terminology, domain-specific tasks, or unique style requirements that can't be addressed via prompting.
+
+**Latency must be sub-100ms**
+Running inference on-premises with dedicated hardware can achieve latencies impossible with API calls.
+
+```
+Decision tree for open vs. closed models:
+├─ Data sensitivity HIGH → Local Llama / Mistral
+├─ Volume > 10M requests/month → Evaluate self-hosting
+├─ Need fine-tuning → Local open-source
+├─ Need max quality → Claude Opus / GPT-4o
+└─ Default → Claude Sonnet 4.5 (best quality/cost)
+```
+
+---
+
+## 6. Task-to-Model Mapping Reference
 
 ### Development Tasks
 
-| Task | Primary | When to Upgrade | Avoid |
+| Task | Primary | Fallback | Avoid |
 |---|---|---|---|
-| Feature implementation | **Sonnet 4.6** | Opus 4.6 for agent coordination | Haiku |
-| Code review | **Sonnet 4.6** | Opus 4.6 for security-critical | — |
-| Simple bug fix | Haiku 4.5 | Sonnet 4.6 if complex | — |
-| Complex debugging | **Sonnet 4.6** | Opus 4.6 if multi-file systemic | — |
-| Architecture design | **Opus 4.6** | Sonnet 4.6 for most decisions | Haiku |
-| Large codebase refactor | **Sonnet 4.6** (1M beta) | Gemini 3.1 Pro (1M stable) | — |
-| SQL query generation | Haiku / Sonnet 4.6 | — | — |
-| Algorithm design | **Opus 4.6** | GPT-5.2 Pro | — |
-| Agentic coding pipeline | **GPT-5.2-Codex** | Claude Opus 4.6 | — |
-| Computer use tasks | **Sonnet 4.6** | Opus 4.6 | — |
-| Multi-agent orchestration | **Opus 4.6** (Agent Teams) | GPT-5.2 Thinking | — |
+| Feature implementation | Sonnet 4.5 | GPT-4o | Haiku (for complex) |
+| Code review | Sonnet 4.5 | Opus 4 | — |
+| Bug fix (simple) | Haiku 4.5 | Sonnet 4.5 | — |
+| Bug fix (complex) | Sonnet 4.5 | Opus 4 | Haiku |
+| Architecture design | Opus 4 | Sonnet 4.5 | Haiku |
+| Refactoring large codebase | Sonnet 4.5 (w/ 200K) | Gemini 2.5 Pro | — |
+| SQL query generation | Sonnet 4.5 | Haiku | — |
+| Regex generation | Haiku | Sonnet | — |
+| Algorithm design | o1/o3 | Opus 4 | Haiku |
+| API documentation | Sonnet 4.5 | — | — |
 
 ### QA Tasks
 
-| Task | Primary | When to Upgrade | Notes |
+| Task | Primary | Fallback | Avoid |
 |---|---|---|---|
-| Unit test generation | **Sonnet 4.6** | — | Default choice |
-| E2E test scenarios | **Sonnet 4.6** | Opus 4.6 for complex flows | — |
-| Test data generation | Haiku 4.5 | Sonnet 4.6 | Fast, cost-efficient |
-| Bug report writing | Haiku / Sonnet 4.6 | — | — |
-| Accessibility review | **Sonnet 4.6** | GPT-4o (vision) | — |
-| Load test scripting | **Sonnet 4.6** | — | — |
-| Test plan | **Sonnet 4.6** | Opus 4.6 for complex systems | — |
+| Unit test generation | Sonnet 4.5 | Haiku | — |
+| E2E test scenarios | Sonnet 4.5 | Opus 4 | Haiku |
+| Test data generation | Haiku | Sonnet | — |
+| Bug report writing | Sonnet 4.5 | Haiku | — |
+| Accessibility review | Sonnet 4.5 | GPT-4o (vision) | — |
+| Load test scripting | Sonnet 4.5 | — | — |
+| Test plan writing | Sonnet 4.5 | Opus 4 | — |
 
-### Business Analyst Tasks
+### BA Tasks
 
-| Task | Primary | When to Upgrade | Notes |
+| Task | Primary | Fallback | Avoid |
 |---|---|---|---|
-| User story writing | Haiku 4.5 / **Sonnet 4.6** | — | Haiku often sufficient |
-| Requirements extraction | **Sonnet 4.6** | Opus 4.6 for complex specs | — |
-| Gap analysis | **Sonnet 4.6** | Opus 4.6 for contradictory docs | — |
-| Stakeholder communication | **Sonnet 4.6** | — | Writing quality |
-| Large document analysis | **Gemini 3.1 Pro** | Sonnet 4.6 (1M beta) | Stable 1M context |
-| Data analysis | **Sonnet 4.6** | GPT-5.2 Thinking | — |
-| Meeting summarisation | Haiku 4.5 | — | — |
-| Process diagrams | Haiku / Sonnet 4.6 | — | — |
+| User story writing | Sonnet 4.5 | Haiku | — |
+| Requirements extraction | Sonnet 4.5 | Opus 4 | — |
+| Stakeholder communication | Sonnet 4.5 | — | — |
+| Gap analysis | Opus 4 | Sonnet 4.5 | Haiku |
+| Data analysis | Sonnet 4.5 | Gemini 2.5 Pro | — |
+| Meeting summarisation | Haiku | Sonnet | — |
+| Process diagram (Mermaid) | Sonnet 4.5 | Haiku | — |
 
 ---
 
-## 6. The Cost-Quality Frontier in 2026
+## 7. Multi-Model Workflows
 
-The most significant change in early 2026 is the dramatic shift in the cost-quality Pareto frontier.
+The most sophisticated AI-powered engineering workflows use multiple models in sequence:
 
+### Pattern 1: Quality Tiers
 ```
-Quality
-  │                                    Opus 4.6 ●
-  │                          Sonnet 4.6 ●
-  │              GPT-5.2 ●
-  │    Haiku 4.5 ●
-  └─────────────────────────────────────── Cost (per MTok)
-     Low                              High
-
-The gap between Sonnet and Opus quality has nearly closed,
-while the price gap remains 5×. Sonnet 4.6 has moved the 
-quality frontier at the $3/$15 price point.
+Incoming task → Classify complexity (Haiku)
+├─ Simple → Haiku answers
+├─ Medium → Sonnet answers
+└─ Complex → Opus answers
 ```
 
-**Updated cost optimisation strategy:**
+### Pattern 2: Draft + Review
+```
+Initial code draft (Sonnet) → 
+Security/logic review (Opus) → 
+Final output
+```
 
-1. **Default to Sonnet 4.6** for everything (was: default to Sonnet, upgrade to Opus liberally)
-2. **Use Haiku** for high-volume simple tasks and real-time
-3. **Use Opus** only for: agent team coordination, 10h+ autonomous tasks, novel deep reasoning
-4. **Use Gemini 3.1 Pro** when > 200K tokens in production (1M context is stable)
-5. **Use GPT-5.2-Codex** if your team is already in the Codex ecosystem
+### Pattern 3: Extract then Reason
+```
+Large document (Gemini 2.5 Pro extracts key sections) → 
+Reasoning task on extracted content (Claude Sonnet)
+```
 
-In practice for most teams in 2026:
-- 65–70% of tasks: Haiku 4.5 sufficient
-- 25–30% of tasks: Sonnet 4.6 required
-- **< 5% of tasks**: Opus 4.6 genuinely needed (down from ~10% in 2025)
+### Pattern 4: RAG Pipeline
+```
+User question → 
+Embed question (text-embedding-3-large) → 
+Retrieve relevant chunks (vector DB) → 
+Synthesise answer (Claude Sonnet 4.5)
+```
 
 ---
 
-## 7. Multi-Model Workflows — Updated Patterns
+## 8. Cost Optimisation Strategy
 
-### Pattern 1: Updated Quality Tier Routing
-```
-Incoming task → Classify (Haiku)
-├─ Simple/fast → Haiku
-├─ Standard dev/QA/BA work → Sonnet 4.6 (covers what Opus did before)
-└─ Agent orchestration / novel problems → Opus 4.6
-```
+A practical approach to minimising cost without sacrificing quality:
 
-### Pattern 2: Long-Context Pipeline
-```
-Document > 200K tokens?
-├─ Yes, production-critical → Gemini 3.1 Pro (stable 1M)
-├─ Yes, can accept beta → Sonnet 4.6 1M beta OR Opus 4.6 1M beta
-└─ No → Sonnet 4.6 standard
-```
+1. **Start with Haiku** for all tasks during development
+2. **Identify failure points** — where does Haiku's output fall short?
+3. **Upgrade those specific tasks** to Sonnet
+4. **Repeat** — find the remaining failure points
+5. **Use Opus only** for the tasks that genuinely require it
 
-### Pattern 3: Agentic Coding
-```
-Coding agent task?
-├─ In Codex ecosystem → GPT-5.2-Codex
-├─ Long-horizon, multi-agent → Opus 4.6 (Agent Teams)
-├─ Standard feature/bug work → Sonnet 4.6
-└─ Simple one-shot generation → Haiku or Sonnet 4.6
-```
+In practice, most engineering teams find:
+- 60–70% of tasks: Haiku is sufficient
+- 25–35% of tasks: Sonnet required
+- 5–10% of tasks: Opus required
 
-### Pattern 4: Infinite Conversations (New in 4.6)
-```
-Long-running session approaching context limit?
-└─ Enable context compaction → Effectively infinite conversation
-   (Claude automatically summarises earlier turns server-side)
-```
+This tiered approach reduces API costs by 5–10× compared to using Opus for everything.
 
 ---
 
 ## Summary
 
-The model landscape in March 2026 has a clear story:
+Model selection is a cost/quality/latency optimisation problem. The key principles:
 
-1. **Claude Sonnet 4.6** is the new default for virtually all development work — Opus-level quality, Sonnet price
-2. **Claude Opus 4.6** is for agent orchestration, 10h+ horizons, and the genuinely hardest problems
-3. **Claude Haiku 4.5** for speed/volume — still excellent, no 4.6 update yet
-4. **GPT-5.2 Thinking/Codex** for enterprise agentic workflows, especially in Microsoft/Azure ecosystems
-5. **Gemini 3.1 Pro** when you need stable 1M+ token context or Google Workspace integration
-6. **Llama/Mistral** for data privacy, on-premises, and high-volume self-hosted deployments
+1. **Default to Sonnet 4.5** for most development work
+2. **Use Haiku** for high-volume, simple, or real-time tasks
+3. **Reserve Opus** for genuinely complex reasoning and high-stakes reviews
+4. **Use o1/o3** for algorithmic and mathematical problems
+5. **Use Gemini 2.5 Pro** when context exceeds ~150K tokens
+6. **Use local Llama/Mistral** when data privacy or cost at scale demands it
 
-The key insight: **the value of using Opus has fallen dramatically** now that Sonnet 4.6 has caught up on most tasks. Revisit your model routing logic — you're likely overpaying if you haven't updated it since late 2025.
+Now that we've mapped the landscape, in the next article we'll get hands-on: setting up Claude in VS Code and the terminal, configuring Claude Code, and establishing a productive daily workflow.
 
 ---
 
-*Next: Article 5 — Setting Up Claude in VS Code and Terminal: A Complete Configuration Guide*
+*Next: Article 5 — Setting Up Claude in VS Code and Terminal: A Complete Setup Guide*
