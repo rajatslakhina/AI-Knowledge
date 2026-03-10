@@ -79,7 +79,7 @@ claude
 
 # You'll see the interactive REPL:
 # ╔═══════════════════════════════════════╗
-# ║          Claude Code v2.x.x           ║
+# ║          Claude Code v1.x.x           ║
 # ╚═══════════════════════════════════════╝
 # >
 ```
@@ -144,12 +144,12 @@ claude "I'm new to this codebase. Explain the overall architecture and the main 
 
 ```bash
 # Specify model explicitly
-claude --model claude-opus-4-6 "Design the database schema for this project"
-claude --model claude-sonnet-4-6 "Implement the user registration endpoint"
+claude --model claude-opus-4-20250514 "Design the database schema for this project"
+claude --model claude-sonnet-4-5-20251001 "Implement the user registration endpoint"
 claude --model claude-haiku-4-5-20251001 "Summarise this file in 3 bullet points"
 
 # Set default model for the session
-export ANTHROPIC_MODEL="claude-sonnet-4-6"
+export ANTHROPIC_MODEL="claude-sonnet-4-5-20251001"
 
 # Or set in CLAUDE.md (covered in Article 8)
 ```
@@ -161,8 +161,8 @@ Add these to your `~/.zshrc` or `~/.bashrc`:
 ```bash
 # Model shortcuts
 alias claude-fast="claude --model claude-haiku-4-5-20251001"
-alias claude-smart="claude --model claude-sonnet-4-6"
-alias claude-pro="claude --model claude-opus-4-6"
+alias claude-smart="claude --model claude-sonnet-4-5-20251001"
+alias claude-pro="claude --model claude-opus-4-20250514"
 
 # Task-specific aliases
 alias ai-review="git diff --staged | claude-smart 'Review this diff for bugs, security issues, and code quality'"
@@ -195,9 +195,9 @@ Create or edit `~/.continue/config.json`:
 {
   "models": [
     {
-      "title": "Claude Sonnet 4.6",
+      "title": "Claude Sonnet 4.5",
       "provider": "anthropic",
-      "model": "claude-sonnet-4-6",
+      "model": "claude-sonnet-4-5-20251001",
       "apiKey": "sk-ant-your-key-here"
     },
     {
@@ -207,9 +207,9 @@ Create or edit `~/.continue/config.json`:
       "apiKey": "sk-ant-your-key-here"
     },
     {
-      "title": "Claude Opus 4.6 (Complex Tasks)",
+      "title": "Claude Opus 4 (Complex Tasks)",
       "provider": "anthropic",
-      "model": "claude-opus-4-6",
+      "model": "claude-opus-4-20250514",
       "apiKey": "sk-ant-your-key-here"
     }
   ],
@@ -280,7 +280,7 @@ Cline is an agentic VS Code extension — it can create files, run terminal comm
 2. Click settings icon
 3. Set API Provider: Anthropic
 4. Enter API key
-5. Select model: `claude-sonnet-4-6`
+5. Select model: `claude-sonnet-4-5-20251001`
 
 **Cline is best for:**
 - Multi-file feature implementation

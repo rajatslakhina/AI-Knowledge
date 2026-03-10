@@ -1,6 +1,6 @@
 # Article 1: What Is AI? A Developer's No-Nonsense Guide to Artificial Intelligence
 
-> *From neural networks to Claude Sonnet 4.6 and GPT-5.2 — understanding what AI actually is, how it works, and why it matters more than ever.*
+> *From Turing's dream to GPT-4 and Claude — understanding what AI actually is, how it works, and why it matters more than ever.*
 
 ---
 
@@ -63,7 +63,7 @@ Before Transformers, sequence-to-sequence models like RNNs processed text word b
 ### Training an LLM: The Three Phases
 
 **Phase 1 — Pre-training**  
-The model is trained on a massive corpus of text (books, code, articles, websites). It learns to predict the next token given a sequence. This is unsupervised — no labels, just patterns. Models like Claude Sonnet 4.6 and GPT-5.2 were trained on trillions of tokens.
+The model is trained on a massive corpus of text (books, code, articles, websites). It learns to predict the next token given a sequence. This is unsupervised — no labels, just patterns. Models like GPT-4 and Claude were trained on trillions of tokens.
 
 **Phase 2 — Fine-tuning / SFT (Supervised Fine-Tuning)**  
 The pre-trained model is fine-tuned on curated instruction-response pairs. This teaches it to follow instructions rather than just predict the next word.
@@ -83,7 +83,7 @@ Tokens are the units LLMs operate on — roughly 0.75 words each. "Hello, develo
 ## 4. Key Concepts Every Developer Must Know
 
 ### 4.1 Context Window
-The context window is the model's "working memory." Everything — your system prompt, conversation history, documents, and current message — must fit inside it. Modern models range from 32K to 1M+ tokens (Claude and GPT-5.2 offer 200K; Gemini 3.1 Pro reaches 1M).
+The context window is the model's "working memory." Everything — your system prompt, conversation history, documents, and current message — must fit inside it. Modern models range from 8K to 200K+ tokens.
 
 **Practical impact:** A 200K token window can hold roughly 150,000 words — about half a novel, or a moderately-sized codebase. Exceeding the window causes the model to "forget" earlier content.
 
@@ -120,7 +120,7 @@ Instead of relying solely on the model's training data, RAG retrieves relevant d
 │   (LangChain, LlamaIndex, Claude Code)       │
 ├─────────────────────────────────────────────┤
 │           LLM API Layer                      │
-│   (Claude Sonnet 4.6, GPT-5.2, Gemini 3.1 Pro, Llama 4)            │
+│   (Claude, GPT-4, Gemini, Llama)            │
 ├─────────────────────────────────────────────┤
 │           Infrastructure Layer               │
 │   (GPU clusters, vector DBs, storage)        │
@@ -139,7 +139,7 @@ As a developer, you primarily operate at the **Application** and **Orchestration
 
 **Artificial Superintelligence (ASI)** — Surpasses human intelligence across all domains. Theoretical.
 
-Current LLMs like Claude Sonnet 4.6 are extraordinarily capable narrow systems — they can *reason* and *generalise* across many domains, but they are still fundamentally prediction machines with significant limitations.
+Current LLMs like Claude 3.5 Sonnet are extraordinarily capable narrow systems — they can *reason* and *generalise* across many domains, but they are still fundamentally prediction machines with significant limitations.
 
 ---
 

@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Andrej Karpathy described a shift in early 2026 that resonated across the engineering community: he'd gone from **80% manual coding + 20% agents** to **80% agent coding + 20% edits and touchups** in a matter of weeks — noting that the change felt more like a threshold crossed than a gradual transition. He wasn't alone. The inflection point was real, and for most developers it arrived with two things happening simultaneously: Claude Code 2.x's architectural maturation, and Claude Sonnet 4.6 matching near-Opus quality at Sonnet pricing.
+Andrej Karpathy put it bluntly in early 2026: he went from **80% manual coding + 20% agents** to **80% agent coding + 20% edits and touchups** in a matter of weeks. He wasn't alone. The inflection point was real, and for most developers it arrived with two things happening simultaneously: Claude Code 2.x's architectural maturation, and Claude Sonnet 4.6 matching near-Opus quality at Sonnet pricing.
 
 This article is the practical guide that sits at the intersection of those two things. It covers:
 

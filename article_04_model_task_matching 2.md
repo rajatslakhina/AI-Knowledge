@@ -23,19 +23,19 @@ Before picking a model, answer four questions:
 
 **2. How large is the context?**
 - < 8K tokens: Any model
-- 8K–100K tokens: Any modern model
-- 100K–200K tokens: Claude Sonnet 4.6 / Opus 4.6.6, GPT-5.2
-- 200K–1M tokens: Gemini 3.1 Pro (native 1M) or Claude 200K + chunking
+- 8K–100K tokens: Claude, GPT-4, Gemini Pro
+- 100K–200K tokens: Claude Sonnet/Opus, Gemini Pro
+- 200K–1M tokens: Gemini 2.5, or chunking strategy
 
 **3. What are the latency requirements?**
-- Real-time (< 500ms): Haiku 4.5, GPT-5.2 mini, Gemini 3.1 Flash, Groq
-- Interactive (< 5s): Sonnet 4.6, GPT-5.2, Gemini 3.1 Pro
-- Batch (minutes okay): Opus 4.6, o4, Gemini 3.1 Pro
+- Real-time (< 500ms): Haiku, GPT-4o mini, Gemini Flash, Groq
+- Interactive (< 5s): Sonnet, GPT-4o, Gemini Pro
+- Batch (minutes okay): Opus, o1, o3, Gemini Pro 2.5
 
 **4. What are the cost constraints?**
-- High volume, cost-sensitive: Haiku 4.5 ($0.80/$4 MTok), GPT-5.2 mini, Mistral Small 3
-- Moderate volume: Sonnet 4.6 ($3/$15 MTok), GPT-5.2
-- Low volume, quality-critical: Opus 4.6 ($15/$75 MTok), o4, Gemini 3.1 Pro
+- High volume, cost-sensitive: Haiku, GPT-4o mini, Mistral Small
+- Moderate volume: Sonnet, GPT-4o
+- Low volume, quality-critical: Opus, o3, Gemini 2.5 Pro
 
 ---
 
@@ -43,7 +43,7 @@ Before picking a model, answer four questions:
 
 Since we're building toward a Claude-focused setup in this series, let's thoroughly understand the Claude model tiers.
 
-### Claude Opus 4.6
+### Claude Opus 4
 **The Flagship — Highest Intelligence**
 
 Opus is Anthropic's most capable model. Use it when the task demands maximum reasoning depth, nuanced judgment, or working through genuinely difficult problems.
@@ -73,7 +73,7 @@ Opus is Anthropic's most capable model. Use it when the task demands maximum rea
 
 ---
 
-### Claude Sonnet 4.6
+### Claude Sonnet 4.5
 **The Workhorse — Best Performance-per-Dollar**
 
 Sonnet is the model most developers will use most of the time. It's fast enough for interactive use, capable enough for almost all development tasks, and costs significantly less than Opus.
@@ -143,17 +143,17 @@ This tiered routing pattern can reduce costs by 60–80% while maintaining quali
 
 ## 3. OpenAI Model Deep-Dive
 
-### GPT-5.2: The Multimodal Powerhouse
-Best when your task involves images, diagrams, screenshots, or audio alongside text. GPT-5.2 is fully multimodal — text, image, audio, and video in a single API call.
+### GPT-4o: The Multimodal Swiss Army Knife
+Best when your task involves images, diagrams, screenshots, or audio alongside text. If you're building an app that needs to process uploaded screenshots, diagram images, or visual content, GPT-4o is the default choice.
 
 **Unique strengths:**
-- Process images directly (UI screenshots, diagrams, charts, handwritten notes)
+- Process images directly (UI screenshots, diagrams, charts)
 - Real-time audio input/output (voice apps)
-- GPT-5.2-Codex variant purpose-built for agentic software development
-- Massive ecosystem (thousands of examples, integrations, plugins)
+- Strong function calling implementation
+- Massive ecosystem (thousands of examples, integrations)
 
-### o4: The Reasoning Model
-OpenAI's o4 "thinks before it answers" — they spend tokens on internal chain-of-thought reasoning before producing output. This dramatically improves performance on:
+### o1 / o3: The Reasoning Models
+These models "think before they answer" — they spend tokens on internal chain-of-thought reasoning before producing output. This dramatically improves performance on:
 - Mathematical proofs
 - Complex algorithm design
 - Multi-step logical puzzles
@@ -161,7 +161,7 @@ OpenAI's o4 "thinks before it answers" — they spend tokens on internal chain-o
 
 **Trade-off:** Much slower (30–120 seconds for hard problems). Not for interactive use.
 
-**When to use o4:**
+**When to use o1/o3:**
 ```
 ✓ The problem involves multiple logical steps that must all be correct
 ✓ Competitive programming or algorithmic challenges
@@ -171,11 +171,11 @@ OpenAI's o4 "thinks before it answers" — they spend tokens on internal chain-o
 
 ---
 
-## 4. Gemini 3.1 Pro: The Long-Context King
+## 4. Gemini 2.5 Pro: The Long-Context King
 
-When you need to process genuinely massive amounts of context — an entire codebase, a year of meeting transcripts, a library of documentation — Gemini 3.1 Pro's 1 million token window is unmatched.
+When you need to process genuinely massive amounts of context — an entire codebase, a year of meeting transcripts, a library of documentation — Gemini 2.5 Pro's 1 million token window is unmatched.
 
-**Practical threshold:** When your context exceeds 200K tokens and you can't (or don't want to) implement chunking, Gemini 3.1 Pro is the right choice.
+**Practical threshold:** When your context exceeds 150K tokens and you can't (or don't want to) implement chunking, Gemini 2.5 Pro is the right choice.
 
 **Best for:**
 ```
@@ -209,8 +209,8 @@ Decision tree for open vs. closed models:
 ├─ Data sensitivity HIGH → Local Llama / Mistral
 ├─ Volume > 10M requests/month → Evaluate self-hosting
 ├─ Need fine-tuning → Local open-source
-├─ Need max quality → Claude Opus 4.6 / GPT-5.2
-└─ Default → Claude Sonnet 4.6 (best quality/cost at $3/$15 MTok)
+├─ Need max quality → Claude Opus / GPT-4o
+└─ Default → Claude Sonnet 4.5 (best quality/cost)
 ```
 
 ---
@@ -221,40 +221,40 @@ Decision tree for open vs. closed models:
 
 | Task | Primary | Fallback | Avoid |
 |---|---|---|---|
-| Feature implementation | Sonnet 4.6 | GPT-5.2 | Haiku (for complex) |
-| Code review | Sonnet 4.6 | Opus 4.6 | — |
-| Bug fix (simple) | Haiku 4.5 | Sonnet 4.6 | — |
-| Bug fix (complex) | Sonnet 4.6 | Opus 4.6 | Haiku |
-| Architecture design | Opus 4.6 | Sonnet 4.6 | Haiku |
-| Refactoring large codebase | Sonnet 4.6 (w/ 200K) | Gemini 3.1 Pro | — |
-| SQL query generation | Sonnet 4.6 | Haiku | — |
+| Feature implementation | Sonnet 4.5 | GPT-4o | Haiku (for complex) |
+| Code review | Sonnet 4.5 | Opus 4 | — |
+| Bug fix (simple) | Haiku 4.5 | Sonnet 4.5 | — |
+| Bug fix (complex) | Sonnet 4.5 | Opus 4 | Haiku |
+| Architecture design | Opus 4 | Sonnet 4.5 | Haiku |
+| Refactoring large codebase | Sonnet 4.5 (w/ 200K) | Gemini 2.5 Pro | — |
+| SQL query generation | Sonnet 4.5 | Haiku | — |
 | Regex generation | Haiku | Sonnet | — |
-| Algorithm design | o4 | Opus 4.6 | Haiku |
-| API documentation | Sonnet 4.6 | — | — |
+| Algorithm design | o1/o3 | Opus 4 | Haiku |
+| API documentation | Sonnet 4.5 | — | — |
 
 ### QA Tasks
 
 | Task | Primary | Fallback | Avoid |
 |---|---|---|---|
-| Unit test generation | Sonnet 4.6 | Haiku | — |
-| E2E test scenarios | Sonnet 4.6 | Opus 4.6 | Haiku |
+| Unit test generation | Sonnet 4.5 | Haiku | — |
+| E2E test scenarios | Sonnet 4.5 | Opus 4 | Haiku |
 | Test data generation | Haiku | Sonnet | — |
-| Bug report writing | Sonnet 4.6 | Haiku | — |
-| Accessibility review | Sonnet 4.6 | GPT-5.2 (vision) | — |
-| Load test scripting | Sonnet 4.6 | — | — |
-| Test plan writing | Sonnet 4.6 | Opus 4.6 | — |
+| Bug report writing | Sonnet 4.5 | Haiku | — |
+| Accessibility review | Sonnet 4.5 | GPT-4o (vision) | — |
+| Load test scripting | Sonnet 4.5 | — | — |
+| Test plan writing | Sonnet 4.5 | Opus 4 | — |
 
 ### BA Tasks
 
 | Task | Primary | Fallback | Avoid |
 |---|---|---|---|
-| User story writing | Sonnet 4.6 | Haiku | — |
-| Requirements extraction | Sonnet 4.6 | Opus 4.6 | — |
-| Stakeholder communication | Sonnet 4.6 | — | — |
-| Gap analysis | Opus 4.6 | Sonnet 4.6 | Haiku |
-| Data analysis | Sonnet 4.6 | Gemini 3.1 Pro | — |
+| User story writing | Sonnet 4.5 | Haiku | — |
+| Requirements extraction | Sonnet 4.5 | Opus 4 | — |
+| Stakeholder communication | Sonnet 4.5 | — | — |
+| Gap analysis | Opus 4 | Sonnet 4.5 | Haiku |
+| Data analysis | Sonnet 4.5 | Gemini 2.5 Pro | — |
 | Meeting summarisation | Haiku | Sonnet | — |
-| Process diagram (Mermaid) | Sonnet 4.6 | Haiku | — |
+| Process diagram (Mermaid) | Sonnet 4.5 | Haiku | — |
 
 ---
 
@@ -279,7 +279,7 @@ Final output
 
 ### Pattern 3: Extract then Reason
 ```
-Large document (Gemini 3.1 Pro extracts key sections) → 
+Large document (Gemini 2.5 Pro extracts key sections) → 
 Reasoning task on extracted content (Claude Sonnet)
 ```
 
@@ -288,7 +288,7 @@ Reasoning task on extracted content (Claude Sonnet)
 User question → 
 Embed question (text-embedding-3-large) → 
 Retrieve relevant chunks (vector DB) → 
-Synthesise answer (Claude Sonnet 4.6)
+Synthesise answer (Claude Sonnet 4.5)
 ```
 
 ---
@@ -316,12 +316,12 @@ This tiered approach reduces API costs by 5–10× compared to using Opus for ev
 
 Model selection is a cost/quality/latency optimisation problem. The key principles:
 
-1. **Default to Sonnet 4.6** for most development work
+1. **Default to Sonnet 4.5** for most development work
 2. **Use Haiku** for high-volume, simple, or real-time tasks
-3. **Reserve Opus 4.6** for genuinely complex reasoning and high-stakes reviews
-4. **Use o4** for algorithmic and mathematical problems
-5. **Use Gemini 3.1 Pro** when context exceeds ~150K tokens
-6. **Use local Llama 4 Scout/Maverick** when data privacy or cost at scale demands it
+3. **Reserve Opus** for genuinely complex reasoning and high-stakes reviews
+4. **Use o1/o3** for algorithmic and mathematical problems
+5. **Use Gemini 2.5 Pro** when context exceeds ~150K tokens
+6. **Use local Llama/Mistral** when data privacy or cost at scale demands it
 
 Now that we've mapped the landscape, in the next article we'll get hands-on: setting up Claude in VS Code and the terminal, configuring Claude Code, and establishing a productive daily workflow.
 

@@ -89,7 +89,7 @@ Add this to your git workflow:
 # .git/hooks/pre-push (or run manually)
 #!/bin/bash
 echo "Running AI code review..."
-git diff main...HEAD | claude --model claude-sonnet-4-6 \
+git diff main...HEAD | claude --model claude-sonnet-4-5-20251001 \
   "You are a senior engineer doing a code review. 
    Analyse this diff and provide:
    1. Security vulnerabilities (CRITICAL)

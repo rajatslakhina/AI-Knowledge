@@ -6,7 +6,7 @@
 
 ## Introduction
 
-The LLM landscape in 2025–2026 is rich, noisy, and moves fast. New model releases and benchmarks appear weekly, each claiming to be "state of the art." For developers building real products, the signal-to-noise ratio can be brutal.
+The LLM landscape in 2024–2025 is rich, noisy, and moves fast. New model releases and benchmarks appear weekly, each claiming to be "state of the art." For developers building real products, the signal-to-noise ratio can be brutal.
 
 This article maps the major model families, their capabilities, and their practical trade-offs — so you can make informed decisions rather than chasing benchmarks.
 
@@ -22,8 +22,8 @@ Anthropic was founded in 2021 by former OpenAI researchers, including Dario and 
 
 | Model | Context Window | Best For |
 |---|---|---|
-| **Claude Opus 4.6.6** | 200K tokens | Complex reasoning, research, architecture |
-| **Claude Sonnet 4.6** | 200K tokens | Balanced: speed + intelligence, coding |
+| **Claude Opus 4** | 200K tokens | Complex reasoning, research, architecture |
+| **Claude Sonnet 4.5** | 200K tokens | Balanced: speed + intelligence, coding |
 | **Claude Haiku 4.5** | 200K tokens | Fast tasks, high-volume, summarisation |
 
 **Key strengths:**
@@ -38,80 +38,76 @@ Anthropic was founded in 2021 by former OpenAI researchers, including Dario and 
 - Constitutional AI training results in outputs that are more reliable and less prone to "going off the rails"
 - Claude is known for being honest about its uncertainty
 - Strongest performance on tasks requiring nuanced reasoning across large documents
-- **Pricing (March 2026):** Opus 4.6 $15/$75 per MTok · Sonnet 4.6 $3/$15 · Haiku 4.5 $0.80/$4
-- **Benchmark (Sonnet 4.6):** SWE-bench 79.6%, OSWorld 72.5%
 
 ---
 
 ### 1.2 OpenAI — GPT Family
 
-OpenAI is the company that popularised LLMs with ChatGPT in late 2022. Their GPT-5 and o-series models remain the strongest competitors to Claude in the enterprise and developer market.
+OpenAI is the company that popularised LLMs with ChatGPT in late 2022. Their GPT and o-series models remain dominant in market share.
 
 **Current OpenAI Models:**
 
 | Model | Context Window | Best For |
 |---|---|---|
-| **GPT-5.2** | 200K tokens | General purpose, multimodal, agentic |
-| **GPT-5.2 mini** | 200K tokens | Fast, cost-effective tasks |
-| **GPT-5.2-Codex** | 200K tokens | Agentic coding, autonomous dev tasks |
-| **o4** | 200K tokens | Advanced reasoning, maths, research |
-| **o4-mini** | 200K tokens | Fast reasoning, cost-efficient |
+| **GPT-4o** | 128K tokens | General purpose, multimodal |
+| **GPT-4o mini** | 128K tokens | Fast, cost-effective tasks |
+| **o1** | 200K tokens | Complex mathematical reasoning |
+| **o3 / o3-mini** | 200K tokens | Advanced reasoning, research |
+| **o4-mini** | 200K tokens | Fast reasoning tasks |
 
 **Key strengths:**
 - Largest ecosystem: plugins, tools, integrations
-- GPT-5.2 is fully multimodal (text, image, audio, video, code)
+- GPT-4o is multimodal (text, image, audio, video)
 - o-series models excel at step-by-step mathematical and logical reasoning
 - Strong function calling and tool use implementation
 - Mature API with extensive community documentation
 
 **Unique differentiators:**
-- GPT-5.2-Codex is purpose-built for agentic software development tasks
-- The o4 "thinking" model spends tokens on internal chain-of-thought before responding — best for puzzles, proofs, and complex algorithmic reasoning
+- OpenAI leads in multimodal capabilities
+- The o-series "thinking" models spend time on internal chain-of-thought before responding — best for puzzles, proofs, and complex reasoning
 
 ---
 
 ### 1.3 Google DeepMind — Gemini Family
 
-Google's Gemini 3 models are deeply integrated into the Google ecosystem and hold the record for the largest production context windows available.
+Google's Gemini models are deeply integrated into the Google ecosystem and offer some of the largest context windows available.
 
 **Current Gemini Models:**
 
 | Model | Context Window | Best For |
 |---|---|---|
-| **Gemini 3.1 Pro** | 1M tokens | Ultra long-context, research, coding |
-| **Gemini 3.1 Flash** | 1M tokens | Fast, efficient, long-document |
-| **Gemini 3.0 Flash** | 1M tokens | Real-time apps, voice, high-volume |
-
-> ⚠️ **Deprecation notice:** `gemini-3-pro-preview` is deprecated as of March 26, 2026. Use `gemini-3.1-pro-preview`.
+| **Gemini 2.5 Pro** | 1M tokens | Ultra long-context, research |
+| **Gemini 2.5 Flash** | 1M tokens | Fast, efficient, long-document |
+| **Gemini 2.0 Flash** | 1M tokens | Real-time apps, voice |
 
 **Key strengths:**
-- 1 million token context window — ingest entire codebases or document libraries in one call
-- Native multimodal from the ground up (text, code, image, audio, video)
-- Deep Google integrations (Workspace, Search, Maps, Vertex AI)
-- Strong performance on structured data and long-document tasks
+- 1 million token context window (industry-leading)
+- Native multimodal from the ground up (trained on text, code, image, audio, video simultaneously)
+- Deep Google integrations (Workspace, Search, Maps)
+- Strong performance on structured data tasks
 
 **Unique differentiators:**
-- The 1M token context window has no practical peer for whole-codebase analysis
-- Google's TPU infrastructure delivers fast inference at massive scale
+- The 1M token context window enables ingesting entire codebases or document libraries
+- Google's infrastructure advantage means extremely fast inference at scale
 
 ---
 
 ### 1.4 Meta — Llama Family
 
-Meta's Llama 4 models are open-weights — you can download the weights and run them yourself. This is a fundamental differentiator for data privacy, custom training, or on-premises deployment.
+Meta's Llama models are open-weights — you can download the weights and run them yourself. This is a fundamental differentiator for use cases where data privacy, custom training, or on-premises deployment are required.
 
-**Current Llama 4 Models:**
+**Current Llama Models:**
 
-| Model | Architecture | Best For |
+| Model | Parameters | Best For |
 |---|---|---|
-| **Llama 4 Scout** | MoE (17B active / 109B total) | Edge, embedded, fast inference, local |
-| **Llama 4 Maverick** | MoE (17B active / 400B total) | Strong coding and reasoning, self-hosted |
-| **Llama 4 Behemoth** | 2T parameters (research) | Frontier-class, research deployments |
+| **Llama 3.3 70B** | 70B | High-quality open-source, coding |
+| **Llama 3.1 8B** | 8B | Edge, embedded, fast inference |
+| **Llama 3.2 Vision** | 11B/90B | Multimodal, vision tasks |
+| **Llama 3.1 405B** | 405B | Near-frontier, self-hosted |
 
 **Key strengths:**
 - Free to use, modify, and deploy
-- Llama 4 Scout runs on a single consumer GPU — genuinely local-first
-- Llama 4 Maverick matches GPT-5.2 quality on many benchmarks when self-hosted
+- Can be run locally or on your own infrastructure
 - Community-driven fine-tunes for every use case
 - No API costs for high-volume applications
 
@@ -127,10 +123,10 @@ French AI lab producing highly efficient open and commercial models, known for p
 
 | Model | Type | Best For |
 |---|---|---|
-| **Mistral Large 3** | Proprietary | Complex reasoning, multilingual, long-context |
+| **Mistral Large 2** | Proprietary | Complex reasoning, multilingual |
 | **Mixtral 8x22B** | Open (MoE) | General purpose, cost-efficient |
-| **Codestral 2025** | Open | Code generation, fill-in-the-middle |
-| **Mistral Small 3** | Open | Fast, lightweight tasks |
+| **Codestral** | Open | Code generation |
+| **Mistral Small** | Open | Fast, lightweight tasks |
 
 **Key strengths:**
 - Mixture of Experts (MoE) architecture is highly efficient
@@ -154,7 +150,7 @@ Enterprise-focused models, particularly strong for RAG and enterprise search use
 
 Elon Musk's AI lab, integrated with X (formerly Twitter). Grok models have access to real-time X data.
 
-**Models:** Grok 3.5, Grok 3.5 mini
+**Models:** Grok 3, Grok 3 mini
 
 **Unique strength:** Real-time internet access and X data integration. Strong reasoning in Grok 3.
 
@@ -162,9 +158,9 @@ Elon Musk's AI lab, integrated with X (formerly Twitter). Grok models have acces
 
 ## 2. Open-Source vs. Closed-Source: The Core Trade-off
 
-| Dimension | Closed (GPT-5.2, Claude, Gemini 3.1) | Open (Llama 4, Mistral) |
+| Dimension | Closed (GPT-4, Claude, Gemini) | Open (Llama, Mistral) |
 |---|---|---|
-| **Quality** | Frontier quality (Claude, GPT-5.2) | Llama 4 Maverick competitive with GPT-5.2 on many tasks |
+| **Quality** | Generally frontier quality | Catching up fast |
 | **Data privacy** | Your data leaves your infra | Full data control |
 | **Cost** | Per-token API fees | Infrastructure cost only |
 | **Customisation** | Limited fine-tuning | Full fine-tuning possible |
@@ -177,10 +173,10 @@ Elon Musk's AI lab, integrated with X (formerly Twitter). Grok models have acces
 ## 3. Specialised Models Worth Knowing
 
 ### Code-Specialised
-- **GitHub Copilot** (GPT-5.2-Codex based) — IDE autocomplete and agentic PR generation
-- **Codestral 2025** (Mistral) — Code generation, strong on fill-in-the-middle
-- **DeepSeek V3** — Strong open-source code model, cost-efficient
-- **Llama 4 Maverick** — Meta's general-purpose model with strong coding; Code Llama deprecated in favour of Llama 4
+- **GitHub Copilot** (GPT-4o based) — IDE autocomplete leader
+- **Codestral** (Mistral) — Code generation, strong on fill-in-the-middle
+- **DeepSeek Coder V2** — Strong open-source code model
+- **Code Llama** — Meta's code-focused Llama fine-tune
 
 ### Embedding Models
 - **OpenAI text-embedding-3-large** — Strong general-purpose embeddings
@@ -188,10 +184,10 @@ Elon Musk's AI lab, integrated with X (formerly Twitter). Grok models have acces
 - **all-MiniLM-L6-v2** (Sentence Transformers) — Lightweight, local-first
 
 ### Vision Models
-- **GPT-5.2** — Full multimodal: vision, audio, video + text
-- **Claude Sonnet 4.6** — Vision + document analysis, highest accuracy on OCR and structured documents
-- **Llama 4 Scout / Maverick** — Open, self-hostable vision (native multimodal in Llama 4)
-- **Gemini 3.1 Flash** (Google) — Fast vision + text at scale
+- **GPT-4o** — Versatile vision + text
+- **Claude 3.5 Sonnet** — Vision + document analysis
+- **Llama 3.2 Vision** — Open, self-hostable vision
+- **PaliGemma** (Google) — Efficient vision-language model
 
 ### Audio / Speech
 - **Whisper** (OpenAI, open-source) — Speech-to-text gold standard
@@ -204,16 +200,16 @@ Elon Musk's AI lab, integrated with X (formerly Twitter). Grok models have acces
 
 | Task | Best Choice | Runner-Up | Budget Option |
 |---|---|---|---|
-| Complex coding | Claude Sonnet 4.6 | GPT-5.2-Codex | Codestral 2025 |
-| Long document analysis | Gemini 3.1 Pro (1M ctx) | Claude Opus 4.6 | Claude Sonnet 4.6 |
-| Mathematical / algorithmic reasoning | o4 | Gemini 3.1 Pro | Llama 4 Maverick |
-| Fast API calls | Claude Haiku 4.5 | GPT-5.2 mini | Mistral Small 3 |
-| RAG / retrieval | Claude Sonnet 4.6 | Command R+ | Llama 4 Scout |
-| Multimodal (vision) | GPT-5.2 | Gemini 3.1 Pro | Llama 4 Scout |
-| Privacy-sensitive tasks | Llama 4 Scout (local) | Mistral Large 3 | Llama 4 Maverick |
-| Multilingual | Mistral Large 3 | GPT-5.2 | Llama 4 Maverick |
-| Enterprise search | Cohere Command R+ | Claude Sonnet 4.6 | — |
-| Real-time/speed | Groq + Llama 4 Scout | Gemini 3.1 Flash | Claude Haiku 4.5 |
+| Complex coding | Claude Sonnet 4.5 | GPT-4o | Codestral |
+| Long document analysis | Gemini 2.5 Pro | Claude Opus 4 | Claude Sonnet 4.5 |
+| Mathematical reasoning | o3 / o1 | Gemini 2.5 Pro | Llama 3.3 70B |
+| Fast API calls | Claude Haiku 4.5 | GPT-4o mini | Mistral Small |
+| RAG / retrieval | Claude Sonnet 4.5 | Command R+ | Llama 3.3 70B |
+| Multimodal (vision) | GPT-4o | Gemini 2.5 Pro | Llama 3.2 Vision |
+| Privacy-sensitive tasks | Llama 3.3 70B (local) | Mistral Large 2 | Llama 3.1 8B |
+| Multilingual | Mistral Large 2 | GPT-4o | Llama 3.3 70B |
+| Enterprise search | Cohere Command R+ | Claude Sonnet 4.5 | — |
+| Real-time/speed | Groq + Llama | Gemini Flash | Claude Haiku 4.5 |
 
 ---
 
@@ -240,7 +236,7 @@ Models are evolving from **chat interfaces** to **agentic systems** — models t
 
 Key developments:
 - **Function calling / tool use** — Models can call external APIs and code functions
-- **Computer use** — Claude Sonnet 4.6 (OSWorld 72.5%) and GPT-5.2 can interact with computer interfaces autonomously
+- **Computer use** — Claude and GPT-4o can interact with computer interfaces
 - **Code execution** — Models can run code in sandboxes and iterate based on output
 - **Multi-agent systems** — Multiple LLMs collaborating on complex tasks
 
@@ -252,10 +248,10 @@ This is where the next wave of developer productivity gains will come from — n
 
 The LLM landscape offers a rich spectrum of choices:
 - **Anthropic Claude** — Best for coding, long-context, reliable instruction-following
-- **OpenAI GPT-5.2 / o4** — Strongest multimodal, best reasoning (o4), massive ecosystem
-- **Google Gemini 3.1 Pro** — Longest context (1M tokens), deeply integrated in Google stack
-- **Meta Llama 4** — Best open-source option, Llama 4 Scout runs locally on consumer hardware
-- **Mistral** — Efficient, multilingual, Codestral 2025 is the strongest open-source code model
+- **OpenAI GPT/o-series** — Best ecosystem, strongest reasoning (o-series), multimodal leader
+- **Google Gemini** — Longest context, deeply integrated in Google stack
+- **Meta Llama** — Best open-source option, essential for data-sensitive deployments
+- **Mistral** — Efficient, multilingual, strong open-source code model
 
 In the next article, we'll go deep on specific models — which tasks each excels at, head-to-head comparisons, and a decision framework for building multi-model workflows.
 
