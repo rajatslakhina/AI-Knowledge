@@ -276,23 +276,30 @@ Instead of opening GitHub, JIRA, Slack, and your terminal separately, you intera
 
 ## 7. MCP Security Considerations
 
-MCPs grant Claude real capabilities. This requires careful consideration:
+MCPs grant Claude **real capabilities with real consequences**. Before adding any MCP, ask: "If Claude used this incorrectly, what is the worst-case outcome?"
 
-**Principle of Least Privilege:**
-Only install MCP servers that Claude actually needs for your use case. An MCP with filesystem write access and an MCP with production database access is a powerful (and risky) combination.
+### Risk Rating by MCP Type
 
-**Sensitive MCPs to treat with care:**
-- Filesystem write access — Claude can modify any accessible file
-- Production database MCPs — Claude can modify production data
-- Cloud provider MCPs (AWS/GCP) — Claude can create/delete infrastructure
-- Email/communication MCPs — Claude can send messages on your behalf
+| MCP Type | Risk Level | Worst-Case Scenario | Mitigation |
+| :--- | :---: | :--- | :--- |
+| Filesystem (read-only) | 🟢 Low | Claude reads a file it shouldn't | Scope to project directory only |
+| Filesystem (write access) | 🔴 High | Claude deletes or corrupts files | Add confirmation for destructive ops |
+| Production database (write) | 🔴 Critical | Data loss or corruption | Use read-only creds in dev; never prod write |
+| Development database (write) | 🟡 Medium | Dev data corrupted | Acceptable with backups |
+| GitHub (read) | 🟢 Low | Claude reads private repos | Use scoped personal access token |
+| GitHub (write) | 🟡 Medium | Claude pushes unwanted commits | Require PR review before merge |
+| Slack / Email | 🟡 Medium | Claude sends unintended messages | Review before posting; use draft mode |
+| AWS / Cloud (read) | 🟡 Medium | Claude reads sensitive infra config | Use read-only IAM role |
+| AWS / Cloud (write) | 🔴 Critical | Infrastructure created/deleted | Never grant; use read-only only |
 
-**Best practices:**
-1. Use read-only MCPs where possible
-2. Scope filesystem MCPs to specific directories
-3. Use separate credentials for AI tool access (scoped API tokens)
-4. Never give MCPs credentials with production write access unless necessary
-5. Review what actions Claude plans to take before confirming for irreversible operations
+### Best Practices
+
+1. **Principle of Least Privilege** — only install MCPs Claude actually needs
+2. **Read-only by default** — use read-only credentials wherever possible
+3. **Scoped credentials** — create dedicated API tokens for AI tool access with minimal scopes
+4. **Directory scoping** — restrict filesystem MCP to project directories, not `~` or `/`
+5. **Confirm before irreversible operations** — Claude will ask; always verify before confirming
+6. **Audit trail** — use MCPs that log actions (e.g. git-backed writes)
 
 ---
 

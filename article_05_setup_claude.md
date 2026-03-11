@@ -373,14 +373,14 @@ direnv allow
 
 ## 8. When to Use Which Interface
 
-| Interface | Best For | Speed | Context |
-|---|---|---|---|
-| **Claude Code REPL** | Complex multi-file tasks, architecture work | Slower | Full codebase |
-| **Claude Code single command** | Quick tasks, scripting, CI/CD | Fast | Piped input |
-| **Continue.dev chat** | Interactive development, Q&A, explanation | Medium | Selected files |
-| **Continue.dev inline** | In-place code edits, refactoring | Fast | Current file |
-| **Cline** | Autonomous feature development | Varies | Full project |
-| **claude.ai (browser)** | Exploration, non-code tasks, sensitive data | Medium | None |
+| Interface | Best For | Speed | Context Access | Autonomous? |
+| :--- | :--- | :---: | :--- | :---: |
+| **Claude Code REPL** | Complex multi-file tasks, architecture work | 🐢 Slow | Full codebase | ✅ Yes |
+| **Claude Code — single command** | Quick tasks, scripting, CI/CD pipelines | ⚡ Fast | Piped input only | ✅ Yes |
+| **Continue.dev — chat** | Interactive dev, Q&A, code explanation | 🚀 Fast | Selected files + git | ❌ No |
+| **Continue.dev — inline** | In-place edits, targeted refactoring | ⚡ Fast | Current file | ❌ No |
+| **Cline** | Autonomous multi-file feature development | 🔄 Varies | Full project | ✅ Yes |
+| **claude.ai (browser)** | Exploration, non-code tasks, large documents | 🚀 Fast | None (paste only) | ❌ No |
 
 ---
 

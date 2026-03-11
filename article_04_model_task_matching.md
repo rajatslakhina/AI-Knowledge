@@ -22,20 +22,29 @@ Before picking a model, answer four questions:
 - High: Multi-step reasoning, architectural decisions, complex debugging
 
 **2. How large is the context?**
-- < 8K tokens: Any model
-- 8K–100K tokens: Any modern model
-- 100K–200K tokens: Claude Sonnet 4.6 / Opus 4.6.6, GPT-5.2
-- 200K–1M tokens: Gemini 3.1 Pro (native 1M) or Claude 200K + chunking
+
+| Context Size | Suitable Models |
+| :--- | :--- |
+| < 8K tokens | Any model — even Haiku 4.5 |
+| 8K – 100K | Any modern model |
+| 100K – 200K | Claude Sonnet 4.6 / Opus 4.6, GPT-5.2 |
+| 200K – 1M | Gemini 3.1 Pro (native 1M) or Claude 200K + chunking strategy |
 
 **3. What are the latency requirements?**
-- Real-time (< 500ms): Haiku 4.5, GPT-5.2 mini, Gemini 3.1 Flash, Groq
-- Interactive (< 5s): Sonnet 4.6, GPT-5.2, Gemini 3.1 Pro
-- Batch (minutes okay): Opus 4.6, o4, Gemini 3.1 Pro
+
+| Tier | Target | Best Models |
+| :--- | :---: | :--- |
+| Real-time | < 500ms | Haiku 4.5, GPT-5.2 mini, Gemini 3.1 Flash, Groq + Llama 4 Scout |
+| Interactive | < 5s | Sonnet 4.6, GPT-5.2, Gemini 3.1 Flash |
+| Batch | Minutes OK | Opus 4.6, o4, Gemini 3.1 Pro |
 
 **4. What are the cost constraints?**
-- High volume, cost-sensitive: Haiku 4.5 ($0.80/$4 MTok), GPT-5.2 mini, Mistral Small 3
-- Moderate volume: Sonnet 4.6 ($3/$15 MTok), GPT-5.2
-- Low volume, quality-critical: Opus 4.6 ($15/$75 MTok), o4, Gemini 3.1 Pro
+
+| Volume | Price Sensitivity | Recommended Models |
+| :--- | :---: | :--- |
+| High volume | 🔴 Cost-critical | Haiku 4.5 ($0.80/$4 MTok), GPT-5.2 mini, Mistral Small 3 |
+| Moderate volume | 🟡 Balanced | Sonnet 4.6 ($3/$15 MTok), GPT-5.2 |
+| Low volume | 🟢 Quality-first | Opus 4.6 ($15/$75 MTok), o4, Gemini 3.1 Pro |
 
 ---
 
@@ -219,42 +228,44 @@ Decision tree for open vs. closed models:
 
 ### Development Tasks
 
-| Task | Primary | Fallback | Avoid |
-|---|---|---|---|
-| Feature implementation | Sonnet 4.6 | GPT-5.2 | Haiku (for complex) |
+| Task | ✅ Primary | 🔄 Fallback | ❌ Avoid |
+| :--- | :--- | :--- | :--- |
+| Feature implementation | Sonnet 4.6 | GPT-5.2-Codex | Haiku (complex tasks) |
 | Code review | Sonnet 4.6 | Opus 4.6 | — |
-| Bug fix (simple) | Haiku 4.5 | Sonnet 4.6 | — |
-| Bug fix (complex) | Sonnet 4.6 | Opus 4.6 | Haiku |
+| Bug fix — simple | Haiku 4.5 | Sonnet 4.6 | — |
+| Bug fix — complex | Sonnet 4.6 | Opus 4.6 | Haiku |
 | Architecture design | Opus 4.6 | Sonnet 4.6 | Haiku |
-| Refactoring large codebase | Sonnet 4.6 (w/ 200K) | Gemini 3.1 Pro | — |
-| SQL query generation | Sonnet 4.6 | Haiku | — |
-| Regex generation | Haiku | Sonnet | — |
-| Algorithm design | o4 | Opus 4.6 | Haiku |
-| API documentation | Sonnet 4.6 | — | — |
+| Refactoring large codebase | Sonnet 4.6 (200K ctx) | Gemini 3.1 Pro (1M ctx) | — |
+| SQL query generation | Sonnet 4.6 | Haiku 4.5 | — |
+| Regex generation | Haiku 4.5 | Sonnet 4.6 | — |
+| Algorithm / complexity design | o4 | Opus 4.6 | Haiku |
+| API documentation | Sonnet 4.6 | Haiku 4.5 | — |
 
 ### QA Tasks
 
-| Task | Primary | Fallback | Avoid |
-|---|---|---|---|
-| Unit test generation | Sonnet 4.6 | Haiku | — |
+| Task | ✅ Primary | 🔄 Fallback | ❌ Avoid |
+| :--- | :--- | :--- | :--- |
+| Unit test generation | Sonnet 4.6 | Haiku 4.5 | — |
 | E2E test scenarios | Sonnet 4.6 | Opus 4.6 | Haiku |
-| Test data generation | Haiku | Sonnet | — |
-| Bug report writing | Sonnet 4.6 | Haiku | — |
+| Test data generation | Haiku 4.5 | Sonnet 4.6 | — |
+| Bug report writing | Sonnet 4.6 | Haiku 4.5 | — |
 | Accessibility review | Sonnet 4.6 | GPT-5.2 (vision) | — |
-| Load test scripting | Sonnet 4.6 | — | — |
+| Load test scripting | Sonnet 4.6 | Haiku 4.5 | — |
 | Test plan writing | Sonnet 4.6 | Opus 4.6 | — |
+| Exploratory test charters | Sonnet 4.6 | Opus 4.6 | Haiku |
 
 ### BA Tasks
 
-| Task | Primary | Fallback | Avoid |
-|---|---|---|---|
-| User story writing | Sonnet 4.6 | Haiku | — |
+| Task | ✅ Primary | 🔄 Fallback | ❌ Avoid |
+| :--- | :--- | :--- | :--- |
+| User story writing | Sonnet 4.6 | Haiku 4.5 | — |
 | Requirements extraction | Sonnet 4.6 | Opus 4.6 | — |
 | Stakeholder communication | Sonnet 4.6 | — | — |
 | Gap analysis | Opus 4.6 | Sonnet 4.6 | Haiku |
-| Data analysis | Sonnet 4.6 | Gemini 3.1 Pro | — |
-| Meeting summarisation | Haiku | Sonnet | — |
-| Process diagram (Mermaid) | Sonnet 4.6 | Haiku | — |
+| Data analysis | Sonnet 4.6 | Gemini 3.1 Pro (large data) | — |
+| Meeting summarisation | Haiku 4.5 | Sonnet 4.6 | — |
+| Process diagram (Mermaid) | Sonnet 4.6 | Haiku 4.5 | — |
+| Competitive analysis | Opus 4.6 | Sonnet 4.6 | Haiku |
 
 ---
 

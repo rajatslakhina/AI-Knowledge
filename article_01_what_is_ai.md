@@ -10,7 +10,7 @@ Artificial Intelligence is no longer a science-fiction concept. It's the autocom
 
 Yet most developers treat AI as a black box — something you throw a prompt at and hope for a sensible response. That approach works until it doesn't. To use AI effectively, especially in professional software development, you need to understand *what it actually is*, how it reasons, and where it breaks down.
 
-This article is the first in a 10-part series. We're going from zero to production-grade AI usage across development, QA, and business analysis roles. Let's start at the foundation.
+This article is the first in a 14-part series. We're going from zero to production-grade AI usage across development, QA, and business analysis roles. Let's start at the foundation.
 
 ---
 
@@ -160,15 +160,16 @@ But beyond raw speed, the more profound shift is **democratisation of capability
 
 Using AI without understanding its limits is how teams ship hallucinated data, broken migrations, and security vulnerabilities.
 
-| Limitation | What It Means in Practice |
-|---|---|
-| **Hallucination** | Always verify facts, API signatures, and version numbers |
-| **Context cutoff** | Training data has a date — ask about current versions cautiously |
-| **Context window** | Large codebases can exceed limits; use chunking/RAG |
-| **Non-determinism** | Same prompt can yield different outputs — design for variance |
-| **No real memory** | Each conversation starts fresh (without tools) |
-| **No persistent state** | LLMs are stateless — state management is your job |
-| **Reasoning errors** | Complex multi-step maths/logic can fail — verify critical reasoning |
+| Limitation | Risk Level | What It Means in Practice |
+| :--- | :---: | :--- |
+| **Hallucination** | 🔴 Critical | Always verify facts, API signatures, and version numbers before shipping |
+| **Knowledge cutoff** | 🟡 High | Training data has a date — never trust AI answers on current library versions |
+| **Context window** | 🟡 High | Large codebases exhaust limits; use chunking or RAG for >100K token inputs |
+| **Non-determinism** | 🟡 High | Same prompt yields different outputs — design systems to handle variance |
+| **No real memory** | 🟠 Medium | Each conversation starts fresh unless you use memory tools or context injection |
+| **No persistent state** | 🟠 Medium | LLMs are stateless — all state management is your application's responsibility |
+| **Reasoning errors** | 🟠 Medium | Multi-step maths and logic can silently fail — verify any critical computation |
+| **Prompt injection** | 🔴 Critical | Untrusted input can hijack AI behaviour — sanitise user input in AI pipelines |
 
 ---
 

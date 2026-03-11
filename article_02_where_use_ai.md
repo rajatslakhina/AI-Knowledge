@@ -264,14 +264,15 @@ Feed AI a meeting transcript (from Zoom, Teams, or a manual transcript) and rece
 
 Be deliberate about these boundaries:
 
-| Use Case | Why AI Falls Short |
-|---|---|
-| **Unreviewed production deploys** | Non-deterministic output + no domain context = risk |
-| **Security-critical algorithm design** | Too important for hallucination risk |
-| **Database migrations on live data** | Irreversible operations need human verification |
-| **Legal/compliance decisions** | Hallucination in compliance = liability |
-| **Final architecture decisions** | Missing business/team context |
-| **Real-time data retrieval (without RAG)** | Knowledge cutoff |
+| Use Case | Why AI Falls Short | Safe Mitigation |
+| :--- | :--- | :--- |
+| **Unreviewed production deploys** | Non-deterministic output + no domain context | Always require human sign-off before deploy |
+| **Security-critical algorithm design** | Hallucination risk in crypto/auth logic | Use AI to explore options; expert signs off |
+| **Database migrations on live data** | Irreversible operations — one mistake = data loss | AI drafts migration; DBA validates + dry-runs |
+| **Legal/compliance decisions** | Hallucinated rules can become real liability | AI for first draft; legal counsel reviews |
+| **Final architecture decisions** | AI lacks your team skills and business context | AI for trade-off analysis; team makes decision |
+| **Real-time data retrieval (without RAG)** | Knowledge cutoff means stale answers | Add RAG pipeline; always cite sources |
+| **Autonomous financial transactions** | No way to undo sent money or cancelled orders | Human approval gate required |
 
 ---
 
@@ -291,15 +292,13 @@ Start here. Get 10x value from these five use cases before expanding to more com
 
 ## 9. AI in the Development Lifecycle
 
-```
-REQUIREMENTS       DESIGN          DEVELOPMENT       QA              RELEASE
-─────────────────────────────────────────────────────────────────────────────
-• User story gen  • Architecture  • Code gen        • Test gen      • Release notes
-• AC writing       brainstorm     • Code review     • Test data gen • Runbook gen
-• Gap analysis    • Diagram gen   • Debugging       • Bug triage    • Post-mortems
-• Stakeholder     • Trade-off     • Refactoring     • Accessibility • Status updates
-  comms           analysis        • Documentation   checks
-```
+| 📋 Requirements | 🏗️ Design | 💻 Development | 🧪 QA | 🚀 Release |
+| :--- | :--- | :--- | :--- | :--- |
+| User story gen | Architecture brainstorm | Code generation | Test case gen | Release notes |
+| Acceptance criteria | Diagram generation | Code review | Test data gen | Runbook gen |
+| Gap analysis | Trade-off analysis | Debugging | Bug triage | Post-mortems |
+| Stakeholder comms | ADR writing | Refactoring | Accessibility checks | Status updates |
+| Requirements extraction | API contract design | Documentation | E2E test scripts | Changelog gen |
 
 ---
 

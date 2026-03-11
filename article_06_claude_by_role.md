@@ -484,46 +484,58 @@ Output: Valid Mermaid sequenceDiagram code.
 
 ## Role Workflow Summary
 
+### Quick Reference: Use Cases by Role
+
+| Use Case | DEV | QA | BA | Recommended Model |
+| :--- | :---: | :---: | :---: | :--- |
+| Feature implementation | ✅ | — | — | Sonnet 4.6 |
+| Test case generation | — | ✅ | — | Sonnet 4.6 |
+| User story writing | — | — | ✅ | Sonnet 4.6 |
+| Code review / PR review | ✅ | ✅ | — | Sonnet 4.6 |
+| Debugging & root cause | ✅ | ✅ | — | Sonnet 4.6 → Opus 4.6 |
+| Requirements extraction | — | — | ✅ | Sonnet 4.6 |
+| Test data generation | — | ✅ | — | Haiku 4.5 |
+| Architecture & design | ✅ | — | ✅ | Opus 4.6 |
+| Gap analysis | — | — | ✅ | Opus 4.6 |
+| IaC / pipeline generation | ✅ | — | — | Sonnet 4.6 |
+| Commit / PR descriptions | ✅ | — | — | Haiku 4.5 |
+| Stakeholder communication | — | — | ✅ | Sonnet 4.6 |
+| Exploratory test charters | — | ✅ | — | Sonnet 4.6 |
+| Meeting summarisation | ✅ | ✅ | ✅ | Haiku 4.5 |
+
+---
+
 ### Daily AI Workflow for Developers
-```
-Morning: 
-  ├── ai-review (review overnight PRs)
-  └── claude "Plan today's implementation tasks for [feature]"
 
-Development:
-  ├── claude "Implement [specific task] following [reference file]"
-  ├── claude "Debug this error: [paste error + code]"
-  └── claude "Generate tests for what I just wrote"
-
-End of day:
-  ├── ai-commit (generate commit message)
-  └── ai-review (self-review before pushing)
-```
+| Time of Day | Task | Tool / Alias |
+| :--- | :--- | :--- |
+| **Morning** | Review overnight PRs | `ai-review` |
+| **Morning** | Plan implementation tasks | `claude "Plan today's tasks for [feature]"` |
+| **Development** | Implement a feature | `claude "Implement [task] following [ref file]"` |
+| **Development** | Debug an error | `claude "Debug: [error + code]"` |
+| **Development** | Generate tests | `claude "Generate tests for what I just wrote"` |
+| **End of day** | Commit message | `ai-commit` |
+| **End of day** | Self-review before push | `ai-review` |
 
 ### Daily AI Workflow for QA
-```
-Sprint planning:
-  └── claude "Generate test cases for user story: [story]"
 
-During development:
-  ├── claude "Generate test data for [endpoint/feature]"
-  └── claude "Write Playwright tests for [spec]"
-
-Bug reporting:
-  └── claude "Formalise this bug: [notes]"
-```
+| Phase | Task | Tool / Command |
+| :--- | :--- | :--- |
+| **Sprint planning** | Generate test cases from stories | `claude "Generate test suite for: [story]"` |
+| **Development** | Generate test data for endpoint | `claude "Generate test data for: [spec]"` |
+| **Development** | Write Playwright tests | `claude "Write Playwright tests for: [spec]"` |
+| **Bug reporting** | Formalise bug notes | `claude "Write formal bug report from: [notes]"` |
+| **Release** | Regression test planning | `claude "Generate regression test plan for: [release]"` |
 
 ### Daily AI Workflow for BAs
-```
-Requirements gathering:
-  └── claude "Extract requirements from this transcript: [transcript]"
 
-Story writing:
-  └── claude "Break this feature into user stories: [feature description]"
-
-Communication:
-  └── claude "Write stakeholder update for: [technical context]"
-```
+| Phase | Task | Tool / Command |
+| :--- | :--- | :--- |
+| **Requirements** | Extract from meeting transcript | `claude "Extract requirements from: [transcript]"` |
+| **Story writing** | Break feature into sprint stories | `claude "Break into stories: [feature description]"` |
+| **Communication** | Translate tech update → exec summary | `claude "Write stakeholder update for: [context]"` |
+| **Gap analysis** | Requirements vs. tech spec | `claude "Gap analysis between: [doc A] and [doc B]"` |
+| **Diagramming** | Convert process to Mermaid | `claude "Convert to Mermaid sequence: [process]"` |
 
 ---
 

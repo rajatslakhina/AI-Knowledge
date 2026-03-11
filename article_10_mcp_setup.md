@@ -686,43 +686,32 @@ claude --list-tools
 
 ## 7. Troubleshooting Common Issues
 
-### MCP Server Not Starting
+| Symptom | Likely Cause | Diagnosis | Fix |
+| :--- | :--- | :--- | :--- |
+| **MCP server not starting** | Missing dependency or wrong Node version | `node --version` (need 18+) | `nvm use 20` then reinstall |
+| **"command not found" error** | npx cache issue or global install missing | `npx -y @modelcontextprotocol/server-filesystem /tmp` | Clear npx cache: `npm cache clean --force` |
+| **Auth error on remote MCP** | Missing or expired env var | `echo $GITHUB_PERSONAL_ACCESS_TOKEN` | Verify token set; check token scopes |
+| **Timeout on first use** | Server startup too slow | Check logs with `--debug` flag | Add `"timeout": 30000` to server config |
+| **"Permission denied" on filesystem** | Path not granted in config | `ls -la /path/you/granted` | Add path to `args` array in settings.json |
+| **Claude doesn't use the MCP** | MCP not loaded or name mismatch | Check Claude Code startup output | Restart Claude Code; verify server name |
+| **Rate limit errors** | Too many parallel MCP calls | Check API usage dashboard | Reduce parallel MCP usage; add retry logic |
+
+### Debugging Commands
+
 ```bash
-# Test the server command directly
+# Test a server command directly before adding to config
 npx -y @modelcontextprotocol/server-filesystem /tmp
 
-# Check for permission issues
-ls -la /path/you/granted/access
-
-# Verify Node.js version
-node --version  # Must be 18+
-```
-
-### Authentication Errors (Remote MCPs)
-```bash
 # Verify environment variables are set
 echo $GITHUB_PERSONAL_ACCESS_TOKEN
+echo $SLACK_BOT_TOKEN
 
-# Test API token directly
+# Test a remote API token manually
 curl -H "Authorization: Bearer $GITHUB_PERSONAL_ACCESS_TOKEN" \
   https://api.github.com/user
 
-# Check token scopes are correct
-```
-
-### MCP Timeout Issues
-```json
-// Add timeout configuration
-{
-  "mcpServers": {
-    "slow-server": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["server.js"],
-      "timeout": 30000
-    }
-  }
-}
+# Restart Claude Code with debug output
+claude --debug
 ```
 
 ---
@@ -770,30 +759,26 @@ ANTHROPIC_API_KEY=
 
 ## Summary: Complete MCP Setup Checklist
 
-```
-Local MCPs (recommended for all projects):
-☐ filesystem — for project file access
-☐ git        — for history, blame, diffs
-☐ sqlite/postgres — for local database queries
-☐ memory     — for persistent project context
-
-Remote MCPs (configure based on your stack):
-☐ github/gitlab — for PR and issue management
-☐ slack/teams   — for team communication
-☐ jira/linear   — for ticket management
-☐ aws/gcp/azure — for infrastructure queries
-
-Custom MCPs (build when needed):
-☐ internal APIs
-☐ proprietary data sources
-☐ custom workflows
-```
+| Category | MCP Server | Priority | Use Case |
+| :--- | :--- | :---: | :--- |
+| **Local — All Projects** | `@modelcontextprotocol/server-filesystem` | 🔴 High | File read/write within project |
+| **Local — All Projects** | `@modelcontextprotocol/server-git` | 🔴 High | Git history, blame, diffs |
+| **Local — Databases** | `@modelcontextprotocol/server-sqlite` | 🟡 Medium | Local dev database queries |
+| **Local — Databases** | `@modelcontextprotocol/server-postgres` | 🟡 Medium | PostgreSQL queries |
+| **Local — Memory** | `@modelcontextprotocol/server-memory` | 🟡 Medium | Persistent project context |
+| **Local — Browser** | `@modelcontextprotocol/server-puppeteer` | 🟢 Optional | Browser automation, testing |
+| **Remote — Source** | `@modelcontextprotocol/server-github` | 🔴 High | PR reviews, issue management |
+| **Remote — Comms** | `@modelcontextprotocol/server-slack` | 🟡 Medium | Team communication context |
+| **Remote — PM** | `@linear/mcp-server` | 🟡 Medium | Linear ticket management |
+| **Remote — PM** | `mcp-jira-server` | 🟡 Medium | Jira issue management |
+| **Remote — Infra** | `@modelcontextprotocol/server-aws-kb-retrieval` | 🟢 Optional | AWS infrastructure queries |
+| **Custom** | Build your own | 🟢 Optional | Internal APIs, proprietary data |
 
 ---
 
 ## Series Summary
 
-Over these 10 articles, we've covered the complete journey from understanding AI fundamentals to deploying a production-grade Claude-powered development environment:
+Over these first 10 articles in the series, we've covered the complete journey from understanding AI fundamentals to deploying a production-grade Claude-powered development environment:
 
 1. **What AI is** — LLMs, transformers, tokens, limitations
 2. **Where to use AI** — Role-by-role application map
@@ -810,4 +795,4 @@ The developers who master these tools aren't replacing their skills — they're 
 
 ---
 
-*This concludes the 10-part series on AI in Software Engineering. Each article can be used as a standalone reference or read in sequence as a complete guide.*
+*This concludes the foundational 10 articles of the 14-part series on AI in Software Engineering. Each article can be used as a standalone reference or read in sequence. Articles 11–14 continue with advanced topics: Claude Code 2.x, Git integration, GitMCP, and Jira/Linear MCP workflows.*

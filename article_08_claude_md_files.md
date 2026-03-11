@@ -421,46 +421,39 @@ Skip "here's what I did" summaries — just give me the output.
 
 Build your Claude configuration iteratively:
 
-### Level 1 — Basic (60–70% accuracy)
-- `CLAUDE.md` with tech stack and basic coding conventions
+| Level | Accuracy | What to Add |
+| :---: | :---: | :--- |
+| **1 — Basic** | 60–70% | `CLAUDE.md` with tech stack + basic coding conventions |
+| **2 — Intermediate** | 75–85% | Architecture patterns · security rules · "what NOT to do" · testing conventions |
+| **3 — Advanced** | 85–95% | Domain model docs · common patterns · reference implementations · `.claude/commands.md` · `memory.md` |
+| **4 — Expert** | 95%+ | All above + actively maintained `memory.md` · per-system context files · calibrated from observed failure modes |
 
-### Level 2 — Intermediate (75–85% accuracy)
-- Add architecture patterns and reference files
-- Add security rules and what-not-to-do sections
-- Add testing conventions
+**The core feedback loop:**
 
-### Level 3 — Advanced (85–95% accuracy)
-- Add domain model documentation
-- Add common patterns and reference implementations
-- Add `.claude/commands.md` with task-specific prompts
-- Add `memory.md` with project history
-
-### Level 4 — Expert (95%+ accuracy)
-- All above +
-- Maintain `memory.md` actively
-- Add domain-specific context files for each system area
-- Calibrate based on observed failure modes (when Claude gets something wrong, add a rule)
-
-**The feedback loop:**
 ```
-Claude produces wrong output → 
-Ask yourself: "What context was missing?" → 
-Add that context to CLAUDE.md or the relevant context file → 
-Next time, Claude gets it right automatically
+Claude produces wrong output
+        ↓
+Ask: "What context was missing?"
+        ↓
+Add that context to CLAUDE.md or the relevant context file
+        ↓
+Claude gets it right automatically next time
 ```
+
+This is a compounding investment — every failure that gets added to `CLAUDE.md` prevents that same failure from ever happening again.
 
 ---
 
 ## 9. Complete File Reference
 
-| File | Purpose | Commit to Git? |
-|---|---|---|
-| `CLAUDE.md` | Main project configuration | ✅ Yes |
-| `.claude/commands.md` | Custom slash commands | ✅ Yes |
-| `.claude/context/*.md` | Domain and technical context | ✅ Yes |
-| `.claude/memory.md` | Evolving project knowledge | ✅ Yes |
-| `~/.claude/CLAUDE.md` | Personal global preferences | ❌ No (personal) |
-| `.env` | Environment variables | ❌ No (secrets) |
+| File | Purpose | Commit? | Who Maintains | Update Frequency |
+| :--- | :--- | :---: | :--- | :--- |
+| `CLAUDE.md` | Main project config — tech stack, conventions, rules | ✅ Yes | Whole team | On tech stack or convention changes |
+| `.claude/commands.md` | Custom slash commands (e.g. `/review`, `/pr`) | ✅ Yes | Any dev | As new workflows emerge |
+| `.claude/context/*.md` | Domain model, system-specific technical context | ✅ Yes | Domain owner | When domain rules change |
+| `.claude/memory.md` | Evolving project knowledge, past decisions | ✅ Yes | Team rotating | After significant decisions or bugs |
+| `~/.claude/CLAUDE.md` | Personal global preferences and role | ❌ Personal | Individual | Per personal preference |
+| `.env` | API keys and environment variables | ❌ Secrets | DevOps / individual | Per environment change |
 
 ---
 

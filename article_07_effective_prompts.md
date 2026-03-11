@@ -78,13 +78,15 @@ The effective role communicates:
 
 **Role examples by task:**
 
-| Task | Role |
-|---|---|
-| Code review | "You are a security-focused senior engineer who has seen production incidents caused by the exact bugs you're looking for." |
-| User stories | "You are a product manager with 8 years experience writing stories for agile teams, with deep understanding of BDD." |
-| Architecture | "You are a principal engineer who has designed systems at scale for millions of users and has strong opinions about reliability." |
-| Test cases | "You are a QA lead who approaches testing adversarially — you're trying to break the system." |
-| Documentation | "You are a technical writer who values clarity and consistency and despises jargon." |
+| Task | Effective Role Prompt |
+| :--- | :--- |
+| Code review | *"You are a security-focused senior engineer who has investigated production incidents caused by the exact bugs you're looking for."* |
+| User stories | *"You are a product manager with 8 years writing stories for agile teams, with deep expertise in BDD and acceptance criteria."* |
+| Architecture | *"You are a principal engineer who has designed systems for millions of users and has strong, reasoned opinions about reliability trade-offs."* |
+| Test cases | *"You are a QA lead who approaches testing adversarially — your job is to break the system, not validate that it works."* |
+| Documentation | *"You are a technical writer who values precision and simplicity and will rewrite any sentence that a junior developer would misread."* |
+| Debugging | *"You are a senior SRE who has debugged hundreds of production incidents and thinks systematically about failure modes."* |
+| Refactoring | *"You are a senior engineer who obsesses over maintainability and has strong opinions about SOLID principles."* |
 
 ---
 
@@ -321,6 +323,80 @@ If you find any issues, fix them and show me the corrected version.
 
 ---
 
+## 9.5 Extended Thinking and Reasoning Model Prompts
+
+Modern LLMs offer two distinct reasoning modes that require different prompting strategies.
+
+### When to Use Extended Thinking (Claude) or o4 (OpenAI)
+
+These models spend additional tokens on internal reasoning before answering. This makes them dramatically better at problems where standard prompting gives plausible-but-wrong answers.
+
+**Signal phrases that indicate extended thinking is worth the cost:**
+```
+"Design a conflict-free algorithm for..."
+"What are all the edge cases in this multi-threaded code?"
+"Analyse all failure modes of this distributed system design..."
+"Verify this mathematical proof..."
+"Find every security vulnerability in this authentication flow..."
+```
+
+### Prompting for Extended Thinking (Claude Opus 4.6)
+
+Claude's extended thinking mode can be enabled via the API. In practice, you can signal that depth is expected:
+
+```
+Think through this carefully and systematically before answering.
+
+Problem: [complex problem]
+
+I need you to:
+1. First, identify every relevant consideration
+2. Explore the trade-offs for each approach
+3. Check your reasoning for logical gaps
+4. Only then give your final recommendation
+
+This is a production security decision — I need the reasoning, not just the answer.
+```
+
+**What changes when you signal depth:**
+- Claude explores more solution paths before committing
+- More edge cases are surfaced
+- Reasoning is made explicit and auditable
+- Error rate drops significantly on complex multi-step problems
+
+### Prompting for o4 (OpenAI Reasoning Model)
+
+o4 always reasons before answering. Your prompt should describe the problem precisely and let the model's reasoning do the work:
+
+```
+Optimise this database query for a table with 50M rows.
+The query runs 12 times per second in production and currently takes 800ms.
+Indexes available: [list indexes]
+
+Query:
+[paste query]
+
+Return: The optimised query + explanation of what made it slow.
+```
+
+**o4 prompting principles:**
+- Be precise about the problem — verbose context helps
+- Don't instruct it to "think step by step" — it already does
+- Do specify constraints and success criteria clearly
+- Use it for algorithmic, mathematical, and logic problems where reasoning depth matters
+
+### Cost/Quality Trade-off
+
+| Approach | Cost | Speed | Best For |
+| :--- | :---: | :---: | :--- |
+| Standard Sonnet 4.6 | $ | Fast | Most tasks |
+| Claude Opus 4.6 + depth signals | $$$ | Slower | Architecture, security, hard bugs |
+| o4 reasoning | $$$ | Slow | Maths, algorithms, logic proofs |
+| Gemini 3.1 Pro | $$ | Moderate | Long-context analysis |
+
+
+---
+
 ## 10. Anti-Patterns to Avoid
 
 ### 10.1 The Vague Request
@@ -361,6 +437,49 @@ Second prompt: "The processPayment function doesn't handle timeout errors.
                 Also, the logging is too verbose — only log failures."
 Third prompt:  "Now write tests for this implementation."
 ```
+
+---
+
+## 10.5 Prompt Caching — Reducing Cost at Scale
+
+If you're building applications that send the same system prompt or large context document to Claude repeatedly, **prompt caching** can reduce costs by up to 90% on those repeated tokens.
+
+### How It Works
+
+Claude caches the beginning of the context window. On subsequent calls that start identically, you pay a lower "cache read" price instead of the full "cache write" price.
+
+**Cost model:**
+- Cache write (first call): Normal input price
+- Cache read (subsequent calls): ~10% of normal input price
+
+### Design Patterns for Caching
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  SYSTEM PROMPT              [CACHED — paid once]         │
+│  (role, instructions, constraints)                        │
+│                                                          │
+│  LARGE CONTEXT              [CACHED — paid once]         │
+│  (CLAUDE.md, codebase, docs)                             │
+├──────────────────────────────────────────────────────────┤
+│  USER MESSAGE               [NOT CACHED — paid each call]│
+│  (the actual question / task)                             │
+└──────────────────────────────────────────────────────────┘
+```
+
+**When to design for caching:**
+- Long system prompts (> 1000 tokens) used repeatedly
+- Injecting a large context document (codebase, spec) that doesn't change per request
+- Batch processing many tasks against the same base context
+
+**Prompt design for cacheability:**
+```
+GOOD: [long stable system prompt + docs] + [short varying user query]
+BAD:  [short system prompt] + [different large context each time]
+```
+
+The stable content should always come first — Claude's cache starts at the beginning of the context.
+
 
 ---
 
