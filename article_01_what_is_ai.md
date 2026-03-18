@@ -60,6 +60,9 @@ Before Transformers, sequence-to-sequence models like RNNs processed text word b
 
 **Self-attention** allows a model to weigh how relevant each word in a sentence is to every other word — simultaneously. This is why modern LLMs can understand nuanced context across thousands of tokens.
 
+<img width="2816" height="1536" alt="Gemini_Generated_Image_nqqxn0nqqxn0nqqx" src="https://github.com/user-attachments/assets/e0578db3-a7ce-4eaa-a8de-aaec722ca78f" />
+
+
 ### Training an LLM: The Three Phases
 
 **Phase 1 — Pre-training**  
