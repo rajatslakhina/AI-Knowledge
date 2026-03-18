@@ -117,12 +117,25 @@ The **semantic search** tool is the critical one. Claude does not dump the entir
 
 GitMCP uses a strict priority order when fetching documentation:
 
+```mermaid
+graph TD
+    FETCH["🤖 Claude fetches docs"] --> Q{"llms.txt<br/>exists?"}
+    Q -->|"Yes"| L1["📄 <b>llms.txt</b><br/><i>Optimised for AI<br/>Concise, structured</i>"]
+    Q -->|"No"| Q2{"llms-full.txt<br/>exists?"}
+    Q2 -->|"Yes"| L2["📄 <b>llms-full.txt</b><br/><i>Extended AI-readable</i>"]
+    Q2 -->|"No"| L3["📄 <b>README.md</b><br/><i>Human-facing fallback</i>"]
+    
+    L1 --> SEARCH["🔍 Semantic search discovers<br/>other .md files on demand"]
+    L2 --> SEARCH
+    L3 --> SEARCH
+
+    style L1 fill:#50c878,stroke:#3da360,color:#fff
+    style L2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style L3 fill:#6c757d,stroke:#495057,color:#fff
+    style SEARCH fill:#f5a623,stroke:#d4891a,color:#fff
 ```
-llms.txt          ← Optimised for AI consumption (concise, structured)
-llms-full.txt     ← Full AI-readable version
-README.md         ← Human-facing fallback
-Other .md files   ← Discovered through semantic search
-```
+
+> 🎯 **Highest-leverage action:** Add an `llms.txt` file to your knowledge repo root. It's the first thing Claude reads.
 
 **The single highest-leverage thing you can do** is add an `llms.txt` file to the root of your knowledge repo. This file is the first thing Claude reads when it connects to the repo MCP. It sets the frame for every subsequent query.
 
@@ -400,6 +413,23 @@ your-org/knowledge-repo/
 
 ### The llms.txt File — The Most Important File in the Repo
 
+```mermaid
+graph TB
+    subgraph LLMS["📄 llms.txt — The Most Important File"]
+        direction TB
+        S["🏗️ <b>Stack</b><br/>Languages, frameworks,<br/>databases, versions"]
+        AR["🏛️ <b>Architecture Rules</b><br/>Non-negotiable patterns<br/>and anti-patterns"]
+        SR["🔒 <b>Security Rules</b><br/>Auth, validation, secrets<br/>handling requirements"]
+        KP["📋 <b>Key Patterns</b><br/>Links to pattern docs<br/>for each domain"]
+    end
+
+    CLAUDE["🤖 Claude reads this FIRST<br/>on every session"] --> LLMS
+
+    style LLMS fill:#d4edda,stroke:#28a745
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff
+```
+
+
 The `llms.txt` file is read first on every GitMCP connection. It is your opportunity to prime Claude with the most critical team context before any work begins. Keep it concise and scannable — Claude reads it to orient, not to learn everything.
 
 ```markdown
@@ -447,6 +477,29 @@ This file answers the most common questions Claude would need to ask before gene
 ---
 
 ## How the Multi-MCP Stack Behaves Together: A Concrete Example
+
+```mermaid
+sequenceDiagram
+    participant Dev as 👨‍💻 Developer
+    participant CC as 🤖 Claude Code
+    participant FS as 📁 Filesystem
+    participant Jira as 📋 Jira
+    participant KR as 📚 Knowledge Repo
+    participant Git as 🔀 Git
+
+    Dev->>CC: "Add rate limiting to the orders API"
+    CC->>Jira: Search for rate-limiting tickets
+    Jira-->>CC: PROJ-89: Rate limit all public APIs
+    CC->>KR: search("rate limiting pattern")
+    KR-->>CC: middleware/rate-limit.md — token bucket, Redis-backed
+    CC->>FS: Read src/middleware/
+    FS-->>CC: Current middleware files
+    CC->>Git: Recent rate-limit commits?
+    Git-->>CC: None found
+    CC->>FS: Create rate-limit middleware following team pattern
+    CC->>Dev: "Implemented per knowledge repo pattern. Shall I add tests?"
+```
+
 
 You open Claude Code and type:
 
@@ -546,6 +599,24 @@ Each GitMCP query is an HTTP round-trip to `gitmcp.io` (or your self-hosted inst
 ---
 
 ## Comparing the Three Knowledge Delivery Approaches
+
+```mermaid
+graph TB
+    subgraph APPROACHES["📊 Three Knowledge Delivery Approaches"]
+        direction LR
+        A["📄 <b>CLAUDE.md Only</b><br/>━━━━━━━━<br/>✅ Simple<br/>⚠️ Limited size<br/>❌ Not searchable<br/>❌ Static"]
+        B["📂 <b>.claude/skills/</b><br/>━━━━━━━━<br/>✅ Structured<br/>✅ Repo-scoped<br/>⚠️ Manual loading<br/>⚠️ Local only"]
+        C["🌐 <b>GitMCP Repo</b><br/>━━━━━━━━<br/>✅ Semantic search<br/>✅ Zero infra<br/>✅ Team-shared<br/>✅ Auto-queried"]
+    end
+
+    REC["💡 Best: Combine all three — CLAUDE.md for essentials,<br/>skills for workflows, GitMCP for deep patterns"]
+
+    style A fill:#ffe5e5,stroke:#e74c3c
+    style B fill:#fff3cd,stroke:#ffc107
+    style C fill:#d4edda,stroke:#28a745
+    style REC fill:#f0f4ff,stroke:#4a90d9
+```
+
 
 | Approach | Setup | Maintenance | Private? | Accuracy |
 |---|---|---|---|---|

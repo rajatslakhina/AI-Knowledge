@@ -281,6 +281,25 @@ Never hardcode values. Always use `src/config/index.ts` to access config.
 
 ## 3. The `.claude` Directory Structure
 
+```mermaid
+graph TB
+    subgraph DOTCLAUDE["📂 .claude/ Directory — Your AI Configuration Hub"]
+        direction TB
+        CMD["📜 commands.md<br/><i>Custom slash commands<br/>/review, /test, /pr, /debug</i>"]
+        CTX["📂 context/<br/><i>Domain model, API contracts,<br/>infra docs, runbooks</i>"]
+        MEM["🧠 memory.md<br/><i>Auto-updated project memory<br/>Decisions, known issues</i>"]
+        PRM["📂 prompts/<br/><i>Reusable prompt templates<br/>for common tasks</i>"]
+        SET["⚙️ settings.json<br/><i>MCP servers, permissions,<br/>hooks configuration</i>"]
+    end
+
+    style DOTCLAUDE fill:#f0f4ff,stroke:#4a90d9
+    style CMD fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style CTX fill:#50c878,stroke:#3da360,color:#fff
+    style MEM fill:#f5a623,stroke:#d4891a,color:#fff
+    style SET fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
+
+
 For larger projects, a single `CLAUDE.md` can become unwieldy. The `.claude` directory lets you organise context into focused files.
 
 ```
@@ -301,6 +320,28 @@ For larger projects, a single `CLAUDE.md` can become unwieldy. The `.claude` dir
 ---
 
 ## 4. `.claude/commands.md` — Custom Slash Commands
+
+```mermaid
+graph TB
+    subgraph CMDS["⚡ Custom Slash Commands"]
+        direction LR
+        R["/review<br/><i>Security + performance<br/>+ edge case review</i>"]
+        T["/test<br/><i>Generate test suite<br/>with edge cases</i>"]
+        P["/pr<br/><i>Generate PR description<br/>with checklist</i>"]
+        E["/explain<br/><i>ELI5 explanation<br/>for any file</i>"]
+        D["/debug<br/><i>Systematic debugging<br/>with hypothesis</i>"]
+        M["/migrate<br/><i>Safe migration plan<br/>with rollback</i>"]
+    end
+
+    style CMDS fill:#f8f9fa,stroke:#6c757d
+    style R fill:#e74c3c,stroke:#c0392b,color:#fff
+    style T fill:#50c878,stroke:#3da360,color:#fff
+    style P fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style E fill:#f5a623,stroke:#d4891a,color:#fff
+    style D fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style M fill:#17a2b8,stroke:#138496,color:#fff
+```
+
 
 Define reusable commands that can be triggered with `/commandname`:
 
@@ -470,6 +511,21 @@ Skip "here's what I did" summaries — just give me the output.
 ---
 
 ## 8. Achieving 95% Accuracy: The Maturity Model
+
+```mermaid
+graph LR
+    L1["🔴 Level 1<br/><b>Basic</b><br/>No CLAUDE.md<br/>Generic outputs"] --> L2["🟠 Level 2<br/><b>Configured</b><br/>CLAUDE.md with<br/>stack + conventions"]
+    L2 --> L3["🟡 Level 3<br/><b>Contextual</b><br/>+ .claude/ context<br/>+ domain model"]
+    L3 --> L4["🟢 Level 4<br/><b>Automated</b><br/>+ hooks + MCPs<br/>+ slash commands"]
+    L4 --> L5["⭐ Level 5<br/><b>95% Accuracy</b><br/>Full context stack<br/>Team consistency"]
+
+    style L1 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style L2 fill:#fd7e14,stroke:#e8690a,color:#fff
+    style L3 fill:#ffc107,stroke:#d4a106,color:#333
+    style L4 fill:#50c878,stroke:#3da360,color:#fff
+    style L5 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
+
 
 Build your Claude configuration iteratively:
 

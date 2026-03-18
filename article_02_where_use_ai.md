@@ -158,6 +158,32 @@ But AI doesn't know your team's skills, your existing infrastructure, or your bu
 
 ---
 
+
+```mermaid
+graph LR
+    subgraph DEV_USE["👨‍💻 Dev Use Cases"]
+        D1["Code Gen ★★★★☆"]
+        D2["Code Review ★★★★☆"]
+        D3["Debugging ★★★★☆"]
+        D4["Refactoring ★★★★☆"]
+        D5["Docs ★★★★★"]
+    end
+    subgraph QA_USE["🧪 QA Use Cases"]
+        Q1["Test Cases ★★★★★"]
+        Q2["Test Data ★★★★☆"]
+        Q3["Bug Triage ★★★☆☆"]
+    end
+    subgraph BA_USE["📊 BA Use Cases"]
+        B1["Requirements ★★★★☆"]
+        B2["User Stories ★★★★★"]
+        B3["Gap Analysis ★★★★☆"]
+    end
+
+    style DEV_USE fill:#d4edda,stroke:#28a745
+    style QA_USE fill:#fff3cd,stroke:#ffc107
+    style BA_USE fill:#f0f4ff,stroke:#4a90d9
+```
+
 ## 3. QA and Testing Use Cases
 
 ### 3.1 Test Case Generation

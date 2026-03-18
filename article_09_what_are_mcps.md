@@ -232,6 +232,36 @@ await server.connect(transport);
 
 ## 4. The MCP Ecosystem — Available Servers
 
+```mermaid
+graph TB
+    subgraph OFFICIAL["🏢 Official Anthropic MCP Servers"]
+        O1["📁 Filesystem"]
+        O2["🔀 Git"]
+        O3["🐘 PostgreSQL"]
+        O4["🧠 Memory"]
+        O5["🌐 Puppeteer"]
+        O6["🗃️ SQLite"]
+    end
+    subgraph COMMUNITY["🌍 Community MCP Servers"]
+        C1["🐙 GitHub"]
+        C2["💬 Slack"]
+        C3["📋 Jira/Linear"]
+        C4["☁️ AWS"]
+        C5["🐳 Docker"]
+        C6["📊 Datadog"]
+    end
+    subgraph CUSTOM["🔧 Build Your Own"]
+        CU1["FastMCP SDK"]
+        CU2["Your internal APIs"]
+        CU3["Custom tools"]
+    end
+
+    style OFFICIAL fill:#d4edda,stroke:#28a745
+    style COMMUNITY fill:#f0f4ff,stroke:#4a90d9
+    style CUSTOM fill:#fff3cd,stroke:#ffc107
+```
+
+
 ### Official Anthropic MCP Servers
 
 | Server | What It Does |

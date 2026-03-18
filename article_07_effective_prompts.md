@@ -137,6 +137,28 @@ at peak load. Performance is critical.
 
 ## 4. Task Decomposition
 
+```mermaid
+graph TD
+    BIG["🎯 Big Task<br/><i>'Build a user management system'</i>"] 
+    BIG --> S1["Step 1<br/>Design database schema"]
+    BIG --> S2["Step 2<br/>Implement CRUD service"]
+    BIG --> S3["Step 3<br/>Add validation layer"]
+    BIG --> S4["Step 4<br/>Write API endpoints"]
+    BIG --> S5["Step 5<br/>Generate test suite"]
+    
+    S1 -->|"Output feeds"| S2 -->|"Output feeds"| S3 -->|"Output feeds"| S4 -->|"Output feeds"| S5
+
+    style BIG fill:#e74c3c,stroke:#c0392b,color:#fff
+    style S1 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S3 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S4 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S5 fill:#50c878,stroke:#3da360,color:#fff
+```
+
+> 🎯 **Key Principle:** Each step produces output that becomes context for the next step. This is how you get production-quality results from AI.
+
+
 For complex tasks, don't ask Claude to do everything in one shot. Break it down.
 
 **Anti-pattern (one giant prompt):**
@@ -439,6 +461,30 @@ Return: The optimised query + explanation of what made it slow.
 
 ## 10. Anti-Patterns to Avoid
 
+```mermaid
+graph LR
+    subgraph BAD["❌ Anti-Patterns"]
+        direction TB
+        B1["😐 Vague Request<br/><i>'Write some code'</i>"]
+        B2["😵 Too Much at Once<br/><i>'Build entire app'</i>"]
+        B3["🤷 Missing Context<br/><i>'Fix the bug'</i>"]
+    end
+    subgraph GOOD["✅ Best Practices"]
+        direction TB
+        G1["🎯 Specific Request<br/><i>'Write a TS function<br/>that groups users<br/>by creation month'</i>"]
+        G2["📋 Decomposed Tasks<br/><i>'Step 1: Schema<br/>Step 2: Service<br/>Step 3: Tests'</i>"]
+        G3["📚 Full Context<br/><i>'Stack: Node/Express/TS<br/>Pattern: Repository<br/>Style: functional'</i>"]
+    end
+
+    B1 -.->|"Fix"| G1
+    B2 -.->|"Fix"| G2
+    B3 -.->|"Fix"| G3
+
+    style BAD fill:#ffe5e5,stroke:#e74c3c
+    style GOOD fill:#d4edda,stroke:#28a745
+```
+
+
 ### 10.1 The Vague Request
 ```
 Bad:  "Fix my code"
@@ -494,18 +540,23 @@ Claude caches the beginning of the context window. On subsequent calls that star
 
 ### Design Patterns for Caching
 
+```mermaid
+graph TB
+    subgraph CACHED["💰 CACHED — Paid Once"]
+        SP["📋 SYSTEM PROMPT<br/><i>Role, instructions, constraints</i>"]
+        LC["📚 LARGE CONTEXT<br/><i>CLAUDE.md, codebase, docs</i>"]
+    end
+    subgraph VARIABLE["🔄 NOT CACHED — Paid Each Call"]
+        UM["💬 USER MESSAGE<br/><i>The actual question / task</i>"]
+    end
+    
+    SP --> LC --> UM
+
+    style CACHED fill:#d4edda,stroke:#28a745
+    style VARIABLE fill:#fff3cd,stroke:#ffc107
 ```
-┌──────────────────────────────────────────────────────────┐
-│  SYSTEM PROMPT              [CACHED — paid once]         │
-│  (role, instructions, constraints)                        │
-│                                                          │
-│  LARGE CONTEXT              [CACHED — paid once]         │
-│  (CLAUDE.md, codebase, docs)                             │
-├──────────────────────────────────────────────────────────┤
-│  USER MESSAGE               [NOT CACHED — paid each call]│
-│  (the actual question / task)                             │
-└──────────────────────────────────────────────────────────┘
-```
+
+> 💡 **Design for caching:** Put large, stable content (system prompt + docs) at the top, keep the varying user query short at the bottom.
 
 **When to design for caching:**
 - Long system prompts (> 1000 tokens) used repeatedly

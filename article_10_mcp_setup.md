@@ -52,6 +52,20 @@ All MCP configuration lives in Claude Code's configuration file. Depending on yo
 
 **Priority:** Project-level config overrides global config.
 
+```mermaid
+graph TD
+    subgraph PRIORITY["📂 MCP Config Priority (higher overrides lower)"]
+        direction TB
+        P["🏠 Project-level<br/><code>.claude/settings.json</code><br/><i>Committed to git, shared with team</i>"]
+        G["🌐 Global<br/><code>~/.claude/settings.json</code><br/><i>Your personal defaults</i>"]
+    end
+    P -->|"overrides"| G
+
+    style P fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style G fill:#6c757d,stroke:#495057,color:#fff
+```
+
+
 ### Config File Structure
 
 ```json
@@ -87,6 +101,22 @@ For remote servers:
 ---
 
 ## 2. Setting Up Local MCP Servers
+
+```mermaid
+graph TB
+    subgraph LOCAL["🏠 Local MCP Servers (stdio) — Zero Network Latency"]
+        direction LR
+        FS["📁 Filesystem<br/><i>Read/write/list<br/>local files</i>"]
+        GIT["🔀 Git<br/><i>Log, diff, blame<br/>branch ops</i>"]
+        SQL["🗃️ SQLite<br/><i>Query local<br/>databases</i>"]
+        PG["🐘 PostgreSQL<br/><i>Query dev<br/>database</i>"]
+        MEM["🧠 Memory<br/><i>Persistent KV store<br/>across sessions</i>"]
+        PUP["🌐 Puppeteer<br/><i>Browser automation<br/>& screenshots</i>"]
+    end
+
+    style LOCAL fill:#d4edda,stroke:#28a745
+```
+
 
 ### 2.1 Filesystem MCP
 
@@ -305,6 +335,23 @@ The memory MCP gives Claude persistent memory that survives across sessions.
 
 ## 3. Setting Up Remote MCP Servers
 
+```mermaid
+graph TB
+    subgraph REMOTE["🌐 Remote MCP Servers (HTTP/SSE) — Cloud APIs"]
+        direction LR
+        GH["🐙 GitHub<br/><i>Issues, PRs,<br/>code search</i>"]
+        SL["💬 Slack<br/><i>Messages, channels,<br/>search history</i>"]
+        AWS["☁️ AWS<br/><i>S3, Lambda,<br/>CloudWatch</i>"]
+    end
+
+    NOTE["🔑 All require authentication tokens<br/>stored in environment variables"]
+    REMOTE --> NOTE
+
+    style REMOTE fill:#f0f4ff,stroke:#4a90d9
+    style NOTE fill:#fff3cd,stroke:#ffc107
+```
+
+
 ### 3.1 GitHub MCP
 
 ```bash
@@ -496,6 +543,18 @@ ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxx
 ---
 
 ## 5. Building a Custom MCP Server
+
+```mermaid
+graph LR
+    A["1️⃣ Define<br/>Tools & Resources"] --> B["2️⃣ Implement<br/>Handler Functions"] --> C["3️⃣ Register<br/>with FastMCP SDK"] --> D["4️⃣ Add to<br/>settings.json"] --> E["5️⃣ Test via<br/>claude --mcp-debug"]
+
+    style A fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style B fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style C fill:#f5a623,stroke:#d4891a,color:#fff
+    style D fill:#50c878,stroke:#3da360,color:#fff
+    style E fill:#17a2b8,stroke:#138496,color:#fff
+```
+
 
 When no existing MCP meets your needs, build your own.
 

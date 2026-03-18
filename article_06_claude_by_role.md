@@ -143,6 +143,16 @@ git diff main...HEAD | claude --model claude-sonnet-4-6 \
 
 ## DEV Use Case 4: Test-Driven Development
 
+```mermaid
+graph LR
+    R["🔴 RED<br/>Write failing test<br/><i>Claude generates test</i>"] --> G["🟢 GREEN<br/>Implement minimum<br/><i>Claude writes code</i>"] --> B["🔵 REFACTOR<br/>Clean up<br/><i>Claude refactors</i>"] --> R
+
+    style R fill:#e74c3c,stroke:#c0392b,color:#fff
+    style G fill:#50c878,stroke:#3da360,color:#fff
+    style B fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
+
+
 **Workflow: Write Tests First, Then Implement**
 
 ```
@@ -224,6 +234,23 @@ Project uses: Node 20, npm, TypeScript, Jest, ESLint
 # PART 2: QA ENGINEERS
 
 ## QA Use Case 1: Comprehensive Test Case Generation
+
+```mermaid
+graph LR
+    F["📋 Feature<br/>Spec"] --> TC["🧪 Claude:<br/>Test Cases<br/><i>Happy + Edge + Error</i>"]
+    TC --> TD["📊 Claude:<br/>Test Data<br/><i>Realistic fixtures</i>"]
+    TD --> EC["🔍 Claude:<br/>Exploratory<br/>Charters"]
+    EC --> API["⚡ Claude:<br/>API Test<br/>Scripts"]
+    API --> BR["📝 Claude:<br/>Bug Reports<br/><i>Structured + repro steps</i>"]
+
+    style F fill:#f5a623,stroke:#d4891a,color:#fff
+    style TC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style TD fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style EC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style API fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style BR fill:#7b68ee,stroke:#5a4dbd,color:#fff
+```
+
 
 **Workflow: Story to Test Suite**
 
@@ -380,6 +407,23 @@ Then list what additional information you'd need from me to complete the report.
 # PART 3: BUSINESS ANALYSTS
 
 ## BA Use Case 1: Requirements Extraction from Meetings
+
+```mermaid
+graph LR
+    MT["📞 Meeting<br/>Transcript"] --> RE["📑 Claude:<br/>Requirements<br/>Extraction"]
+    RE --> US["📋 Claude:<br/>User Stories<br/>+ ACs"]
+    US --> GA["🔎 Claude:<br/>Gap Analysis<br/><i>vs existing system</i>"]
+    GA --> SC["📧 Claude:<br/>Stakeholder<br/>Comms"]
+    SC --> PM["📊 Claude:<br/>Process Maps<br/><i>Mermaid diagrams</i>"]
+
+    style MT fill:#f5a623,stroke:#d4891a,color:#fff
+    style RE fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style US fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style GA fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style SC fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style PM fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
+
 
 **Workflow: Transcript to Requirements**
 

@@ -231,6 +231,28 @@ Now your main session uses Sonnet 4.6, but summarisation tasks automatically use
 
 ### 2.4 Hooks — Automating the Development Lifecycle
 
+```mermaid
+graph LR
+    subgraph LIFECYCLE["⚡ Hook Lifecycle Events"]
+        direction TB
+        PRE["🔒 PreToolUse<br/><i>Before any tool</i><br/>Validate, log, block"]
+        POST["✅ PostToolUse<br/><i>After tool execution</i><br/>Lint, format, notify"]
+        STOP["🏁 Stop<br/><i>When turn ends</i><br/>Test, CI, Slack"]
+        SS["🚀 SubagentStart<br/><i>Agent spawned</i><br/>Log, inject context"]
+        SE["🏁 SubagentStop<br/><i>Agent finished</i><br/>Collect results"]
+        PR["🔑 PermissionRequest<br/><i>New permission needed</i><br/>Custom approval"]
+    end
+
+    PRE --> POST --> STOP
+    SS --> SE
+
+    style LIFECYCLE fill:#f8f9fa,stroke:#6c757d
+    style PRE fill:#f5a623,stroke:#d4891a,color:#fff
+    style POST fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style STOP fill:#50c878,stroke:#3da360,color:#fff
+```
+
+
 Hooks are scripts that fire automatically at specific points in Claude Code's execution. They're the difference between Claude being a tool you operate and Claude being infrastructure that runs your development process.
 
 **Hook lifecycle events:**
@@ -337,6 +359,25 @@ fi
 
 ### 2.5 Skills — Reusable Prompt Workflows
 
+```mermaid
+graph TB
+    subgraph SKILLS["📚 Skills — Reusable Prompt Workflows"]
+        direction LR
+        S1["📄 Markdown files<br/>in .claude/skills/"]
+        S2["⚡ Invoked as<br/>slash commands"]
+        S3["🤖 Auto-activated<br/>when relevant"]
+        S4["🔀 Can spawn<br/>isolated subagents"]
+        S5["🔄 Hot-reload<br/>without restart"]
+    end
+
+    DEV["👨‍💻 /review"] --> S1
+    S1 --> CLAUDE["🤖 Claude follows<br/>skill instructions<br/>consistently"]
+
+    style SKILLS fill:#f0f4ff,stroke:#4a90d9
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff
+```
+
+
 Skills are Markdown files that encode repeatable workflows. They're invoked as slash commands, auto-activated by Claude when relevant, and since v2.1.0, they can spawn isolated subagents, restrict tools, hot-reload without restart, and be shared via plugins.
 
 **Skills vs. CLAUDE.md:**
@@ -417,6 +458,19 @@ Feature to scaffold: $0
 
 ### 2.6 Tasks — Persistent Work Across Sessions
 
+```mermaid
+graph LR
+    T1["📋 Task Created<br/><i>Persistent across<br/>sessions</i>"] --> T2["🔀 Subtasks<br/><i>DAG structure<br/>with dependencies</i>"]
+    T2 --> T3["🤖 Agents Execute<br/><i>Each subtask<br/>independently</i>"]
+    T3 --> T4["✅ Results Merged<br/><i>Combined into<br/>final output</i>"]
+
+    style T1 fill:#f5a623,stroke:#d4891a,color:#fff
+    style T2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style T3 fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style T4 fill:#50c878,stroke:#3da360,color:#fff
+```
+
+
 Tasks (introduced Jan 2026) solve the problem of work that spans multiple sessions or is too complex for a single conversation. They use a DAG (Directed Acyclic Graph) structure — tasks can have dependencies, so Claude won't start "Run Tests" until both "Build API" and "Configure Auth" are complete.
 
 **What makes Tasks different from a todo list:**
@@ -467,19 +521,52 @@ This graph is persisted. If context compaction occurs mid-task, Claude picks up 
 
 ---
 
+
+```mermaid
+graph TB
+    subgraph SUB["🔀 Subagents — Isolated Workers"]
+        direction TB
+        S1["Main Agent assigns task"]
+        S2["Subagent works alone"]
+        S3["Reports results back"]
+        S1 --> S2 --> S3
+    end
+    subgraph TEAM["🤖 Agent Teams — Collaborative Squad"]
+        direction TB
+        T1["Team Lead coordinates"]
+        T2["Agents work in parallel"]
+        T3["Share task list + challenge each other"]
+        T4["Produce combined output"]
+        T1 --> T2 --> T3 --> T4
+    end
+
+    style SUB fill:#f0f4ff,stroke:#4a90d9
+    style TEAM fill:#fff3cd,stroke:#ffc107
+```
+
+> 💡 **Rule of thumb:** Use **subagents** for isolated tasks that don't need coordination. Use **Agent Teams** when agents need to share context and challenge each other's work.
+
 ### 2.7 Agent Teams — Collaborative Multi-Agent Development
 
 Agent Teams (released Feb 5, 2026 alongside Opus 4.6) are the most powerful and most expensive Claude Code feature. Where subagents are isolated workers that report back, Agent Teams are a collaborative squad: one Claude leads, others are teammates — they share a task list, can challenge each other's findings, and work in parallel.
 
 **Architecture:**
-```
-                    Team Lead (Opus 4.6)
-                    ↙       ↓        ↘
-         Agent A        Agent B         Agent C
-      (Backend Dev)   (Security)      (Test Writer)
-      Sonnet 4.6      Opus 4.6       Sonnet 4.6
-           ↓               ↓               ↓
-      [shared task list] ← → [shared task list]
+```mermaid
+graph TB
+    LEAD["👑 Team Lead<br/><b>Opus 4.6</b><br/>Coordinates work"]
+    LEAD --> A["👨‍💻 Agent A<br/><b>Backend Dev</b><br/>Sonnet 4.6"]
+    LEAD --> B["🔒 Agent B<br/><b>Security</b><br/>Opus 4.6"]
+    LEAD --> C["🧪 Agent C<br/><b>Test Writer</b><br/>Sonnet 4.6"]
+    
+    A <--> TASKS["📋 Shared Task List<br/><i>All agents read & update</i>"]
+    B <--> TASKS
+    C <--> TASKS
+
+    style LEAD fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style A fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style B fill:#e74c3c,stroke:#c0392b,color:#fff
+    style C fill:#50c878,stroke:#3da360,color:#fff
+    style TASKS fill:#f5a623,stroke:#d4891a,color:#fff
 ```
 
 **Enabling Agent Teams:**
@@ -523,6 +610,19 @@ Working files: src/services/payment.service.ts, src/repositories/payment.reposit
 ---
 
 ### 2.8 Context Compaction — Infinite Conversations
+
+```mermaid
+graph LR
+    A["🕐 9AM<br/>Start feature<br/>Full context"] --> B["🕐 12PM<br/>100+ tool calls<br/>Context filling up"]
+    B --> C["⚡ Auto-Compaction<br/>Summarise old history<br/>Keep key decisions"]
+    C --> D["🕐 6PM<br/>Still working<br/>Context fresh"]
+
+    style A fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style B fill:#f5a623,stroke:#d4891a,color:#fff
+    style C fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style D fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 Context compaction (v2.x, using the Claude 4.6 API feature) automatically summarises earlier conversation history when the context window approaches its limit. The result: effectively infinite conversations within a single session.
 
@@ -629,6 +729,27 @@ Task complexity
 Task simplicity
 ```
 
+
+```mermaid
+graph TD
+    T["📋 Ticket"] --> PLAN["📐 Plan Mode<br/><i>Shift+Tab</i><br/>Design approach"]
+    PLAN --> IMPL["💻 Implement<br/><i>Sonnet 4.6</i><br/>Code generation"]
+    IMPL --> TEST["🧪 Tests<br/><i>Sonnet 4.6</i><br/>Unit + Integration"]
+    TEST --> REVIEW["🔍 Self-Review<br/><i>Sonnet/Opus</i><br/>Quality check"]
+    REVIEW --> HOOKS["⚡ Hooks Fire<br/><i>Lint + Build + Test</i>"]
+    HOOKS -->|"Pass"| PR["📝 PR Created<br/><i>Auto-description</i>"]
+    HOOKS -->|"Fail"| FIX["🔧 Auto-Fix<br/><i>Claude iterates</i>"]
+    FIX --> HOOKS
+    PR --> MERGE["🎉 Merged"]
+
+    style T fill:#f5a623,stroke:#d4891a,color:#fff
+    style PLAN fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style IMPL fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style REVIEW fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style HOOKS fill:#f5a623,stroke:#d4891a,color:#fff
+    style MERGE fill:#50c878,stroke:#3da360,color:#fff
+```
+
 ### Task-by-Task Model Reference
 
 #### Feature Development
@@ -695,6 +816,33 @@ Task simplicity
 ---
 
 ## 4. The AISFD Daily Development Workflow
+
+```mermaid
+graph TB
+    subgraph AM["☀️ Morning (15 min)"]
+        M1["📋 Review backlog<br/><i>Haiku for summaries</i>"]
+        M2["🎯 Plan today's work<br/><i>Sonnet for analysis</i>"]
+    end
+    subgraph DEV["💻 Feature Dev (bulk of day)"]
+        D1["📐 Plan Mode"] --> D2["💻 Implement<br/><i>Sonnet 4.6</i>"]
+        D2 --> D3["🧪 Write Tests<br/><i>Sonnet 4.6</i>"]
+        D3 --> D4["🔍 Self-Review"]
+        D4 -->|"Issues found"| D2
+        D4 -->|"Clean"| D5["✅ Commit"]
+    end
+    subgraph PM["🌙 End of Day"]
+        E1["📝 PR with description"]
+        E2["📋 Update tickets"]
+        E3["💬 Slack summary"]
+    end
+    
+    AM --> DEV --> PM
+
+    style AM fill:#fff3cd,stroke:#ffc107
+    style DEV fill:#d4edda,stroke:#28a745
+    style PM fill:#f0f4ff,stroke:#4a90d9
+```
+
 
 This is a concrete, hour-by-hour workflow for a developer using AISFD with Claude Code 2.x.
 
@@ -880,6 +1028,21 @@ export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 ---
 
 ## 6. AISFD Anti-Patterns
+
+```mermaid
+graph TB
+    subgraph ANTI["🚫 AISFD Anti-Patterns — Don't Do These"]
+        direction TB
+        A1["❌ <b>Dump and pray</b><br/><i>Pasting 10K lines without context</i>"]
+        A2["❌ <b>Opus for everything</b><br/><i>Using flagship model for simple tasks</i>"]
+        A3["❌ <b>No CLAUDE.md</b><br/><i>Skipping context = generic outputs</i>"]
+        A4["❌ <b>Skip review</b><br/><i>Shipping unreviewed AI code</i>"]
+        A5["❌ <b>One giant prompt</b><br/><i>Instead of decomposed steps</i>"]
+    end
+
+    style ANTI fill:#ffe5e5,stroke:#e74c3c
+```
+
 
 Avoid these common mistakes:
 

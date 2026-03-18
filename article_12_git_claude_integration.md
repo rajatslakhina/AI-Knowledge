@@ -57,6 +57,27 @@ Before Claude touches a single file, it needs to know your team's git rules. Add
 - Experiments: experiment/description                   (e.g., experiment/redis-cache-strategy)
 
 ### Commit Message Format (Conventional Commits)
+
+```mermaid
+graph LR
+    subgraph FORMAT["📝 Conventional Commit Format"]
+        direction TB
+        F1["<b>type(scope): description</b><br/><br/>feat(auth): add OAuth2 PKCE flow<br/>fix(cart): handle empty cart checkout<br/>refactor(api): extract validation middleware<br/>test(payment): add Stripe webhook tests<br/>docs(readme): update deployment guide"]
+    end
+    subgraph TYPES["🏷️ Common Types"]
+        direction TB
+        T1["<b>feat</b> — new feature"]
+        T2["<b>fix</b> — bug fix"]
+        T3["<b>refactor</b> — code change"]
+        T4["<b>test</b> — tests only"]
+        T5["<b>docs</b> — documentation"]
+        T6["<b>chore</b> — maintenance"]
+    end
+
+    style FORMAT fill:#f0f4ff,stroke:#4a90d9
+    style TYPES fill:#d4edda,stroke:#28a745
+```
+
 type(scope): short description [max 72 chars]
 
 [optional body — wrap at 72 chars]
@@ -338,6 +359,26 @@ Rules:
 
 ## 3. Git Hooks — Automated Quality Gates
 
+```mermaid
+graph LR
+    subgraph HOOKS["⚡ Git Hook Architecture"]
+        direction TB
+        PRE["🔒 PreToolUse<br/><b>git-safety-check.sh</b><br/>Block force-push, rm -rf"]
+        POST["✅ PostToolUse<br/><b>post-file-write.sh</b><br/>Auto lint + type check"]
+        STOP["🏁 Stop<br/><b>on-turn-complete.sh</b><br/>Run tests + build"]
+    end
+
+    FILE["📝 File Edit"] --> POST
+    GIT_CMD["🔀 Git Command"] --> PRE
+    TURN_END["💬 Turn Complete"] --> STOP
+
+    style HOOKS fill:#f8f9fa,stroke:#6c757d
+    style PRE fill:#e74c3c,stroke:#c0392b,color:#fff
+    style POST fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style STOP fill:#50c878,stroke:#3da360,color:#fff
+```
+
+
 These hooks wire Claude's quality checks into your git workflow automatically.
 
 ### `.claude/settings.json` — Git Hook Configuration
@@ -539,38 +580,47 @@ claude --worktree fix-PROJ-456-session-timeout
 
 ### When to Use Worktrees
 
-```
-Use worktrees when:
-├── You're implementing two features that don't touch the same files
-├── You want to review a colleague's branch while your own is in progress
-├── You want to run an experiment without polluting your main branch
-├── An Agent Team is working on parallel sub-features
-└── A background subagent is doing exploratory work on a risky change
+```mermaid
+graph TB
+    subgraph USE["✅ Use Worktrees When"]
+        U1["Two features on<br/>different files"]
+        U2["Reviewing a colleague's<br/>branch during your work"]
+        U3["Running experiments<br/>without polluting main"]
+        U4["Agent Teams working<br/>parallel sub-features"]
+        U5["Background subagent<br/>doing exploratory work"]
+    end
+    subgraph AVOID["❌ Don't Use When"]
+        A1["Tasks have<br/>sequential dependencies"]
+        A2["Both tasks modify<br/>the same files"]
+        A3["Coordination overhead<br/>exceeds benefit"]
+    end
 
-Don't use worktrees when:
-├── Tasks have sequential dependencies (one must complete before the other starts)
-├── Both tasks modify the same files (causes merge conflicts)
-└── The coordination overhead exceeds the parallelism benefit
+    style USE fill:#d4edda,stroke:#28a745
+    style AVOID fill:#ffe5e5,stroke:#e74c3c
 ```
 
 ### Worktree Directory Structure
 
-```
-my-project/
-├── .git/                           # Shared git history
-├── main-branch/                    # Your main working directory
-│   ├── CLAUDE.md
-│   └── .claude/
-│       └── settings.json
-└── .claude/worktrees/
-    ├── feature-PROJ-123-auth/      # Worktree 1 (separate branch)
-    │   ├── CLAUDE.md               # Inherited from project
-    │   └── .claude/
-    │       └── settings.json       # Can override MCPs per-worktree
-    └── fix-PROJ-456-timeout/       # Worktree 2 (separate branch)
-        ├── CLAUDE.md
-        └── .claude/
-            └── settings.json
+```mermaid
+graph TB
+    subgraph PROJECT["📁 my-project/"]
+        GIT["🗄️ .git/<br/><i>Shared git history</i>"]
+        MAIN["📂 main-branch/<br/>CLAUDE.md + .claude/settings.json<br/><i>Your main working directory</i>"]
+        subgraph WORKTREES["📂 .claude/worktrees/"]
+            WT1["🌿 feature-PROJ-123-auth/<br/>CLAUDE.md (inherited)<br/>.claude/settings.json<br/><i>Can override MCPs</i>"]
+            WT2["🌿 fix-PROJ-456-timeout/<br/>CLAUDE.md (inherited)<br/>.claude/settings.json<br/><i>Independent MCP config</i>"]
+        end
+    end
+    
+    GIT -.->|"shared"| MAIN
+    GIT -.->|"shared"| WT1
+    GIT -.->|"shared"| WT2
+
+    style PROJECT fill:#f8f9fa,stroke:#6c757d
+    style MAIN fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style WORKTREES fill:#fff3cd,stroke:#ffc107
+    style WT1 fill:#50c878,stroke:#3da360,color:#fff
+    style WT2 fill:#50c878,stroke:#3da360,color:#fff
 ```
 
 ### Per-Worktree MCP Configuration
@@ -741,6 +791,29 @@ claude
 ---
 
 ## 6. CI/CD Integration — Headless Claude in GitHub Actions
+
+```mermaid
+graph LR
+    PR["📝 PR Opened"] --> GHA["⚙️ GitHub Action<br/>Triggered"]
+    GHA --> DIFF["📄 Get PR Diff"]
+    DIFF --> REVIEW["🤖 Claude Headless<br/><code>claude -p</code><br/><i>AI Code Review</i>"]
+    REVIEW --> COMMENT["💬 Post Review<br/>Comment on PR"]
+    REVIEW --> CHANGELOG["📋 Generate<br/>Changelog Entry"]
+    
+    subgraph GATES["Quality Gates"]
+        LINT["✅ Lint"] 
+        TEST["✅ Tests"]
+        BUILD["✅ Build"]
+    end
+    
+    COMMENT --> GATES
+    GATES -->|"All pass"| READY["🟢 Ready for<br/>Human Review"]
+
+    style PR fill:#f5a623,stroke:#d4891a,color:#fff
+    style REVIEW fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style READY fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 Claude Code in headless mode (`-p` flag, no REPL) integrates cleanly into GitHub Actions, enabling AI-powered code review, changelog generation, and automated quality gates.
 

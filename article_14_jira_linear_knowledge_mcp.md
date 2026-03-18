@@ -89,6 +89,31 @@ This is the difference between asking a contractor to build something based on a
 
 ---
 
+
+```mermaid
+graph TB
+    subgraph LINEAR["🟣 Linear MCP"]
+        direction TB
+        L1["✅ API key auth — no expiry"]
+        L2["✅ Official first-party server"]
+        L3["✅ npm install, 2-min setup"]
+        L4["✅ Rich tool set: issues, projects, teams"]
+    end
+    subgraph JIRA["🔵 Jira MCP"]
+        direction TB
+        J1["⚠️ OAuth/API token — needs rotation"]
+        J2["⚠️ Complex custom field discovery"]
+        J3["⚠️ Heavier config"]
+        J4["✅ Full enterprise Jira features"]
+    end
+    
+    REC["💡 <b>Recommendation:</b><br/>Start with Linear if you have a choice.<br/>Jira works great once auth is configured."]
+
+    style LINEAR fill:#d4edda,stroke:#28a745
+    style JIRA fill:#f0f4ff,stroke:#4a90d9
+    style REC fill:#fff3cd,stroke:#ffc107
+```
+
 ## Part 2: Configuring Linear MCP
 
 Linear is the cleaner setup of the two — API key authentication with no expiry issues makes it the most reliable project management MCP available today.
@@ -156,6 +181,26 @@ Jira is more complex — not because the MCP itself is difficult, but because Ji
 
 ### The Authentication Problem
 
+```mermaid
+graph TD
+    START["🔑 Jira Authentication"] --> Q{"Cloud or<br/>Server?"}
+    Q -->|"Cloud"| CLOUD["☁️ Jira Cloud<br/><code>https://your-domain.atlassian.net</code>"]
+    Q -->|"Data Center"| DC["🏢 Jira Data Center<br/><code>https://jira.company.com</code>"]
+    
+    CLOUD --> API["🔑 API Token<br/><i>id.atlassian.com → Security<br/>→ Create API Token</i>"]
+    DC --> PAT["🔑 Personal Access Token<br/><i>Profile → Personal Access Tokens<br/>→ Create Token</i>"]
+    
+    API --> ENV["📝 Export to env:<br/><code>JIRA_API_TOKEN</code><br/><code>JIRA_USER_EMAIL</code><br/><code>JIRA_BASE_URL</code>"]
+    PAT --> ENV
+    ENV --> CONFIG["⚙️ Add to<br/>settings.json"]
+
+    style CLOUD fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style DC fill:#6c757d,stroke:#495057,color:#fff
+    style ENV fill:#f5a623,stroke:#d4891a,color:#fff
+    style CONFIG fill:#50c878,stroke:#3da360,color:#fff
+```
+
+
 The official Atlassian MCP server uses OAuth, which means re-authentication flows can interrupt your work. For daily development use, **API token authentication via a local MCP server** is dramatically more reliable.
 
 The recommended approach is `mcp-jira-server`, which uses long-lived API tokens:
@@ -222,6 +267,36 @@ Claude will return a list. Find the field labelled "Acceptance Criteria" and not
 The Knowledge Repo MCP is what transforms Claude from a capable code generator into a team-aware engineering assistant. It gives Claude access to your team's accumulated decisions, patterns, templates, security rules, and architectural guidance — in real time, every session.
 
 ### What the Knowledge Repo Contains
+
+```mermaid
+mindmap
+  root((📚 Knowledge<br/>Repo Contents))
+    🏗️ Architecture
+      System overview
+      Tech stack + versions
+      Module boundaries
+    📝 Patterns
+      Backend service layer
+      Frontend components
+      Error handling
+      API contracts
+    🔒 Security
+      Auth patterns
+      Input validation
+      Secrets handling
+    🧪 Testing
+      Unit test patterns
+      Integration patterns
+      E2E conventions
+    📋 Templates
+      New service scaffold
+      New component scaffold
+      Migration template
+    📖 ADRs
+      Settled decisions
+      Trade-off rationale
+```
+
 
 Before discussing configuration, understand what belongs in a knowledge repo:
 
@@ -414,6 +489,26 @@ sequenceDiagram
 With Linear + Knowledge Repo MCP, Claude can close this loop completely.
 
 #### The `ticket-implement` Skill
+
+```mermaid
+graph TD
+    DEV["👨‍💻 'Implement PROJ-123'"] --> FETCH["📋 Jira MCP<br/><i>get_issue PROJ-123</i><br/>Title + ACs + comments"]
+    FETCH --> KNOW["📚 Knowledge Repo<br/><i>search: relevant patterns</i><br/>Architecture + security rules"]
+    KNOW --> PLAN["📐 Plan Mode<br/><i>Map each AC to approach</i>"]
+    PLAN --> IMPL["💻 Implement<br/><i>Following team patterns</i>"]
+    IMPL --> VERIFY["✅ AC Verification<br/><i>/ac-verify — check each AC</i>"]
+    VERIFY -->|"All ✅"| PR["📝 Create PR<br/>+ update ticket status"]
+    VERIFY -->|"❌ Missing"| FIX["🔧 Fix gaps"]
+    FIX --> VERIFY
+    PR --> COMMENT["💬 Post summary<br/>as ticket comment"]
+
+    style DEV fill:#f5a623,stroke:#d4891a,color:#fff
+    style FETCH fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style KNOW fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style VERIFY fill:#50c878,stroke:#3da360,color:#fff
+    style PR fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 Create `.claude/skills/ticket-implement.md`:
 
@@ -627,6 +722,29 @@ The real power isn't using these MCPs in isolation — it's the **combination**.
 
 ### The Quality Compounding Model
 
+```mermaid
+graph TD
+    subgraph COMPOUND["📈 Quality Compounding Model"]
+        direction TB
+        T1["📋 Ticket Context<br/><i>Jira/Linear MCP</i>"] --> CLAUDE["🤖 Claude"]
+        T2["📚 Team Patterns<br/><i>Knowledge Repo</i>"] --> CLAUDE
+        T3["💻 Code Context<br/><i>Filesystem + Git</i>"] --> CLAUDE
+        CLAUDE --> OUTPUT["✅ Code that matches<br/>team conventions +<br/>passes ACs on first try"]
+    end
+    
+    subgraph METRICS["📊 Measurable Impact"]
+        M1["PR review rounds:<br/><b>2.3 → 0.7</b>"]
+        M2["AC verification:<br/><b>60% → 94%</b>"]
+        M3["Time to merge:<br/><b>3 days → 4 hours</b>"]
+    end
+    
+    OUTPUT --> METRICS
+
+    style COMPOUND fill:#f0f4ff,stroke:#4a90d9
+    style METRICS fill:#d4edda,stroke:#28a745
+```
+
+
 Consider what happens when Claude receives a ticket with MCP context versus without:
 
 **Without MCPs:**
@@ -688,6 +806,27 @@ These numbers represent realistic conservative estimates from teams that have im
 ---
 
 ## Part 7: Skills That Leverage Both MCPs Together
+
+```mermaid
+graph TB
+    subgraph SKILLS["📚 Skills That Leverage Both MCPs"]
+        direction LR
+        S1["🏗️ /feature-scaffold<br/><i>Read ticket → check knowledge<br/>→ scaffold with patterns</i>"]
+        S2["🏛️ /arch-check<br/><i>Verify implementation<br/>against architecture rules</i>"]
+        S3["📋 /sprint-plan<br/><i>Analyse sprint tickets<br/>→ dependency map</i>"]
+        S4["✅ /ac-verify<br/><i>Check each AC<br/>against implementation</i>"]
+    end
+
+    JIRA["📋 Jira/Linear"] --> SKILLS
+    KR["📚 Knowledge Repo"] --> SKILLS
+    SKILLS --> CODE["💻 Better Code"]
+
+    style SKILLS fill:#f8f9fa,stroke:#6c757d
+    style JIRA fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style KR fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style CODE fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 The highest-leverage skills combine ticket context (Jira/Linear) with team knowledge (knowledge repo) in a single workflow.
 
@@ -790,6 +929,21 @@ Analyse the current sprint backlog and provide implementation recommendations.
 ---
 
 ## Part 8: Automated Hooks — Closing the Loop Without Manual Triggers
+
+```mermaid
+graph LR
+    DONE["🤖 Claude says<br/>'Implementation done'"] --> HOOK["⚡ TaskCompleted<br/>Hook fires"]
+    HOOK --> VERIFY["🔍 Auto AC<br/>Verification"]
+    VERIFY -->|"All ✅"| COMMIT["✅ Allow<br/>commit + push"]
+    VERIFY -->|"❌ Missing"| BLOCK["🚫 Block commit<br/>Show gaps"]
+    BLOCK --> FIX["🔧 Claude<br/>fixes gaps"]
+    FIX --> VERIFY
+
+    style HOOK fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style COMMIT fill:#50c878,stroke:#3da360,color:#fff
+    style BLOCK fill:#e74c3c,stroke:#c0392b,color:#fff
+```
+
 
 Skills require you to remember to call them. Hooks run automatically, making the quality gates zero-effort.
 
@@ -936,25 +1090,21 @@ When your team discovers a better pattern, you add it to the knowledge repo. Cla
 
 ### The Knowledge Flywheel
 
+```mermaid
+graph LR
+    W1["📅 <b>Week 1</b><br/>5 core patterns added<br/><i>→ Fewer review comments</i>"] --> W4["📅 <b>Week 4</b><br/>3 templates added<br/><i>→ Consistent code from line 1</i>"]
+    W4 --> W8["📅 <b>Week 8</b><br/>Security rules added<br/><i>→ 0 security regressions</i>"]
+    W8 --> W12["📅 <b>Week 12</b><br/>New dev joins<br/><i>→ Productive from day 1</i>"]
+    W12 --> W24["📅 <b>Week 24</b><br/>40+ patterns, 12 templates<br/><i>→ 94% AC pass rate<br/>→ 0.7 PR review rounds</i>"]
+
+    style W1 fill:#e3f2fd,stroke:#4a90d9
+    style W4 fill:#bbdefb,stroke:#4a90d9
+    style W8 fill:#90caf9,stroke:#2d6cb4,color:#fff
+    style W12 fill:#64b5f6,stroke:#2d6cb4,color:#fff
+    style W24 fill:#42a5f5,stroke:#1976d2,color:#fff
 ```
-Week 1:  Team adds 5 core patterns
-         Claude applies them to tickets → fewer review comments
 
-Week 4:  Team adds 3 templates from commonly scaffolded features
-         Claude uses templates → code is consistent from line one
-
-Week 8:  Team adds security rules from post-incident review
-         Claude applies security rules → 0 security regressions in next quarter
-
-Week 12: New developer joins
-         Claude + knowledge repo = productive from day one
-         (Would normally take 4-6 weeks to reach this level)
-
-Week 24: Knowledge repo has 40+ patterns, 12 templates, 3 security rule sets
-         Claude generates code that senior engineers rarely need to comment on
-         AC verification pass rate: 94%+
-         PR review cycles: average 0.7 rounds
-```
+> 🔁 **The Knowledge Flywheel:** Each pattern added makes Claude better → better code means fewer review comments → team adds more patterns → Claude improves further. This is compounding, not linear.
 
 This is not theoretical. It is the direct consequence of giving Claude persistent, structured access to your team's accumulated engineering judgment.
 

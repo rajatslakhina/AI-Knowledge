@@ -416,6 +416,21 @@ direnv allow
 
 ## 8. When to Use Which Interface
 
+```mermaid
+graph LR
+    subgraph INTERFACES["🔧 When to Use Which Interface"]
+        direction TB
+        A["🖥️ <b>Claude Code REPL</b><br/>Complex multi-file tasks<br/>Full codebase access<br/>⚡ Autonomous"] 
+        B["⌨️ <b>Single Command</b><br/>Quick tasks, CI/CD scripts<br/>Piped input<br/>⚡ Autonomous"]
+        C["💬 <b>Continue.dev Chat</b><br/>Interactive Q&A<br/>Selected files + git<br/>🔒 Manual"]
+        D["✏️ <b>Continue.dev Inline</b><br/>In-place edits<br/>Current file only<br/>🔒 Manual"]
+        E["🤖 <b>Cline</b><br/>Full feature development<br/>Full project access<br/>⚡ Autonomous"]
+    end
+
+    style INTERFACES fill:#f8f9fa,stroke:#6c757d
+```
+
+
 | Interface | Best For | Speed | Context Access | Autonomous? |
 | :--- | :--- | :---: | :--- | :---: |
 | **Claude Code REPL** | Complex multi-file tasks, architecture work | 🐢 Slow | Full codebase | ✅ Yes |
@@ -431,27 +446,58 @@ direnv allow
 
 Here's a practical model selection guide for your day:
 
-```
-Morning standup → Planning
-├── Reviewing yesterday's PRs? → Sonnet (code review)
-├── Writing today's tasks? → Haiku (quick summarisation)
-└── Architecture meeting prep? → Opus (complex analysis)
+```mermaid
+graph TB
+    subgraph MORNING["☀️ Morning — Planning"]
+        M1["🔍 PR Reviews<br/><b>→ Sonnet</b>"]
+        M2["📝 Task Planning<br/><b>→ Haiku</b>"]
+        M3["🏗️ Arch Prep<br/><b>→ Opus</b>"]
+    end
+    subgraph MIDDAY["💻 Feature Development"]
+        D1["⚡ Scaffolding<br/><b>→ Sonnet</b>"]
+        D2["🐛 Debugging<br/><b>→ Sonnet → Opus</b>"]
+        D3["🧪 Tests<br/><b>→ Sonnet</b>"]
+        D4["📖 Docs<br/><b>→ Haiku/Sonnet</b>"]
+    end
+    subgraph EOD["🌙 End of Day"]
+        E1["✅ Commits<br/><b>→ Haiku</b>"]
+        E2["📝 PR Description<br/><b>→ Sonnet</b>"]
+        E3["📋 Release Notes<br/><b>→ Sonnet</b>"]
+    end
+    
+    MORNING --> MIDDAY --> EOD
 
-Feature development
-├── Scaffolding new code? → Sonnet (generation)
-├── Debugging a hard bug? → Sonnet → Opus if stuck
-├── Writing tests? → Sonnet (comprehensive coverage)
-└── Writing docs? → Haiku → Sonnet for complex APIs
-
-End of day
-├── Commit message? → Haiku (fast, simple)
-├── PR description? → Sonnet (clear, complete)
-└── Release notes? → Sonnet (polished writing)
+    style MORNING fill:#fff3cd,stroke:#ffc107
+    style MIDDAY fill:#d4edda,stroke:#28a745
+    style EOD fill:#f0f4ff,stroke:#4a90d9
 ```
 
 ---
 
 ## 10. Verifying Your Setup
+
+```mermaid
+graph TD
+    V1["1️⃣ claude --version<br/>Shows version?"] -->|✅| V2["2️⃣ claude --model<br/>Shows current model?"]
+    V2 -->|✅| V3["3️⃣ Short prompt test<br/>'Explain a for loop'"]
+    V3 -->|✅| V4["4️⃣ File access test<br/>'Read package.json'"]
+    V4 -->|✅| V5["5️⃣ MCP test<br/>'List files in .'"]
+    V5 -->|✅| DONE["✅ Setup Complete!"]
+    
+    V1 -->|❌| F1["Reinstall Claude Code<br/>Check Node.js version"]
+    V2 -->|❌| F2["Check auth:<br/>claude auth login"]
+    V3 -->|❌| F3["Check API key<br/>and network"]
+    V4 -->|❌| F4["Check filesystem<br/>permissions"]
+    V5 -->|❌| F5["Check .claude/settings.json<br/>MCP config"]
+
+    style DONE fill:#50c878,stroke:#3da360,color:#fff
+    style F1 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F2 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F3 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F4 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F5 fill:#e74c3c,stroke:#c0392b,color:#fff
+```
+
 
 Run this checklist to confirm everything works:
 
