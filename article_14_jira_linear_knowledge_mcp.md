@@ -6,6 +6,25 @@
 
 ## The Problem No One Talks About
 
+```mermaid
+graph LR
+    subgraph BEFORE["❌ Before MCP — The Context Gap"]
+        direction TB
+        B1["Developer reads ticket"] --> B2["Copy-pastes to Claude"] --> B3["Describes context<br/>from memory"] --> B4["Claude generates<br/>generic code"] --> B5["2+ review rounds"]
+    end
+
+    subgraph AFTER["✅ After MCP — Context Closed"]
+        direction TB
+        A1["Developer says:<br/>'Implement PROJ-123'"] --> A2["Claude reads ticket<br/>directly from Jira"] --> A3["Claude checks<br/>knowledge repo"] --> A4["Claude generates<br/>team-pattern code"] --> A5["Ship it ✅"]
+    end
+
+    style BEFORE fill:#ffe5e5,stroke:#e74c3c
+    style AFTER fill:#d4edda,stroke:#28a745
+    style B5 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style A5 fill:#50c878,stroke:#3da360,color:#fff
+```
+
+
 Most engineering teams face the same invisible tax every day.
 
 A developer picks up a ticket. They read it in Jira or Linear. They tab over to Claude Code. They copy-paste the title, acceptance criteria, and maybe a few notes. They describe the codebase context they know off the top of their head. They prompt Claude. Claude generates something reasonable — but "reasonable" is calibrated against a generic understanding of software, not *your* system, *your* conventions, *your* security rules, or *your* exact definition of done.
@@ -21,6 +40,44 @@ This article walks through exactly how to set it up, why it works, and what the 
 ---
 
 ## Part 1: Understanding MCP in the Claude Code Context
+
+```mermaid
+graph TB
+    CC["🤖 Claude Code"]
+    
+    subgraph PM["📋 Project Management"]
+        LIN["Linear MCP<br/><i>@linear/mcp-server</i>"]
+        JIRA["Jira MCP<br/><i>@anthropic/jira-mcp</i>"]
+    end
+    
+    subgraph KNOW["📚 Knowledge"]
+        KR["Knowledge Repo<br/><i>GitMCP.io</i>"]
+        MEM["Memory MCP<br/><i>@anthropic/memory</i>"]
+    end
+    
+    subgraph DEV["💻 Development"]
+        FS["Filesystem"]
+        GIT["Git"]
+        GH["GitHub"]
+    end
+    
+    subgraph DATA["🗄️ Data"]
+        PG["PostgreSQL"]
+        SL["Slack"]
+    end
+    
+    CC --> PM
+    CC --> KNOW
+    CC --> DEV
+    CC --> DATA
+
+    style CC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style PM fill:#f0f4ff,stroke:#4a90d9
+    style KNOW fill:#fff3cd,stroke:#ffc107
+    style DEV fill:#d4edda,stroke:#28a745
+    style DATA fill:#ffe5cc,stroke:#fd7e14
+```
+
 
 Before diving into configuration, it's worth being precise about what MCP actually does.
 
@@ -326,6 +383,31 @@ Without MCP integration, AC verification looks like this:
 8. Ticket finally done — 2 days after the code was "finished"
 
 The root cause: **ACs live in the ticket, code lives in the repo, and no automated process connects them**.
+
+
+```mermaid
+sequenceDiagram
+    participant Dev as 👨‍💻 Developer
+    participant CC as 🤖 Claude Code
+    participant Jira as 📋 Jira/Linear
+    participant KR as 📚 Knowledge Repo
+    participant Code as 💻 Codebase
+
+    Dev->>CC: "Implement PROJ-123"
+    CC->>Jira: get_issue("PROJ-123")
+    Jira-->>CC: Title, ACs, comments, priority
+    CC->>KR: search("auth pattern")
+    KR-->>CC: Team's auth implementation pattern
+    CC->>KR: search("error handling")
+    KR-->>CC: Team's error handling standard
+    CC->>Code: Read existing code patterns
+    Code-->>CC: Current implementation context
+    CC->>Code: Implement feature
+    CC->>CC: Self-verify against ACs
+    CC->>Dev: "Done. All 5 ACs verified. ✅"
+    Dev->>CC: "Looks good, submit PR"
+    CC->>Code: git commit + push + create PR
+```
 
 ### The MCP-Powered AC Verification Loop
 

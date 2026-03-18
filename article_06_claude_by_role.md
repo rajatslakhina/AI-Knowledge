@@ -10,6 +10,45 @@ Claude is not a one-size-fits-all tool. A developer needs code generation and de
 
 This article gives you concrete, copy-paste-ready workflows for all three roles — not theory, but real tasks you can start doing today.
 
+```mermaid
+graph TB
+    subgraph DEV["👨‍💻 DEVELOPERS"]
+        direction TB
+        D1["Feature Implementation"]
+        D2["Debugging"]
+        D3["Code Review"]
+        D4["Test-Driven Dev"]
+        D5["Refactoring"]
+        D6["DevOps/Infra"]
+    end
+    subgraph QA["🧪 QA ENGINEERS"]
+        direction TB
+        Q1["Test Case Gen"]
+        Q2["Test Data Gen"]
+        Q3["Exploratory Testing"]
+        Q4["API Test Scripts"]
+        Q5["Bug Report Writing"]
+    end
+    subgraph BA["📊 BUSINESS ANALYSTS"]
+        direction TB
+        B1["Requirements Extraction"]
+        B2["User Story Writing"]
+        B3["Gap Analysis"]
+        B4["Stakeholder Comms"]
+        B5["Process Mapping"]
+    end
+
+    CLAUDE["🤖 Claude"] --> DEV
+    CLAUDE --> QA
+    CLAUDE --> BA
+
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style DEV fill:#d4edda,stroke:#28a745
+    style QA fill:#fff3cd,stroke:#ffc107
+    style BA fill:#f0f4ff,stroke:#4a90d9
+```
+
+
 ---
 
 # PART 1: DEVELOPERS
@@ -504,6 +543,19 @@ Output: Valid Mermaid sequenceDiagram code.
 | Meeting summarisation | ✅ | ✅ | ✅ | Haiku 4.5 |
 
 ---
+
+
+```mermaid
+graph LR
+    A["☀️ Morning<br/>Standup Prep"] --> B["📋 Pick<br/>Ticket"] --> C["🤖 Claude:<br/>Implement"] --> D["🧪 Claude:<br/>Write Tests"] --> E["🔍 Claude:<br/>Self-Review"] --> F["📝 Claude:<br/>PR Description"] --> G["🚀 Submit<br/>PR"]
+
+    style A fill:#f5a623,stroke:#d4891a,color:#fff
+    style C fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style D fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style E fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style F fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style G fill:#50c878,stroke:#3da360,color:#fff
+```
 
 ### Daily AI Workflow for Developers
 

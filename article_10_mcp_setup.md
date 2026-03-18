@@ -10,6 +10,31 @@ This is the hands-on article. We're going to configure MCPs from scratch — sta
 
 By the end, you'll have a production-ready MCP setup that makes Claude Code genuinely agentic across your development tools.
 
+```mermaid
+graph TB
+    CC["🤖 Claude Code"] --> FS["📁 Filesystem<br/>(stdio)"]
+    CC --> GIT["🔀 Git<br/>(stdio)"]
+    CC --> DB["🗄️ PostgreSQL<br/>(stdio)"]
+    CC --> GH["🐙 GitHub<br/>(remote)"]
+    CC --> SL["💬 Slack<br/>(remote)"]
+    CC --> MEM["🧠 Memory<br/>(stdio)"]
+    CC --> PUP["🌐 Puppeteer<br/>(stdio)"]
+    
+    FS --> LOCAL["💻 Local Machine"]
+    GIT --> LOCAL
+    DB --> DBSRV["🗃️ Database Server"]
+    GH --> CLOUD["☁️ Cloud APIs"]
+    SL --> CLOUD
+    MEM --> LOCAL
+    PUP --> LOCAL
+
+    style CC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style LOCAL fill:#50c878,stroke:#3da360,color:#fff
+    style CLOUD fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style DBSRV fill:#f5a623,stroke:#d4891a,color:#fff
+```
+
+
 ---
 
 ## 1. The MCP Configuration File
@@ -683,6 +708,27 @@ claude --list-tools
 ```
 
 ---
+
+
+```mermaid
+graph TD
+    START["❌ MCP Not Working?"] --> Q1{"Server shows<br/>in /mcp?"}
+    Q1 -->|"No"| A1["Check settings.json<br/>path and syntax"]
+    Q1 -->|"Yes"| Q2{"Tools<br/>available?"}
+    Q2 -->|"No"| A2["Check command/args<br/>npx path correct?"]
+    Q2 -->|"Yes"| Q3{"Auth<br/>error?"}
+    Q3 -->|"Yes"| A3["Check env vars<br/>API keys exported?"]
+    Q3 -->|"No"| Q4{"Timeout?"}
+    Q4 -->|"Yes"| A4["Network issue<br/>Check firewall/proxy"]
+    Q4 -->|"No"| A5["Run claude --mcp-debug<br/>Check server logs"]
+
+    style START fill:#e74c3c,stroke:#c0392b,color:#fff
+    style A1 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A2 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A3 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A4 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A5 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
 
 ## 7. Troubleshooting Common Issues
 

@@ -28,23 +28,28 @@ The term was coined in 1956 by John McCarthy at the Dartmouth Conference, but th
 
 AI is an umbrella term. Here's how the major subfields relate:
 
+```mermaid
+mindmap
+  root((🧠 Artificial<br/>Intelligence))
+    🤖 Machine Learning
+      Supervised Learning
+      Unsupervised Learning
+      Reinforcement Learning
+        RLHF
+    🔬 Deep Learning
+      CNNs
+      RNNs
+      **Transformers**
+        ⭐ LLMs live here
+    💬 NLP
+      **Large Language Models**
+        Claude, GPT, Gemini
+    👁️ Computer Vision
+    🦾 Robotics
+    📋 Expert Systems
 ```
-Artificial Intelligence
-├── Machine Learning (ML)
-│   ├── Supervised Learning
-│   ├── Unsupervised Learning
-│   └── Reinforcement Learning
-│       └── RLHF (Reinforcement Learning from Human Feedback)
-├── Deep Learning (DL)
-│   ├── Convolutional Neural Networks (CNNs)
-│   ├── Recurrent Neural Networks (RNNs)
-│   └── Transformers ← where modern LLMs live
-├── Natural Language Processing (NLP)
-│   └── Large Language Models (LLMs)
-├── Computer Vision
-├── Robotics
-└── Expert Systems
-```
+
+> 🎯 **Key Insight:** Modern AI tools like Claude, GPT, and Gemini are all **Large Language Models** — a type of deep learning model built on the **Transformer** architecture.
 
 For software engineers today, the most relevant branch is **Large Language Models (LLMs)** — a type of deep learning model built on the Transformer architecture.
 
@@ -64,6 +69,19 @@ Before Transformers, sequence-to-sequence models like RNNs processed text word b
 
 
 ### Training an LLM: The Three Phases
+
+```mermaid
+graph LR
+    A["📚 Phase 1<br/><b>Pre-training</b><br/>Trillions of tokens<br/>Unsupervised"] --> B["🎯 Phase 2<br/><b>Fine-tuning (SFT)</b><br/>Instruction-response pairs<br/>Supervised"]
+    B --> C["👥 Phase 3<br/><b>RLHF</b><br/>Human preference ranking<br/>Reward optimisation"]
+    C --> D["✅ Production<br/><b>Model</b><br/>Helpful, safe,<br/>instruction-following"]
+
+    style A fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style B fill:#f5a623,stroke:#d4891a,color:#fff
+    style C fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style D fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 **Phase 1 — Pre-training**  
 The model is trained on a massive corpus of text (books, code, articles, websites). It learns to predict the next token given a sequence. This is unsupervised — no labels, just patterns. Models like Claude Sonnet 4.6 and GPT-5.2 were trained on trillions of tokens.
@@ -108,33 +126,80 @@ LLMs can confidently produce false information. They are pattern-completion mach
 Numerical vector representations of text. Used for semantic search, RAG (Retrieval-Augmented Generation), and recommendation systems. Similar meaning → similar vectors → close together in vector space.
 
 ### 4.7 RAG (Retrieval-Augmented Generation)
+
+```mermaid
+graph LR
+    Q["🔍 User Query"] --> E["Embedding<br/>Model"]
+    E --> VS["Vector<br/>Search"]
+    DB[("📦 Vector DB<br/>Your docs,<br/>code, data")] --> VS
+    VS --> CTX["📋 Retrieved<br/>Context"]
+    CTX --> LLM["🧠 LLM<br/>(Claude)"]
+    Q --> LLM
+    LLM --> R["✅ Grounded<br/>Response"]
+
+    style Q fill:#f5a623,stroke:#d4891a,color:#fff
+    style LLM fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style DB fill:#50c878,stroke:#3da360,color:#fff
+    style R fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
+
 Instead of relying solely on the model's training data, RAG retrieves relevant documents from an external store (vector DB) and injects them into the context. This grounds the model in facts and enables up-to-date knowledge.
 
 ---
 
 ## 5. The AI Stack — Where LLMs Fit
 
+```mermaid
+block-beta
+    columns 1
+    block:app["🖥️ APPLICATION LAYER — Your product, IDE plugin, chatbot"]
+        a1["Web App"] a2["IDE Plugin"] a3["Chatbot"] a4["API Service"]
+    end
+    block:orch["⚙️ ORCHESTRATION LAYER — LangChain, LlamaIndex, Claude Code"]
+        o1["Prompt<br/>Routing"] o2["Context<br/>Management"] o3["Tool<br/>Orchestration"]
+    end
+    block:llm["🧠 LLM API LAYER — Claude · GPT · Gemini · Llama"]
+        l1["Claude<br/>Sonnet 4.6"] l2["GPT-5.2"] l3["Gemini<br/>3.1 Pro"] l4["Llama 4"]
+    end
+    block:infra["🏗️ INFRASTRUCTURE LAYER — GPU clusters, vector DBs, storage"]
+        i1["GPU<br/>Clusters"] i2["Vector<br/>DBs"] i3["Object<br/>Storage"]
+    end
+
+    app --> orch --> llm --> infra
+
+    style app fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style orch fill:#f5a623,stroke:#d4891a,color:#fff
+    style llm fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style infra fill:#6c757d,stroke:#495057,color:#fff
 ```
-┌─────────────────────────────────────────────┐
-│           Application Layer                  │
-│   (your product, IDE plugin, chatbot)        │
-├─────────────────────────────────────────────┤
-│           Orchestration Layer                │
-│   (LangChain, LlamaIndex, Claude Code)       │
-├─────────────────────────────────────────────┤
-│           LLM API Layer                      │
-│   (Claude Sonnet 4.6, GPT-5.2, Gemini 3.1 Pro, Llama 4)            │
-├─────────────────────────────────────────────┤
-│           Infrastructure Layer               │
-│   (GPU clusters, vector DBs, storage)        │
-└─────────────────────────────────────────────┘
-```
+
+> 👨‍💻 As a developer, you primarily operate at the **Application** and **Orchestration** layers, consuming the LLM API.
 
 As a developer, you primarily operate at the **Application** and **Orchestration** layers, consuming the LLM API.
 
 ---
 
 ## 6. Narrow AI vs. General AI vs. AGI
+
+```mermaid
+graph LR
+    subgraph TODAY["✅ Today"]
+        ANI["🎯 Narrow AI<br/>(ANI)<br/>Chess engines, LLMs,<br/>image classifiers"]
+    end
+    subgraph EMERGING["🔄 Emerging"]
+        AGI["🧠 General AI<br/>(AGI)<br/>Human-level adaptability<br/>across all domains"]
+    end
+    subgraph THEORETICAL["❓ Theoretical"]
+        ASI["🚀 Superintelligence<br/>(ASI)<br/>Surpasses humans<br/>in all domains"]
+    end
+    
+    ANI --> AGI --> ASI
+
+    style ANI fill:#50c878,stroke:#3da360,color:#fff
+    style AGI fill:#f5a623,stroke:#d4891a,color:#fff
+    style ASI fill:#e74c3c,stroke:#c0392b,color:#fff
+```
+
 
 **Narrow AI (ANI)** — Does one thing very well. Chess engines, spam filters, image classifiers, current LLMs. This is what exists today.
 

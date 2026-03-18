@@ -6,6 +6,33 @@
 
 ## What You're Actually Building
 
+```mermaid
+graph TB
+    CLAUDE["🤖 Claude Code<br/>Full Context"] 
+    
+    CLAUDE --> FS["📁 Filesystem<br/><i>Current codebase</i>"]
+    CLAUDE --> GIT["🔀 Git<br/><i>Change history</i>"]
+    CLAUDE --> PG["🗄️ Postgres<br/><i>Data shape</i>"]
+    CLAUDE --> GH["🐙 GitHub<br/><i>PRs & issues</i>"]
+    CLAUDE --> JR["📋 Jira/Linear<br/><i>What to build</i>"]
+    CLAUDE --> SL["💬 Slack<br/><i>Decisions</i>"]
+    CLAUDE --> MEM["🧠 Memory<br/><i>Past sessions</i>"]
+    CLAUDE --> KR["📚 Knowledge Repo<br/><i>Team patterns<br/>& rules</i>"]
+
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style KR fill:#f5a623,stroke:#d4891a,color:#fff
+    style FS fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style GIT fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style PG fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style GH fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style JR fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style SL fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style MEM fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
+
+> 🎯 **The Knowledge Repo (via GitMCP) is the only MCP that tells Claude HOW your team builds software.** Without it, Claude falls back to generic "best practices" that may conflict with your actual architecture.
+
+
 When you combine these servers in `.claude/settings.json`:
 
 ```
@@ -30,6 +57,21 @@ The knowledge repo via GitMCP is the only one that answers that last question. W
 ---
 
 ## How GitMCP.io Works Mechanically
+
+```mermaid
+graph LR
+    REPO["📦 GitHub Repo<br/>your-org/knowledge-repo"] -->|"Replace github.com<br/>with gitmcp.io"| GITMCP["🔌 GitMCP.io<br/>Remote MCP Server"]
+    GITMCP -->|"mcp-remote"| CC["🤖 Claude Code"]
+    
+    CC -->|"fetch_docs"| D["📄 llms.txt<br/>Overview"]
+    CC -->|"search_docs"| S["🔍 Semantic<br/>Search"]
+    CC -->|"search_code"| C["💻 Code<br/>Examples"]
+
+    style REPO fill:#6c757d,stroke:#495057,color:#fff
+    style GITMCP fill:#f5a623,stroke:#d4891a,color:#fff
+    style CC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+```
+
 
 GitMCP is a free, open-source remote MCP server. The core mechanic is extremely simple: replace `github.com` with `gitmcp.io` in any GitHub URL.
 
@@ -87,6 +129,23 @@ Other .md files   ← Discovered through semantic search
 ---
 
 ## Does It Actually Improve Accuracy? Breaking Down the Mechanisms
+
+```mermaid
+graph TD
+    subgraph WITHOUT["❌ Without Knowledge Repo"]
+        W1["Claude uses generic patterns"] --> W2["Code works but doesn't<br/>match team conventions"] --> W3["2+ rounds of<br/>review comments"] --> W4["⏱️ 3x longer delivery"]
+    end
+    
+    subgraph WITH["✅ With Knowledge Repo"]
+        K1["Claude reads team patterns"] --> K2["Code matches architecture<br/>+ naming + security rules"] --> K3["Minor review comments<br/>if any"] --> K4["⚡ Ship fast"]
+    end
+
+    style WITHOUT fill:#ffe5e5,stroke:#e74c3c
+    style WITH fill:#d4edda,stroke:#28a745
+    style W4 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style K4 fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 Yes. Here is exactly why — broken down by the type of improvement:
 
@@ -249,6 +308,37 @@ Here is the full `.claude/settings.json` that wires all nine MCPs together, with
 ---
 
 ## How to Structure Your Knowledge Repo for Maximum GitMCP Accuracy
+
+```mermaid
+mindmap
+  root((📚 Knowledge<br/>Repo Structure))
+    📄 llms.txt
+      Stack summary
+      Architecture rules
+      Security rules
+      Key patterns
+    🏗️ architecture/
+      ADRs
+      System diagrams
+      Module boundaries
+    📝 patterns/
+      Service patterns
+      Error handling
+      API contracts
+    🔒 security/
+      Auth patterns
+      Input validation
+      Secrets handling
+    🧪 testing/
+      Test conventions
+      Coverage rules
+      Fixture patterns
+    📋 templates/
+      PR templates
+      Issue templates
+      RFC templates
+```
+
 
 The quality of Claude's context is directly proportional to the quality of your knowledge repo structure. Here is the recommended layout:
 

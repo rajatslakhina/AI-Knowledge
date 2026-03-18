@@ -14,6 +14,28 @@ By the end of this article you'll have:
 - A shell alias setup for daily use
 - A model selection strategy for your daily workflow
 
+```mermaid
+graph TD
+    START["🚀 Setup Claude Dev Environment"] --> A["1️⃣ Prerequisites<br/>Node.js 18+, API key"]
+    A --> B["2️⃣ Install Claude Code<br/>npm install -g @anthropic-ai/claude-code"]
+    B --> C["3️⃣ Authenticate<br/>claude auth login"]
+    C --> D{"VS Code<br/>Integration?"}
+    D -->|"Full IDE"| E["Continue.dev<br/>Extension"]
+    D -->|"Autonomous"| F["Cline<br/>Extension"]
+    D -->|"Hybrid"| G["GitHub Copilot<br/>+ Claude API"]
+    E --> H["4️⃣ Configure<br/>Shell aliases + env vars"]
+    F --> H
+    G --> H
+    H --> I["✅ Ready!<br/>Claude in terminal + IDE"]
+
+    style START fill:#f5a623,stroke:#d4891a,color:#fff
+    style I fill:#50c878,stroke:#3da360,color:#fff
+    style E fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style F fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style G fill:#e74c3c,stroke:#c0392b,color:#fff
+```
+
+
 ---
 
 ## 1. Prerequisites
@@ -177,6 +199,27 @@ alias ai-commit="git diff --staged | claude-fast 'Write a conventional commit me
 ---
 
 ## 5. VS Code Setup
+
+
+```mermaid
+graph TB
+    subgraph OPTIONS["🔧 VS Code AI Integration Options"]
+        direction LR
+        subgraph A["Option A: Continue.dev"]
+            A1["✅ Full IDE integration<br/>✅ Multi-model support<br/>✅ Inline completions<br/>✅ Chat sidebar<br/>⚠️ Requires config"]
+        end
+        subgraph B["Option B: Cline"]
+            B1["✅ Autonomous agent<br/>✅ File creation/editing<br/>✅ Terminal commands<br/>✅ Visual diffs<br/>⚠️ Higher token usage"]
+        end
+        subgraph C["Option C: Copilot + Claude"]
+            C1["✅ Best autocomplete<br/>✅ PR descriptions<br/>✅ Claude via API<br/>⚠️ Two subscriptions<br/>⚠️ Complex setup"]
+        end
+    end
+
+    style A fill:#d4edda,stroke:#28a745
+    style B fill:#fff3cd,stroke:#ffc107
+    style C fill:#f0f4ff,stroke:#4a90d9
+```
 
 ### Option A: Continue.dev (Recommended for Full IDE Integration)
 

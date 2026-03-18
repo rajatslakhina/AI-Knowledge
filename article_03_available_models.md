@@ -10,6 +10,37 @@ The LLM landscape in 2025–2026 is rich, noisy, and moves fast. New model relea
 
 This article maps the major model families, their capabilities, and their practical trade-offs — so you can make informed decisions rather than chasing benchmarks.
 
+```mermaid
+mindmap
+  root((🌐 LLM<br/>Landscape<br/>2025-26))
+    🟣 Anthropic
+      Claude Opus 4.6
+      Claude Sonnet 4.6
+      Claude Haiku 4.5
+    🟢 OpenAI
+      GPT-5.2
+      GPT-5.2 mini
+      GPT-5.2 Codex
+      o4 / o4-mini
+    🔵 Google
+      Gemini 3.1 Pro
+      Gemini 3.1 Flash
+      Gemini 3.0 Flash
+    🟠 Meta
+      Llama 4 Scout
+      Llama 4 Maverick
+      Llama 4 Behemoth
+    🔴 Mistral
+      Mistral Large 3
+      Mixtral 8x22B
+      Codestral 2025
+    ⚫ Others
+      Cohere Command R+
+      xAI Grok 3.5
+      DeepSeek V3
+```
+
+
 ---
 
 ## 1. The Major Players
@@ -159,6 +190,25 @@ Elon Musk's AI lab, integrated with X (formerly Twitter). Grok models have acces
 
 ---
 
+
+```mermaid
+graph TD
+    START["🤔 Which Model Type?"] --> Q1{"Data leaves<br/>your infra?"}
+    Q1 -->|"Not acceptable"| OPEN["🔓 Open Source<br/>Llama 4, Mistral"]
+    Q1 -->|"OK with DPA"| Q2{"Setup<br/>effort?"}
+    Q2 -->|"Minutes"| CLOSED["🔒 Closed API<br/>Claude, GPT, Gemini"]
+    Q2 -->|"Days OK"| Q3{"Fine-tuning<br/>needed?"}
+    Q3 -->|"Yes"| OPEN
+    Q3 -->|"No"| CLOSED
+    
+    OPEN --> O1["✅ Zero API cost<br/>✅ Full control<br/>⚠️ Infra management"]
+    CLOSED --> C1["✅ Instant setup<br/>✅ Managed uptime<br/>⚠️ Per-token costs"]
+
+    style START fill:#f5a623,stroke:#d4891a,color:#fff
+    style OPEN fill:#50c878,stroke:#3da360,color:#fff
+    style CLOSED fill:#4a90d9,stroke:#2d6cb4,color:#fff
+```
+
 ## 2. Open-Source vs. Closed-Source: The Core Trade-off
 
 | Dimension | 🔒 Closed (Claude, GPT-5.2, Gemini) | 🔓 Open (Llama 4, Mistral) |
@@ -235,6 +285,17 @@ Don't over-index on the best model. The best model for your use case is the chea
 ---
 
 ## 6. The Emerging Landscape: Agents and Multimodality
+
+```mermaid
+graph LR
+    A["💬 Chat<br/>Interface<br/><i>2022-2023</i>"] --> B["🔧 Tool Use<br/>Function Calling<br/><i>2023-2024</i>"] --> C["🖥️ Computer Use<br/>Autonomous UI<br/><i>2024-2025</i>"] --> D["🤖 Agentic Systems<br/>Multi-Agent Teams<br/><i>2025-2026</i>"]
+
+    style A fill:#6c757d,stroke:#495057,color:#fff
+    style B fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style C fill:#f5a623,stroke:#d4891a,color:#fff
+    style D fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 Models are evolving from **chat interfaces** to **agentic systems** — models that can use tools, browse the web, execute code, and complete multi-step workflows autonomously.
 

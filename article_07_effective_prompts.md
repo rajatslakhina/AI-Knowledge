@@ -16,15 +16,26 @@ Prompt engineering is the discipline of crafting inputs that consistently produc
 
 A high-quality prompt has six components. Not all are required for every task, but knowing them lets you decide which to include.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  1. ROLE     — Who Claude should be                         │
-│  2. CONTEXT  — Background information Claude needs          │
-│  3. TASK     — What you want Claude to do                   │
-│  4. FORMAT   — How you want the output structured           │
-│  5. CONSTRAINTS — What to avoid, rules to follow            │
-│  6. EXAMPLES — Demonstrations of expected output            │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph PROMPT["🎯 Anatomy of a High-Quality Prompt"]
+        direction TB
+        R["1️⃣ ROLE<br/>Who Claude should be<br/><i>'You are a senior TypeScript developer...'</i>"]
+        C["2️⃣ CONTEXT<br/>Background information<br/><i>'We use Express 4, Prisma ORM, PostgreSQL...'</i>"]
+        T["3️⃣ TASK<br/>What to do<br/><i>'Implement a user invitation system...'</i>"]
+        F["4️⃣ FORMAT<br/>Output structure<br/><i>'Return as TypeScript with JSDoc...'</i>"]
+        CO["5️⃣ CONSTRAINTS<br/>Rules to follow<br/><i>'No any types, max 50 lines per function...'</i>"]
+        E["6️⃣ EXAMPLES<br/>Expected output demos<br/><i>'Here is an example of the pattern...'</i>"]
+        
+        R --> C --> T --> F --> CO --> E
+    end
+
+    style R fill:#e74c3c,stroke:#c0392b,color:#fff
+    style C fill:#f5a623,stroke:#d4891a,color:#fff
+    style T fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style F fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style CO fill:#50c878,stroke:#3da360,color:#fff
+    style E fill:#17a2b8,stroke:#138496,color:#fff
 ```
 
 ### The Difference It Makes
@@ -272,6 +283,19 @@ The examples teach Claude: format, vocabulary, scope specificity, and length.
 
 ## 8. Chain-of-Thought Prompting
 
+```mermaid
+graph LR
+    P["📝 Prompt<br/>'Think step<br/>by step'"] --> S1["Step 1<br/>Understand<br/>the problem"] --> S2["Step 2<br/>Break into<br/>sub-tasks"] --> S3["Step 3<br/>Solve each<br/>sub-task"] --> S4["Step 4<br/>Verify &<br/>combine"] --> R["✅ Final<br/>Answer"]
+
+    style P fill:#f5a623,stroke:#d4891a,color:#fff
+    style S1 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S3 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S4 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style R fill:#50c878,stroke:#3da360,color:#fff
+```
+
+
 For complex reasoning tasks, instruct Claude to show its work before giving an answer. This dramatically improves accuracy on multi-step problems.
 
 **Basic chain-of-thought:**
@@ -328,6 +352,22 @@ If you find any issues, fix them and show me the corrected version.
 Modern LLMs offer two distinct reasoning modes that require different prompting strategies.
 
 ### When to Use Extended Thinking (Claude) or o4 (OpenAI)
+
+```mermaid
+graph TB
+    subgraph CLAUDE_ET["🟣 Claude Extended Thinking"]
+        direction TB
+        CE1["Budget: thinking tokens<br/>(10K-128K)"] --> CE2["Internal reasoning<br/>visible via API"] --> CE3["Best for: complex code,<br/>architecture, multi-step"]
+    end
+    subgraph O4["🟢 OpenAI o4"]
+        direction TB
+        OE1["Budget: reasoning effort<br/>(low/medium/high)"] --> OE2["Chain-of-thought<br/>before answering"] --> OE3["Best for: math, proofs,<br/>algorithmic problems"]
+    end
+
+    style CLAUDE_ET fill:#f0f4ff,stroke:#7b68ee
+    style O4 fill:#f0fff4,stroke:#50c878
+```
+
 
 These models spend additional tokens on internal reasoning before answering. This makes them dramatically better at problems where standard prompting gives plausible-but-wrong answers.
 

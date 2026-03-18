@@ -25,12 +25,21 @@ This is the article you read once, then keep on your second screen.
 
 The mental model shift is fundamental:
 
-```
-TRADITIONAL DEVELOPMENT
-Developer → writes code → reviews → ships
+```mermaid
+graph LR
+    subgraph TRAD["Traditional Development"]
+        direction LR
+        T1["👨‍💻 Developer"] --> T2["✍️ Writes Code"] --> T3["🔍 Reviews"] --> T4["🚀 Ships"]
+    end
 
-AISFD
-Developer → defines intent + context → AI implements → Developer reviews + corrects → ships
+    subgraph AISFD_FLOW["AISFD — AI-Assisted Feature Development"]
+        direction LR
+        A1["👨‍💻 Developer"] --> A2["📋 Defines Intent<br/>+ Context"] --> A3["🤖 AI<br/>Implements"] --> A4["🔍 Developer<br/>Reviews"] --> A5["🚀 Ships"]
+    end
+
+    style TRAD fill:#ffe5e5,stroke:#e74c3c
+    style AISFD_FLOW fill:#d4edda,stroke:#28a745
+    style A3 fill:#7b68ee,stroke:#5a4dbd,color:#fff
 ```
 
 The developer's job doesn't disappear — it upgrades. You stop being the one who types; you become the one who thinks clearly, provides the right context, and exercises judgment on outputs. The value moves from execution to architecture, from typing to reviewing.
@@ -51,17 +60,22 @@ Claude Code has evolved from a terminal chatbot into a layered platform. Underst
 
 Here is the complete feature stack, in order of how they were added:
 
+```mermaid
+timeline
+    title Claude Code Platform Evolution (2024-2026)
+    section Foundation
+        Nov 2024 : 🔌 MCP Integration : External tools & services
+    section Growth
+        Jul 2025 : 🔀 Subagents : Parallel isolated agents
+        Sep 2025 : ⚡ Hooks : Lifecycle automation
+        Oct 2025 : 📚 Skills/Plugins : Reusable prompt workflows
+    section Maturity
+        Jan 2026 : 📋 Tasks : Persistent DAG task management
+        Feb 2026 : 🤖 Agent Teams : Multi-agent collaboration
+        Feb 2026 : ♾️ Context Compaction : Infinite conversations
 ```
-Claude Code Platform (2026)
-├── Core Agent Loop        → file ops, bash, web, git (always available)
-├── MCP Integration        → Nov 2024 (external tools + services)
-├── Subagents             → Jul 2025 (parallel isolated agents)
-├── Hooks                 → Sep 2025 (lifecycle automation)
-├── Skills / Plugins      → Oct 2025 (reusable prompt workflows)
-├── Tasks                 → Jan 2026 (persistent DAG task management)
-├── Agent Teams           → Feb 2026 (collaborative multi-agent squads)
-└── Context Compaction    → Feb 2026 (infinite conversations)
-```
+
+> 🧱 **Core Agent Loop** (file ops, bash, web, git) is always available as the foundation layer.
 
 Let's go deep on each.
 
@@ -575,6 +589,23 @@ claude --teleport
 This is the decision framework for choosing the right model for every task in your development day. Updated for Claude Code 2.x and the Sonnet 4.6 reality where near-Opus quality is available at Sonnet pricing.
 
 ### The Hierarchy
+
+```mermaid
+graph TD
+    subgraph HIERARCHY["🎯 AISFD Model Selection Hierarchy"]
+        direction TB
+        DEFAULT["<b>DEFAULT: Sonnet 4.6</b><br/>Use for 80% of tasks"]
+        UP["⬆️ UPGRADE to Opus 4.6<br/>When Sonnet output quality<br/>is genuinely insufficient"]
+        DOWN["⬇️ DOWNGRADE to Haiku 4.5<br/>For high-volume, simple tasks<br/>(classification, extraction)"]
+        
+        DOWN --> DEFAULT --> UP
+    end
+
+    style DEFAULT fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style UP fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style DOWN fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 ```
 Task complexity

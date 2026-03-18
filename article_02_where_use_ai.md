@@ -10,27 +10,63 @@ Every week there's a new announcement: "AI can now do X." But knowing what AI *c
 
 This article maps the AI application landscape for software engineering teams — developers, QA engineers, and business analysts — with honest assessments of where the ROI is real.
 
+```mermaid
+graph TB
+    subgraph PROD["🟢 Production-Ready (★★★★★)"]
+        D["📝 Documentation"]
+        TC["🧪 Test Case Gen"]
+        US["📋 User Stories"]
+    end
+    subgraph REVIEW["🟡 Ready with Review (★★★★☆)"]
+        CG["💻 Code Generation"]
+        CR["🔍 Code Review"]
+        DB["🐛 Debugging"]
+        RF["♻️ Refactoring"]
+        TD["📊 Test Data Gen"]
+        RE["📑 Requirements"]
+        GA["🔎 Gap Analysis"]
+        DA["📈 Data Analysis"]
+    end
+    subgraph ASSIST["🟠 Assisted (★★★☆☆)"]
+        AD["🏗️ Architecture"]
+        BT["📋 Bug Triage"]
+        AT["♿ Accessibility"]
+        PT["⚡ Perf Testing"]
+    end
+
+    style PROD fill:#d4edda,stroke:#28a745
+    style REVIEW fill:#fff3cd,stroke:#ffc107
+    style ASSIST fill:#ffe5cc,stroke:#fd7e14
+```
+
+
 ---
 
 ## 1. The Application Spectrum
 
 Think of AI applications on two axes:
 
-```
-                    HIGH CREATIVITY
-                          │
-         Content Gen      │    Architectural Design
-         (articles,       │    (system design,
-          marketing)      │     trade-off analysis)
-                          │
-LOW ──────────────────────┼────────────────────── HIGH
-AUTONOMY                  │                    AUTONOMY
-                          │
-         Data Extraction  │    Automated Testing
-         (parsing,        │    (full test suites,
-          classification) │     CI integration)
-                          │
-                    LOW CREATIVITY
+```mermaid
+quadrantChart
+    title AI Application Spectrum for Software Engineering
+    x-axis "Low Autonomy" --> "High Autonomy"
+    y-axis "Low Creativity" --> "High Creativity"
+    quadrant-1 "🏗️ Architectural Design"
+    quadrant-2 "✍️ Content Generation"
+    quadrant-3 "📊 Data Extraction"
+    quadrant-4 "🧪 Automated Testing"
+    "System Design": [0.75, 0.85]
+    "Trade-off Analysis": [0.80, 0.70]
+    "Article Writing": [0.35, 0.80]
+    "Marketing Copy": [0.25, 0.75]
+    "Code Generation": [0.65, 0.55]
+    "Test Suites": [0.80, 0.30]
+    "CI Integration": [0.85, 0.25]
+    "Parsing/OCR": [0.30, 0.20]
+    "Classification": [0.35, 0.15]
+    "Bug Triage": [0.55, 0.35]
+    "Documentation": [0.50, 0.45]
+    "Code Review": [0.60, 0.40]
 ```
 
 Most enterprise AI use cases cluster in the **high autonomy, lower creativity** quadrant — automation, classification, code generation following patterns.
@@ -278,6 +314,21 @@ Be deliberate about these boundaries:
 
 ## 8. The 80/20 Rule for AI Adoption
 
+```mermaid
+graph LR
+    subgraph TOP5["🎯 Start Here — The 80/20 AI Wins"]
+        direction TB
+        A["📝 Documentation Writing<br/>⏱️ Saves 70-80% of time"] 
+        B["🧪 Test Case Generation<br/>⏱️ Saves 60-70% of time"]
+        C["📋 User Story + AC Gen<br/>⏱️ Saves 50-60% of time"]
+        D["💻 Code Gen (Boilerplate)<br/>⏱️ Saves 30-40% of time"]
+        E["🐛 Bug Triage + Debugging<br/>⏱️ Saves 20-40% of time"]
+    end
+    
+    style TOP5 fill:#d4edda,stroke:#28a745
+```
+
+
 The highest-ROI applications for most engineering teams:
 
 1. **Code generation for boilerplate** (saves 30–40% of typing)
@@ -289,6 +340,24 @@ The highest-ROI applications for most engineering teams:
 Start here. Get 10x value from these five use cases before expanding to more complex workflows.
 
 ---
+
+
+```mermaid
+graph LR
+    R["📋<br/>Requirements"] --> D["🏗️<br/>Design"] --> C["💻<br/>Development"] --> Q["🧪<br/>QA"] --> S["🚀<br/>Release"]
+    
+    R -.- R1["User story gen<br/>AC writing<br/>Gap analysis"]
+    D -.- D1["Architecture brainstorm<br/>Diagram generation<br/>ADR writing"]
+    C -.- C1["Code generation<br/>Code review<br/>Documentation"]
+    Q -.- Q1["Test case gen<br/>Test data gen<br/>Bug triage"]
+    S -.- S1["Release notes<br/>Runbook gen<br/>Changelog"]
+
+    style R fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style D fill:#f5a623,stroke:#d4891a,color:#fff
+    style C fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style Q fill:#50c878,stroke:#3da360,color:#fff
+    style S fill:#e74c3c,stroke:#c0392b,color:#fff
+```
 
 ## 9. AI in the Development Lifecycle
 

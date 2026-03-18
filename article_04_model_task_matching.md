@@ -14,6 +14,34 @@ Model selection is an engineering decision with measurable consequences: quality
 
 ## 1. The Model Selection Framework
 
+```mermaid
+graph TD
+    START["🤔 Choose a Model"] --> Q1{"Cognitive<br/>Demand?"}
+    Q1 -->|"Low"| Q1L["Summarise, classify,<br/>extract, format"]
+    Q1 -->|"Medium"| Q1M["Code gen, docs,<br/>analysis"]
+    Q1 -->|"High"| Q1H["Multi-step reasoning,<br/>architecture"]
+    
+    Q1L --> Q2L{"Context Size?"}
+    Q1M --> Q2M{"Context Size?"}
+    Q1H --> Q2H{"Context Size?"}
+    
+    Q2L -->|"< 100K"| HAIKU["⚡ Haiku 4.5<br/>$0.80/$4 MTok"]
+    Q2L -->|"> 100K"| SONNET1["💡 Sonnet 4.6"]
+    Q2M -->|"< 200K"| SONNET2["💡 Sonnet 4.6<br/>$3/$15 MTok"]
+    Q2M -->|"> 200K"| GEMINI1["🔵 Gemini 3.1 Pro<br/>1M context"]
+    Q2H -->|"< 200K"| OPUS["🟣 Opus 4.6<br/>$15/$75 MTok"]
+    Q2H -->|"> 200K"| GEMINI2["🔵 Gemini 3.1 Pro"]
+
+    style START fill:#f5a623,stroke:#d4891a,color:#fff
+    style HAIKU fill:#50c878,stroke:#3da360,color:#fff
+    style SONNET1 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style SONNET2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style OPUS fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style GEMINI1 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style GEMINI2 fill:#e74c3c,stroke:#c0392b,color:#fff
+```
+
+
 Before picking a model, answer four questions:
 
 **1. What is the cognitive demand?**
@@ -49,6 +77,21 @@ Before picking a model, answer four questions:
 ---
 
 ## 2. The Claude Model Family Deep-Dive
+
+```mermaid
+graph TB
+    subgraph CLAUDE["🟣 Claude Model Family — When to Use Each"]
+        direction LR
+        O["🏆 Opus 4.6<br/>━━━━━━━━━<br/>Architecture decisions<br/>200-page spec review<br/>Security audits<br/>Research synthesis<br/>━━━━━━━━━<br/>⏱️ 15-60s · 💰 $15/$75"]
+        S["⚡ Sonnet 4.6<br/>━━━━━━━━━<br/>Daily coding<br/>Test generation<br/>Documentation<br/>Code review<br/>━━━━━━━━━<br/>⏱️ 3-15s · 💰 $3/$15"]
+        H["🚀 Haiku 4.5<br/>━━━━━━━━━<br/>Classification<br/>Summarisation<br/>Data extraction<br/>High-volume APIs<br/>━━━━━━━━━<br/>⏱️ < 3s · 💰 $0.80/$4"]
+    end
+    
+    style O fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style S fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style H fill:#50c878,stroke:#3da360,color:#fff
+```
+
 
 Since we're building toward a Claude-focused setup in this series, let's thoroughly understand the Claude model tiers.
 
@@ -270,6 +313,32 @@ Decision tree for open vs. closed models:
 ---
 
 ## 7. Multi-Model Workflows
+
+```mermaid
+graph LR
+    subgraph P1["Pattern 1: Quality Tiers"]
+        direction TB
+        P1A["Haiku<br/>Draft"] --> P1B["Sonnet<br/>Refine"] --> P1C["Opus<br/>Final QA"]
+    end
+    subgraph P2["Pattern 2: Draft + Review"]
+        direction TB
+        P2A["Sonnet<br/>Generate Code"] --> P2B["Opus<br/>Review + Critique"]
+    end
+    subgraph P3["Pattern 3: Extract → Reason"]
+        direction TB
+        P3A["Haiku<br/>Extract Data"] --> P3B["Sonnet<br/>Analyse Patterns"]
+    end
+    subgraph P4["Pattern 4: RAG Pipeline"]
+        direction TB
+        P4A["Embedding<br/>Model Index"] --> P4B["Haiku<br/>Retrieve"] --> P4C["Sonnet<br/>Synthesise"]
+    end
+
+    style P1 fill:#f0f4ff,stroke:#4a90d9
+    style P2 fill:#fff8f0,stroke:#f5a623
+    style P3 fill:#f0fff4,stroke:#50c878
+    style P4 fill:#f5f0ff,stroke:#7b68ee
+```
+
 
 The most sophisticated AI-powered engineering workflows use multiple models in sequence:
 

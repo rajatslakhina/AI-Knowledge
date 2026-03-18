@@ -10,6 +10,27 @@ Most developers who start with Claude Code use it for isolated tasks: explain th
 
 This article builds that full integration: Claude Code wired end-to-end into your git workflow, from the moment you start a new feature to the moment a PR is merged.
 
+```mermaid
+graph TD
+    T["📋 Ticket<br/>Assigned"] --> B["🌿 Branch<br/>Created<br/><i>/git-start-feature</i>"]
+    B --> I["💻 Implementation<br/><i>Claude Code</i>"]
+    I --> C["✅ Commits<br/><i>/git-commit</i><br/>Conventional format"]
+    C --> R["🔍 Self-Review<br/><i>/git-review</i>"]
+    R --> PR["📝 PR Created<br/><i>/git-pr</i><br/>Auto-description"]
+    PR --> CI["⚙️ CI/CD<br/><i>Headless Claude</i><br/>Lint + Test + Build"]
+    CI --> HRE["👥 Human<br/>Review"]
+    HRE --> M["🎉 Merged!"]
+
+    style T fill:#f5a623,stroke:#d4891a,color:#fff
+    style I fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style C fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style R fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style PR fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style CI fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style M fill:#50c878,stroke:#3da360,color:#fff
+```
+
+
 By the end you'll have:
 - CLAUDE.md configured with your team's git conventions (enforced automatically)
 - Skills for every git workflow (branch creation, commit messages, PR descriptions, changelogs)
@@ -77,6 +98,25 @@ With this in CLAUDE.md, every Claude action — branch creation, commit generati
 ---
 
 ## 2. Git Skills — Reusable Slash Commands for Every Git Task
+
+```mermaid
+graph TB
+    subgraph SKILLS["📁 .claude/skills/ — Git Workflow Skills"]
+        direction TB
+        S1["🌿 git-start-feature.md<br/>Branch creation + naming"]
+        S2["✅ git-commit.md<br/>Conventional commit format"]
+        S3["📝 git-pr.md<br/>PR description + checklist"]
+        S4["🔍 git-review.md<br/>Self-review before PR"]
+        S5["📋 git-changelog.md<br/>Auto-generated changelog"]
+    end
+
+    DEV["👨‍💻 Developer<br/>types /git-commit"] --> SKILLS
+    SKILLS --> CLAUDE["🤖 Claude follows<br/>team conventions"]
+
+    style SKILLS fill:#f0f4ff,stroke:#4a90d9
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff
+```
+
 
 ### Create and configure your git skills directory
 

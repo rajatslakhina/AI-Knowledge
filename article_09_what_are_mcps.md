@@ -25,44 +25,68 @@ Think of it like USB for AI tools:
 - USB standardised device communication
 - MCP standardises AI tool communication
 
-```
-Without MCP:
-Claude ←→ [custom Anthropic integration] ←→ GitHub
-Claude ←→ [custom Anthropic integration] ←→ JIRA  
-Claude ←→ [custom Anthropic integration] ←→ Database
-(Each integration is one-off, maintained separately)
+```mermaid
+graph LR
+    subgraph WITHOUT["❌ Without MCP — Custom Integrations"]
+        direction TB
+        C1["Claude"] -->|"Custom API"| G1["GitHub"]
+        C1 -->|"Custom API"| J1["JIRA"]
+        C1 -->|"Custom API"| D1["Database"]
+        C1 -->|"Custom API"| S1["Slack"]
+    end
+    
+    subgraph WITH["✅ With MCP — Universal Protocol"]
+        direction TB
+        C2["Claude"] -->|"MCP Protocol"| MCP["🔌 MCP<br/>Standard"]
+        MCP --> G2["GitHub<br/>Server"]
+        MCP --> J2["JIRA<br/>Server"]
+        MCP --> D2["DB<br/>Server"]
+        MCP --> S2["Slack<br/>Server"]
+    end
 
-With MCP:
-Claude ←→ [MCP Protocol] ←→ GitHub MCP Server
-Claude ←→ [MCP Protocol] ←→ JIRA MCP Server
-Claude ←→ [MCP Protocol] ←→ Database MCP Server
-(One protocol, infinite tools)
+    style WITHOUT fill:#ffe5e5,stroke:#e74c3c
+    style WITH fill:#d4edda,stroke:#28a745
+    style MCP fill:#f5a623,stroke:#d4891a,color:#fff
 ```
 
 ---
 
 ## 2. The MCP Architecture
 
-```
-┌─────────────────────────────────────────────────┐
-│                  MCP CLIENT                      │
-│  (Claude Code, Claude Desktop, your application) │
-└────────────────────────┬────────────────────────┘
-                         │ MCP Protocol (JSON-RPC)
-          ┌──────────────┴──────────────────────┐
-          │                                      │
-┌─────────▼─────────┐              ┌─────────────▼────────┐
-│   MCP Server A    │              │    MCP Server B       │
-│   (Filesystem)    │              │    (GitHub API)       │
-│                   │              │                       │
-│  Tools:           │              │  Tools:               │
-│  - read_file      │              │  - create_issue       │
-│  - write_file     │              │  - list_prs           │
-│  - list_dir       │              │  - get_commit         │
-│                   │              │                       │
-│  Resources:       │              │  Resources:           │
-│  - file://        │              │  - github://repo      │
-└───────────────────┘              └──────────────────────┘
+```mermaid
+graph TB
+    CLIENT["🖥️ MCP CLIENT<br/><i>Claude Code · Claude Desktop · Your App</i>"]
+    
+    CLIENT -->|"JSON-RPC"| SA["📁 MCP Server A<br/><b>Filesystem</b>"]
+    CLIENT -->|"JSON-RPC"| SB["🐙 MCP Server B<br/><b>GitHub API</b>"]
+    CLIENT -->|"JSON-RPC"| SC["🗄️ MCP Server C<br/><b>Database</b>"]
+    
+    subgraph TOOLS_A["Server A — Tools & Resources"]
+        TA1["read_file"] 
+        TA2["write_file"]
+        TA3["list_dir"]
+        RA["📂 file://"]
+    end
+    subgraph TOOLS_B["Server B — Tools & Resources"]
+        TB1["create_issue"]
+        TB2["list_prs"]
+        TB3["get_commit"]
+        RB["🔗 github://repo"]
+    end
+    subgraph TOOLS_C["Server C — Tools & Resources"]
+        TC1["query"]
+        TC2["list_tables"]
+        RC["🗃️ postgres://"]
+    end
+    
+    SA --> TOOLS_A
+    SB --> TOOLS_B
+    SC --> TOOLS_C
+
+    style CLIENT fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style SA fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style SB fill:#50c878,stroke:#3da360,color:#fff
+    style SC fill:#f5a623,stroke:#d4891a,color:#fff
 ```
 
 **Three core primitives in MCP:**
@@ -75,14 +99,36 @@ Claude ←→ [MCP Protocol] ←→ Database MCP Server
 
 ## 3. Types of MCP Servers
 
+```mermaid
+graph TB
+    subgraph LOCAL["🏠 Type 1: Local (stdio)"]
+        L1["Runs on your machine<br/>⚡ Zero latency<br/>🔒 Private<br/>📁 Filesystem, Git, DB"]
+    end
+    subgraph REMOTE["🌐 Type 2: Remote (HTTP/SSE)"]
+        R1["Cloud-hosted server<br/>🔗 Network required<br/>🔑 Auth needed<br/>🐙 GitHub, Slack, Jira"]
+    end
+    subgraph CUSTOM["🔧 Type 3: Custom"]
+        CU1["You build it<br/>🎯 Your APIs/tools<br/>📦 FastMCP SDK<br/>🏢 Internal services"]
+    end
+
+    style LOCAL fill:#d4edda,stroke:#28a745
+    style REMOTE fill:#f0f4ff,stroke:#4a90d9
+    style CUSTOM fill:#fff3cd,stroke:#ffc107
+```
+
+
 ### Type 1: Local MCP Servers (stdio)
 
 Local servers run as processes on the same machine as Claude Code. They communicate via standard input/output (stdio) — no network required.
 
 **How they work:**
-```
-Claude Code process → spawns → MCP Server process
-                     ↕ stdin/stdout (JSON-RPC)
+```mermaid
+graph LR
+    CC["🖥️ Claude Code<br/>Process"] -->|"spawns"| MCP["🔧 MCP Server<br/>Process"]
+    CC <-->|"stdin/stdout<br/>(JSON-RPC)"| MCP
+
+    style CC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style MCP fill:#4a90d9,stroke:#2d6cb4,color:#fff
 ```
 
 **Characteristics:**

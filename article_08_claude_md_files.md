@@ -22,14 +22,30 @@ This article covers exactly what files to create, what content to include, and h
 
 When you run `claude` in a project directory, Claude Code automatically loads files in a specific order:
 
+```mermaid
+graph TD
+    subgraph LOADING["📂 Claude Code Context Loading Order"]
+        direction TB
+        L1["1️⃣ ~/.claude/CLAUDE.md<br/><b>Global User Preferences</b><br/>Your personal style, aliases, defaults"] 
+        L2["2️⃣ /project-root/CLAUDE.md<br/><b>Project Configuration</b><br/>Tech stack, conventions, rules"]
+        L3["3️⃣ /project-root/.claude/<br/><b>Additional Context Files</b><br/>Skills, settings, patterns"]
+        L4["4️⃣ Conversation History<br/><b>Dynamic Context</b><br/>Current session + memory"]
+        L5["5️⃣ Referenced Files<br/><b>Explicit Includes</b><br/>Files you mention in your prompt"]
+        
+        L1 --> L2 --> L3 --> L4 --> L5
+    end
+
+    L5 --> CLAUDE["🧠 Claude's<br/>Working Context"]
+
+    style L1 fill:#6c757d,stroke:#495057,color:#fff
+    style L2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style L3 fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style L4 fill:#f5a623,stroke:#d4891a,color:#fff
+    style L5 fill:#50c878,stroke:#3da360,color:#fff
+    style CLAUDE fill:#17a2b8,stroke:#138496,color:#fff
 ```
-Priority order (highest to lowest):
-1. ~/.claude/CLAUDE.md          → Global user preferences
-2. /project-root/CLAUDE.md      → Project-level configuration  
-3. /project-root/.claude/       → Additional project context files
-4. Current conversation history → Dynamic context
-5. Files you explicitly reference in your prompt
-```
+
+> ⚡ **Key:** Project-level `CLAUDE.md` is where you get the most leverage — invest here first.
 
 Understanding this hierarchy lets you structure context at the right level.
 
@@ -52,6 +68,42 @@ your-project/
 ```
 
 ### The Anatomy of a Great CLAUDE.md
+
+```mermaid
+mindmap
+  root((📄 CLAUDE.md<br/>Anatomy))
+    🏗️ Project Overview
+      App description
+      Target users
+      Key objectives
+    ⚙️ Tech Stack
+      Languages & versions
+      Frameworks
+      Databases
+      Build tools
+    📁 Repo Structure
+      Directory layout
+      Module boundaries
+      Entry points
+    🏛️ Architecture Decisions
+      Patterns used
+      Anti-patterns banned
+      ADR references
+    📝 Coding Conventions
+      Naming rules
+      Error handling
+      Async patterns
+      Logging format
+    🧪 Testing Standards
+      Frameworks
+      Coverage targets
+      Naming patterns
+    🔒 Security Rules
+      Auth patterns
+      Input validation
+      Secrets handling
+```
+
 
 Here's a complete template with explanations of every section:
 
