@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitMCP.io as Your Knowledge Repo — Zero-Infrastructure Context That Actually Improves Claude's Accuracy</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: GitMCP, Claude AI, Knowledge Management, MCP, Developer Tools
+    6. Add subtitle: You asked: "If I wire my GitHub knowledge repo through gitmcp.io into the same `.claude/settings.json` as Jira/Linear, filesystem, git, postgres, and memory — will Claude get better context and produce more accurate output?" The short answer is yes, meaningfully so. This article explains exactly why, how the mechanism works under the hood, how to structure your knowledge repo to maximise the gains, and how the full combined stack behaves in practice.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    A GitHub repo transforming into an AI-readable knowledge base. Repository → MCP server visual metaphor.
+    ============================================================
+    RECOMMENDED TAGS:
+    GitMCP, Claude AI, Knowledge Management, MCP, Developer Tools
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>GitMCP.io as Your Knowledge Repo — Zero-Infrastructure Context That Actually Improves Claude's Accuracy</h1>
+
+<p><em>You asked: "If I wire my GitHub knowledge repo through gitmcp.io into the same `.claude/settings.json` as Jira/Linear, filesystem, git, postgres, and memory — will Claude get better context and produce more accurate output?" The short answer is yes, meaningfully so. This article explains exactly why, how the mechanism works under the hood, how to structure your knowledge repo to maximise the gains, and how the full combined stack behaves in practice.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: A GitHub repo transforming into an AI-readable knowledge base. Repository → MCP server visual metaphor. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="what-youre-actually-building">What You're Actually Building</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    CLAUDE["🤖 Claude Code&lt;br/&gt;Full Context"] 
+    
+    CLAUDE --&gt; FS["📁 Filesystem&lt;br/&gt;&lt;i&gt;Current codebase&lt;/i&gt;"]
+    CLAUDE --&gt; GIT["🔀 Git&lt;br/&gt;&lt;i&gt;Change history&lt;/i&gt;"]
+    CLAUDE --&gt; PG["🗄️ Postgres&lt;br/&gt;&lt;i&gt;Data shape&lt;/i&gt;"]
+    CLAUDE --&gt; GH["🐙 GitHub&lt;br/&gt;&lt;i&gt;PRs &amp; issues&lt;/i&gt;"]
+    CLAUDE --&gt; JR["📋 Jira/Linear&lt;br/&gt;&lt;i&gt;What to build&lt;/i&gt;"]
+    CLAUDE --&gt; SL["💬 Slack&lt;br/&gt;&lt;i&gt;Decisions&lt;/i&gt;"]
+    CLAUDE --&gt; MEM["🧠 Memory&lt;br/&gt;&lt;i&gt;Past sessions&lt;/i&gt;"]
+    CLAUDE --&gt; KR["📚 Knowledge Repo&lt;br/&gt;&lt;i&gt;Team patterns&lt;br/&gt;&amp; rules&lt;/i&gt;"]
+
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style KR fill:#f5a623,stroke:#d4891a,color:#fff
+    style FS fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style GIT fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style PG fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style GH fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style JR fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style SL fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style MEM fill:#4a90d9,stroke:#2d6cb4,color:#fff</code></pre>
+</figure>
+
+<blockquote>
+<p>🎯 <strong>The Knowledge Repo (via GitMCP) is the only MCP that tells
+Claude HOW your team builds software.</strong> Without it, Claude falls
+back to generic "best practices" that may conflict with your actual
+architecture.</p>
+</blockquote>
+<p>When you combine these servers in
+<code>.claude/settings.json</code>:</p>
+<pre><code>filesystem + git + postgres + github + jira/linear + slack + memory + gitmcp knowledge-repo</code></pre>
+<p>You are giving Claude <strong>nine dimensions of context</strong>
+simultaneously. Each MCP server answers a different question Claude
+would otherwise have to guess:</p>
+<table>
+<thead>
+<tr>
+<th>MCP Server</th>
+<th>Question it answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>filesystem</code></td>
+<td>What does the actual codebase look like right now?</td>
+</tr>
+<tr>
+<td><code>git</code></td>
+<td>What changed, when, and by whom?</td>
+</tr>
+<tr>
+<td><code>postgres-dev</code></td>
+<td>What is the real data shape and schema?</td>
+</tr>
+<tr>
+<td><code>github</code></td>
+<td>What PRs, issues, and reviews exist?</td>
+</tr>
+<tr>
+<td><code>jira</code> / <code>linear</code></td>
+<td>What is the team trying to build and why?</td>
+</tr>
+<tr>
+<td><code>slack</code></td>
+<td>What decisions were made in conversation?</td>
+</tr>
+<tr>
+<td><code>memory</code></td>
+<td>What did Claude learn across previous sessions?</td>
+</tr>
+<tr>
+<td><strong>gitmcp knowledge-repo</strong></td>
+<td><strong>How does THIS team build software — patterns, rules,
+templates?</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The knowledge repo via GitMCP is the only one that answers that last
+question. Without it, Claude falls back to generic "best practices" —
+which may conflict with your actual architecture, naming conventions,
+and security rules. <strong>That gap is where most AI-generated code
+introduces technical debt.</strong></p>
+<hr />
+<h2 id="how-gitmcpio-works-mechanically">How GitMCP.io Works
+Mechanically</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    REPO["📦 GitHub Repo&lt;br/&gt;your-org/knowledge-repo"] --&gt;|"Replace github.com&lt;br/&gt;with gitmcp.io"| GITMCP["🔌 GitMCP.io&lt;br/&gt;Remote MCP Server"]
+    GITMCP --&gt;|"mcp-remote"| CC["🤖 Claude Code"]
+    
+    CC --&gt;|"fetch_docs"| D["📄 llms.txt&lt;br/&gt;Overview"]
+    CC --&gt;|"search_docs"| S["🔍 Semantic&lt;br/&gt;Search"]
+    CC --&gt;|"search_code"| C["💻 Code&lt;br/&gt;Examples"]
+
+    style REPO fill:#6c757d,stroke:#495057,color:#fff
+    style GITMCP fill:#f5a623,stroke:#d4891a,color:#fff
+    style CC fill:#7b68ee,stroke:#5a4dbd,color:#fff</code></pre>
+</figure>
+
+<p>GitMCP is a free, open-source remote MCP server. The core mechanic is
+extremely simple: replace <code>github.com</code> with
+<code>gitmcp.io</code> in any GitHub URL.</p>
+<pre><code>https://github.com/your-org/knowledge-repo
+        ↓
+https://gitmcp.io/your-org/knowledge-repo</code></pre>
+<p>That URL becomes a fully functioning MCP server endpoint. You connect
+via <code>mcp-remote</code>:</p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;knowledge-repo&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;mcp-remote&quot;,
+        &quot;https://gitmcp.io/your-org/knowledge-repo&quot;
+      ]
+    }
+  }
+}</code></pre>
+<p>Zero infrastructure. Zero build step. No custom server to maintain.
+The repo IS the server.</p>
+<h3 id="what-tools-gitmcp-exposes-to-claude">What Tools GitMCP Exposes
+to Claude</h3>
+<p>Once connected, Claude gets access to <strong>five tools</strong> it
+can call autonomously during any session:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it does</th>
+<th>When Claude uses it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fetch_{repo}_documentation</code></td>
+<td>Retrieves full documentation — prioritises <code>llms.txt</code>,
+falls back to <code>README.md</code></td>
+<td>Broad overview questions, project orientation</td>
+</tr>
+<tr>
+<td><code>search_{repo}_documentation</code></td>
+<td><strong>Semantic search</strong> across all docs — returns only the
+relevant chunks</td>
+<td>"How does this team handle auth?", "What's the error pattern?"</td>
+</tr>
+<tr>
+<td><code>search_{repo}_code</code></td>
+<td>GitHub code search API — finds actual code snippets</td>
+<td>"Show me a service layer example"</td>
+</tr>
+<tr>
+<td><code>fetch_url_content</code></td>
+<td>Follows links inside docs to retrieve referenced material</td>
+<td>When a pattern doc links to an external spec</td>
+</tr>
+<tr>
+<td><code>match_common_libs_owner_repo_mapping</code></td>
+<td>Maps library names to owner/repo pairs</td>
+<td>Dynamic endpoint mode</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>semantic search</strong> tool is the critical one. Claude
+does not dump the entire repo into its context on every prompt. It
+queries intelligently and retrieves only the chunks relevant to the
+current task. This is why a large, well-structured knowledge repo does
+not bloat the context window — it is queried on demand.</p>
+<h3 id="document-priority-llmstxt--llms-fulltxt--readmemd">Document
+Priority: llms.txt → llms-full.txt → README.md</h3>
+<p>GitMCP uses a strict priority order when fetching documentation:</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    FETCH["🤖 Claude fetches docs"] --&gt; Q{"llms.txt&lt;br/&gt;exists?"}
+    Q --&gt;|"Yes"| L1["📄 &lt;b&gt;llms.txt&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Optimised for AI&lt;br/&gt;Concise, structured&lt;/i&gt;"]
+    Q --&gt;|"No"| Q2{"llms-full.txt&lt;br/&gt;exists?"}
+    Q2 --&gt;|"Yes"| L2["📄 &lt;b&gt;llms-full.txt&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Extended AI-readable&lt;/i&gt;"]
+    Q2 --&gt;|"No"| L3["📄 &lt;b&gt;README.md&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Human-facing fallback&lt;/i&gt;"]
+    
+    L1 --&gt; SEARCH["🔍 Semantic search discovers&lt;br/&gt;other .md files on demand"]
+    L2 --&gt; SEARCH
+    L3 --&gt; SEARCH
+
+    style L1 fill:#50c878,stroke:#3da360,color:#fff
+    style L2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style L3 fill:#6c757d,stroke:#495057,color:#fff
+    style SEARCH fill:#f5a623,stroke:#d4891a,color:#fff</code></pre>
+</figure>
+
+<blockquote>
+<p>🎯 <strong>Highest-leverage action:</strong> Add an
+<code>llms.txt</code> file to your knowledge repo root. It's the first
+thing Claude reads.</p>
+</blockquote>
+<p><strong>The single highest-leverage thing you can do</strong> is add
+an <code>llms.txt</code> file to the root of your knowledge repo. This
+file is the first thing Claude reads when it connects to the repo MCP.
+It sets the frame for every subsequent query.</p>
+<hr />
+<h2
+id="does-it-actually-improve-accuracy-breaking-down-the-mechanisms">Does
+It Actually Improve Accuracy? Breaking Down the Mechanisms</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    subgraph WITHOUT["❌ Without Knowledge Repo"]
+        W1["Claude uses generic patterns"] --&gt; W2["Code works but doesn't&lt;br/&gt;match team conventions"] --&gt; W3["2+ rounds of&lt;br/&gt;review comments"] --&gt; W4["⏱️ 3x longer delivery"]
+    end
+    
+    subgraph WITH["✅ With Knowledge Repo"]
+        K1["Claude reads team patterns"] --&gt; K2["Code matches architecture&lt;br/&gt;+ naming + security rules"] --&gt; K3["Minor review comments&lt;br/&gt;if any"] --&gt; K4["⚡ Ship fast"]
+    end
+
+    style WITHOUT fill:#ffe5e5,stroke:#e74c3c
+    style WITH fill:#d4edda,stroke:#28a745
+    style W4 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style K4 fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>Yes. Here is exactly why — broken down by the type of
+improvement:</p>
+<h3 id="1-eliminates-architectural-hallucination">1. Eliminates
+Architectural Hallucination</h3>
+<p>Claude's training data contains patterns from thousands of codebases.
+Without team-specific context, it will generate code that is generically
+correct but architecturally wrong for your project. Examples:</p>
+<ul>
+<li>You use Repository pattern → Claude generates direct Prisma calls in
+service layers</li>
+<li>You use React Query for server state → Claude adds Redux for server
+data</li>
+<li>You have a custom <code>AppError</code> class → Claude throws
+generic <code>new Error()</code></li>
+<li>Your auth uses <code>requestContext.user</code> → Claude imports
+from <code>express-jwt</code> directly</li>
+</ul>
+<p>With the knowledge repo connected, Claude queries it before
+scaffolding and finds the actual patterns. It generates code that fits
+your architecture on the first attempt.</p>
+<h3 id="2-enforces-security-rules-at-generation-time">2. Enforces
+Security Rules at Generation Time</h3>
+<p>Security rules in a knowledge repo are enforced <em>before</em> code
+is written, not in a review after. Example content in
+<code>security/rules.md</code>:</p>
+<pre class="markdown"><code># Security Rules — Non-Negotiable
+
+## SQL
+- NEVER use string interpolation in queries
+- ALL queries go through Prisma or parameterised pg
+- Raw SQL only in /db/migrations, never in application code
+
+## Auth  
+- JWT validation only in middleware, never in route handlers
+- requestContext.user is the ONLY authoritative user object
+- NEVER trust client-supplied user IDs without re-validation
+
+## Secrets
+- NEVER log req.body on authenticated routes
+- NEVER include credentials in error messages returned to client</code></pre>
+<p>When Claude queries the knowledge repo before writing a feature, it
+reads these rules and applies them. This is qualitatively different from
+hoping a security reviewer catches violations after the fact.</p>
+<h3 id="3-templates-eliminate-boilerplate-drift">3. Templates Eliminate
+Boilerplate Drift</h3>
+<p>When your knowledge repo contains actual production-ready templates,
+Claude uses them as the scaffold instead of generating from scratch:</p>
+<pre><code>knowledge-repo/
+  templates/
+    service.template.ts       ← Standard service layer skeleton
+    controller.template.ts    ← Route handler with validation shape
+    repository.template.ts    ← Data access layer pattern
+    react-component.template.tsx
+    expo-screen.template.tsx</code></pre>
+<p>The generated code starts from your template, not from a generic
+interpretation of "TypeScript service". The diff between what Claude
+produces and what your senior engineer would produce shrinks
+dramatically.</p>
+<h3
+id="4-architecture-decision-records-prevent-revisiting-settled-decisions">4.
+Architecture Decision Records Prevent Revisiting Settled Decisions</h3>
+<p>A common AI failure mode: Claude suggests using a library or pattern
+your team explicitly evaluated and rejected. ADRs in the knowledge repo
+prevent this:</p>
+<pre><code>knowledge-repo/
+  architecture/
+    decisions/
+      ADR-001-use-react-query-not-redux.md
+      ADR-002-prisma-not-typeorm.md  
+      ADR-003-zod-validation-at-controller-boundary.md
+      ADR-004-no-class-based-services.md</code></pre>
+<p>When Claude queries "how should I manage server state", it finds
+ADR-001 and uses React Query. When it considers TypeORM, it finds
+ADR-002 and stays on Prisma. Your settled technical decisions stay
+settled.</p>
+<h3 id="5-the-memory-mcp-creates-durable-pattern-reinforcement">5. The
+Memory MCP Creates Durable Pattern Reinforcement</h3>
+<p>The <code>memory</code> MCP in your stack creates an important
+compounding loop with GitMCP. When Claude discovers a pattern from the
+knowledge repo and successfully applies it, you can instruct it to store
+that association in memory:</p>
+<pre><code>&quot;Remember: this team uses AppError with statusCode and code fields for all 
+service-layer errors. Knowledge repo has the pattern at patterns/backend/error-handling.md&quot;</code></pre>
+<p>In future sessions, Claude retrieves this from memory and immediately
+knows to query the knowledge repo for the specific error-handling
+pattern. The two MCPs reinforce each other.</p>
+<hr />
+<h2 id="the-complete-combined-settingsjson">The Complete Combined
+settings.json</h2>
+<p>Here is the full <code>.claude/settings.json</code> that wires all
+nine MCPs together, with the knowledge repo added via GitMCP:</p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;filesystem&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;,
+        &quot;@modelcontextprotocol/server-filesystem&quot;,
+        &quot;/Users/dev/projects/my-app&quot;,
+        &quot;/Users/dev/projects/my-app-docs&quot;
+      ]
+    },
+    &quot;git&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;uvx&quot;,
+      &quot;args&quot;: [&quot;mcp-server-git&quot;, &quot;--repository&quot;, &quot;/Users/dev/projects/my-app&quot;]
+    },
+    &quot;postgres-dev&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;,
+        &quot;@modelcontextprotocol/server-postgres&quot;,
+        &quot;postgresql://claude_readonly:password@localhost:5432/myapp_dev&quot;
+      ]
+    },
+    &quot;github&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+      &quot;env&quot;: {
+        &quot;GITHUB_PERSONAL_ACCESS_TOKEN&quot;: &quot;${GITHUB_PERSONAL_ACCESS_TOKEN}&quot;
+      }
+    },
+    &quot;jira&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;mcp-server-jira&quot;],
+      &quot;env&quot;: {
+        &quot;JIRA_HOST&quot;: &quot;${JIRA_HOST}&quot;,
+        &quot;JIRA_EMAIL&quot;: &quot;${JIRA_EMAIL}&quot;,
+        &quot;JIRA_API_TOKEN&quot;: &quot;${JIRA_API_TOKEN}&quot;
+      }
+    },
+    &quot;slack&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-slack&quot;],
+      &quot;env&quot;: {
+        &quot;SLACK_BOT_TOKEN&quot;: &quot;${SLACK_BOT_TOKEN}&quot;,
+        &quot;SLACK_TEAM_ID&quot;: &quot;${SLACK_TEAM_ID}&quot;
+      }
+    },
+    &quot;memory&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-memory&quot;]
+    },
+    &quot;knowledge-repo&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;mcp-remote&quot;,
+        &quot;https://gitmcp.io/your-org/your-knowledge-repo&quot;
+      ]
+    }
+  }
+}</code></pre>
+<blockquote>
+<p><strong>Note:</strong> Replace
+<code>your-org/your-knowledge-repo</code> with your actual GitHub org
+and repo name. The repo must be <strong>public</strong> — GitMCP only
+supports public repositories. For private repos, see the Self-Hosting
+section below.</p>
+</blockquote>
+<hr />
+<h2
+id="how-to-structure-your-knowledge-repo-for-maximum-gitmcp-accuracy">How
+to Structure Your Knowledge Repo for Maximum GitMCP Accuracy</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>mindmap
+  root((📚 Knowledge&lt;br/&gt;Repo Structure))
+    📄 llms.txt
+      Stack summary
+      Architecture rules
+      Security rules
+      Key patterns
+    🏗️ architecture/
+      ADRs
+      System diagrams
+      Module boundaries
+    📝 patterns/
+      Service patterns
+      Error handling
+      API contracts
+    🔒 security/
+      Auth patterns
+      Input validation
+      Secrets handling
+    🧪 testing/
+      Test conventions
+      Coverage rules
+      Fixture patterns
+    📋 templates/
+      PR templates
+      Issue templates
+      RFC templates</code></pre>
+</figure>
+
+<p>The quality of Claude's context is directly proportional to the
+quality of your knowledge repo structure. Here is the recommended
+layout:</p>
+<pre><code>your-org/knowledge-repo/
+│
+├── llms.txt                          ← CRITICAL: AI entry point, read first
+├── llms-full.txt                     ← Extended AI-readable full content  
+├── README.md                         ← Human-readable index
+│
+├── architecture/
+│   ├── overview.md                   ← System architecture, domain model
+│   ├── tech-stack.md                 ← Approved libraries with versions
+│   └── decisions/
+│       ├── ADR-001-*.md
+│       └── ADR-00N-*.md
+│
+├── patterns/
+│   ├── backend/
+│   │   ├── service-layer.md          ← How services are structured
+│   │   ├── repository-layer.md       ← Data access patterns
+│   │   ├── error-handling.md         ← AppError, status codes, logging
+│   │   ├── validation.md             ← Zod schemas, controller boundary
+│   │   └── testing.md                ← Unit/integration test patterns
+│   ├── frontend/
+│   │   ├── component-structure.md    ← Component anatomy, naming
+│   │   ├── state-management.md       ← React Query vs Zustand rules
+│   │   ├── api-layer.md              ← How frontend calls backend
+│   │   └── testing.md
+│   └── mobile/
+│       ├── screen-structure.md
+│       ├── navigation.md
+│       └── native-features.md
+│
+├── templates/
+│   ├── service.template.ts
+│   ├── controller.template.ts
+│   ├── repository.template.ts
+│   ├── react-component.template.tsx
+│   └── expo-screen.template.tsx
+│
+├── security/
+│   ├── rules.md                      ← Non-negotiable security constraints
+│   ├── auth-patterns.md              ← How auth/authz works in this codebase
+│   └── data-handling.md              ← PII, secrets, logging rules
+│
+├── api-contracts/
+│   ├── rest-conventions.md           ← URL structure, response shapes, errors
+│   └── openapi/                      ← OpenAPI specs if applicable
+│
+└── examples/
+    └── feature-complete/
+        └── user-notifications/       ← Full end-to-end working example
+            ├── controller.ts
+            ├── service.ts
+            ├── repository.ts
+            └── tests/</code></pre>
+<h3 id="the-llmstxt-file--the-most-important-file-in-the-repo">The
+llms.txt File — The Most Important File in the Repo</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph LLMS["📄 llms.txt — The Most Important File"]
+        direction TB
+        S["🏗️ &lt;b&gt;Stack&lt;/b&gt;&lt;br/&gt;Languages, frameworks,&lt;br/&gt;databases, versions"]
+        AR["🏛️ &lt;b&gt;Architecture Rules&lt;/b&gt;&lt;br/&gt;Non-negotiable patterns&lt;br/&gt;and anti-patterns"]
+        SR["🔒 &lt;b&gt;Security Rules&lt;/b&gt;&lt;br/&gt;Auth, validation, secrets&lt;br/&gt;handling requirements"]
+        KP["📋 &lt;b&gt;Key Patterns&lt;/b&gt;&lt;br/&gt;Links to pattern docs&lt;br/&gt;for each domain"]
+    end
+
+    CLAUDE["🤖 Claude reads this FIRST&lt;br/&gt;on every session"] --&gt; LLMS
+
+    style LLMS fill:#d4edda,stroke:#28a745
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff</code></pre>
+</figure>
+
+<p>The <code>llms.txt</code> file is read first on every GitMCP
+connection. It is your opportunity to prime Claude with the most
+critical team context before any work begins. Keep it concise and
+scannable — Claude reads it to orient, not to learn everything.</p>
+<pre class="markdown"><code># YourApp Knowledge Base
+
+## Stack
+- Backend: Node.js 22, TypeScript 5.4, Express 5, Prisma 5, PostgreSQL 16
+- Frontend: React 19, TypeScript 5.4, Vite 6, React Query v6, shadcn/ui
+- Mobile: React Native 0.76, Expo SDK 52, Expo Router v4
+- Testing: Vitest, React Testing Library, Playwright
+
+## Architecture Rules (Non-Negotiable)
+- Controller → Service → Repository (never skip layers)
+- All validation at controller boundary using Zod
+- All errors via AppError class (see patterns/backend/error-handling.md)
+- No direct DB calls outside Repository layer
+- React Query for ALL server state, Zustand for UI-only state
+
+## Security Rules (Non-Negotiable)
+- Never string-interpolate SQL — Prisma or parameterised queries only
+- Never log request bodies on authenticated routes
+- Never trust client-supplied user IDs without re-validation
+- JWT validation in middleware only, never in route handlers
+
+## Key Patterns
+- Service layer: patterns/backend/service-layer.md
+- Error handling: patterns/backend/error-handling.md
+- Component structure: patterns/frontend/component-structure.md
+- State management decision tree: patterns/frontend/state-management.md
+
+## Templates
+- New service: templates/service.template.ts
+- New controller: templates/controller.template.ts
+- New React component: templates/react-component.template.tsx
+
+## ADRs
+- ADR-001: React Query over Redux for server state
+- ADR-002: Prisma over TypeORM
+- ADR-003: Zod at controller boundary, not service layer
+- ADR-004: Functional services, no classes</code></pre>
+<p>This file answers the most common questions Claude would need to ask
+before generating any code. Every section directly maps to a tool call
+Claude would otherwise have to make (or guess).</p>
+<hr />
+<h2 id="how-the-multi-mcp-stack-behaves-together-a-concrete-example">How
+the Multi-MCP Stack Behaves Together: A Concrete Example</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>sequenceDiagram
+    participant Dev as 👨‍💻 Developer
+    participant CC as 🤖 Claude Code
+    participant FS as 📁 Filesystem
+    participant Jira as 📋 Jira
+    participant KR as 📚 Knowledge Repo
+    participant Git as 🔀 Git
+
+    Dev-&gt;&gt;CC: "Add rate limiting to the orders API"
+    CC-&gt;&gt;Jira: Search for rate-limiting tickets
+    Jira--&gt;&gt;CC: PROJ-89: Rate limit all public APIs
+    CC-&gt;&gt;KR: search("rate limiting pattern")
+    KR--&gt;&gt;CC: middleware/rate-limit.md — token bucket, Redis-backed
+    CC-&gt;&gt;FS: Read src/middleware/
+    FS--&gt;&gt;CC: Current middleware files
+    CC-&gt;&gt;Git: Recent rate-limit commits?
+    Git--&gt;&gt;CC: None found
+    CC-&gt;&gt;FS: Create rate-limit middleware following team pattern
+    CC-&gt;&gt;Dev: "Implemented per knowledge repo pattern. Shall I add tests?"</code></pre>
+</figure>
+
+<p>You open Claude Code and type:</p>
+<pre><code>Implement PROJ-247: Add email notification when an order is shipped</code></pre>
+<p>Here is what happens across the MCP stack:</p>
+<p><strong>Step 1 — Jira MCP</strong> reads PROJ-247. Retrieves the
+ticket description, acceptance criteria, and any linked design specs.
+Claude now knows the business requirement in detail.</p>
+<p><strong>Step 2 — Knowledge Repo MCP (GitMCP)</strong> is queried.
+Claude calls:</p>
+<ul>
+<li><code>search_knowledge-repo_documentation("notification service pattern")</code>
+→ finds <code>patterns/backend/service-layer.md</code></li>
+<li><code>search_knowledge-repo_documentation("email integration")</code>
+→ finds any existing email patterns or approved library (e.g. Resend,
+SendGrid)</li>
+<li><code>search_knowledge-repo_code("notification")</code> → finds any
+existing notification code in the repo</li>
+</ul>
+<p><strong>Step 3 — Filesystem MCP</strong> reads the existing codebase.
+Claude locates <code>src/services/</code>,
+<code>src/repositories/</code>, existing service files to understand
+naming conventions.</p>
+<p><strong>Step 4 — Git MCP</strong> checks recent commits. Claude sees
+if similar work was done recently and understands the current branch
+state.</p>
+<p><strong>Step 5 — Postgres MCP</strong> queries the schema. Claude
+checks the <code>orders</code> table structure, confirms column names,
+understands the data shape it will work with.</p>
+<p><strong>Step 6 — Claude generates code</strong> — not from generic
+training data, but grounded in:</p>
+<ul>
+<li>The exact business requirement from Jira</li>
+<li>Your team's service/repository layer pattern</li>
+<li>Your approved email library and its usage pattern</li>
+<li>The actual <code>orders</code> schema from your database</li>
+<li>The naming conventions from your existing codebase</li>
+</ul>
+<p>The result is code that matches your architecture, uses your approved
+libraries, follows your security rules, and satisfies the ACs from the
+ticket — on the first pass.</p>
+<hr />
+<h2 id="limitations-you-need-to-know">Limitations You Need to Know</h2>
+<h3 id="gitmcp-is-public-repos-only">GitMCP is Public Repos Only</h3>
+<p>GitMCP works with any public GitHub repository. <strong>Private
+repositories are not accessible.</strong> For teams with private
+knowledge repos, there are two options:</p>
+<p><strong>Option A — Self-host GitMCP</strong></p>
+<p>GitMCP is fully open-source. You can run your own instance with
+access to private repos:</p>
+<pre class="bash"><code>git clone https://github.com/idosal/git-mcp
+cd git-mcp
+npm install
+npm run build
+GITHUB_TOKEN=ghp_your_token npm start</code></pre>
+<p>Then point your config at your local instance:</p>
+<pre class="json"><code>{
+  &quot;knowledge-repo&quot;: {
+    &quot;command&quot;: &quot;npx&quot;,
+    &quot;args&quot;: [&quot;mcp-remote&quot;, &quot;http://localhost:3000/your-org/private-repo&quot;]
+  }
+}</code></pre>
+<p><strong>Option B — Use the custom MCP server</strong> from Article 13
+of this series. The custom TypeScript MCP server serves content from a
+local directory, requires no GitHub at all, and works with any file
+system. Best choice if your knowledge content should never leave your
+network.</p>
+<h3 id="content-quality-determines-query-quality">Content Quality
+Determines Query Quality</h3>
+<p>GitMCP's semantic search is only as good as what it has to search. A
+knowledge repo with vague, undated, or contradictory content will
+produce ambiguous results. The improvement in Claude's accuracy scales
+directly with the clarity and specificity of your documentation.</p>
+<p>Treat the knowledge repo as production code: PR reviews, clear
+ownership, regular updates. When your patterns change, update the repo.
+When Claude generates something wrong, that is often a signal the
+relevant pattern is missing or unclear.</p>
+<h3 id="the-repo-is-queried-on-demand-not-preloaded">The Repo is Queried
+On Demand, Not Preloaded</h3>
+<p>GitMCP does not dump the entire repo into Claude's context at the
+start of every session. Claude calls the search and fetch tools when it
+judges them relevant. This is efficient for token usage but means Claude
+might not query the repo for a task where a pattern exists but wasn't
+obviously signalled.</p>
+<p>You can make this more reliable by explicitly telling Claude to query
+first:</p>
+<pre><code>Before implementing, check the knowledge repo for any existing patterns 
+related to authentication middleware</code></pre>
+<p>Or add this instruction to your <code>CLAUDE.md</code>:</p>
+<pre class="markdown"><code>## Knowledge Repo
+Always query the knowledge-repo MCP before:
+- Scaffolding any new service, controller, or component
+- Implementing any auth or security-sensitive code  
+- Choosing between libraries or patterns
+- Writing database queries</code></pre>
+<h3 id="network-latency">Network Latency</h3>
+<p>Each GitMCP query is an HTTP round-trip to <code>gitmcp.io</code> (or
+your self-hosted instance). In practice this adds 200–600ms per query.
+For a typical feature implementation with 3–5 knowledge repo queries,
+this is a 1–3 second overhead over the full session — negligible for the
+accuracy gains.</p>
+<hr />
+<h2 id="comparing-the-three-knowledge-delivery-approaches">Comparing the
+Three Knowledge Delivery Approaches</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph APPROACHES["📊 Three Knowledge Delivery Approaches"]
+        direction LR
+        A["📄 &lt;b&gt;CLAUDE.md Only&lt;/b&gt;&lt;br/&gt;━━━━━━━━&lt;br/&gt;✅ Simple&lt;br/&gt;⚠️ Limited size&lt;br/&gt;❌ Not searchable&lt;br/&gt;❌ Static"]
+        B["📂 &lt;b&gt;.claude/skills/&lt;/b&gt;&lt;br/&gt;━━━━━━━━&lt;br/&gt;✅ Structured&lt;br/&gt;✅ Repo-scoped&lt;br/&gt;⚠️ Manual loading&lt;br/&gt;⚠️ Local only"]
+        C["🌐 &lt;b&gt;GitMCP Repo&lt;/b&gt;&lt;br/&gt;━━━━━━━━&lt;br/&gt;✅ Semantic search&lt;br/&gt;✅ Zero infra&lt;br/&gt;✅ Team-shared&lt;br/&gt;✅ Auto-queried"]
+    end
+
+    REC["💡 Best: Combine all three — CLAUDE.md for essentials,&lt;br/&gt;skills for workflows, GitMCP for deep patterns"]
+
+    style A fill:#ffe5e5,stroke:#e74c3c
+    style B fill:#fff3cd,stroke:#ffc107
+    style C fill:#d4edda,stroke:#28a745
+    style REC fill:#f0f4ff,stroke:#4a90d9</code></pre>
+</figure>
+
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Setup</th>
+<th>Maintenance</th>
+<th>Private?</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GitMCP (gitmcp.io)</strong></td>
+<td>2 lines of config</td>
+<td>Git commit</td>
+<td>❌ Public only</td>
+<td>★★★★☆</td>
+</tr>
+<tr>
+<td><strong>GitMCP (self-hosted)</strong></td>
+<td>Run local server</td>
+<td>Git commit + server</td>
+<td>✅</td>
+<td>★★★★☆</td>
+</tr>
+<tr>
+<td><strong>Custom MCP Server</strong> (Article 13)</td>
+<td>Build TypeScript server</td>
+<td>Update files</td>
+<td>✅</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>CLAUDE.md only</strong></td>
+<td>Edit a file</td>
+<td>Edit a file</td>
+<td>✅</td>
+<td>★★★☆☆</td>
+</tr>
+<tr>
+<td><strong>No knowledge layer</strong></td>
+<td>None</td>
+<td>None</td>
+<td>N/A</td>
+<td>★★☆☆☆</td>
+</tr>
+</tbody>
+</table>
+<p>The custom MCP server from Article 13 has a slight accuracy edge
+because it allows structured tools (<code>get_template</code>,
+<code>get_security_rules</code>, <code>search_knowledge</code> with
+typed returns) rather than document-level semantic search. But GitMCP
+gets you to ~90% of that benefit with zero build overhead.</p>
+<p><strong>Recommended progression:</strong></p>
+<ol type="1">
+<li><strong>Week 1</strong> — Start with GitMCP on a public repo.
+Establish the structure, add <code>llms.txt</code>, populate the key
+patterns. Validate that Claude is querying and using it correctly.</li>
+<li><strong>Month 1</strong> — If the accuracy gains are clear (they
+will be), either self-host GitMCP for private access or invest in
+building the custom MCP server for typed tool access.</li>
+<li><strong>Ongoing</strong> — Treat knowledge repo updates as part of
+every feature PR. When a new pattern is established, document it. When
+an old pattern is deprecated, update it.</li>
+</ol>
+<hr />
+<h2 id="quick-start-from-zero-to-working-in-15-minutes">Quick Start:
+From Zero to Working in 15 Minutes</h2>
+<h3 id="step-1--create-the-knowledge-repo-on-github">Step 1 — Create the
+knowledge repo on GitHub</h3>
+<p>Create a new public repo: <code>your-org/ai-knowledge</code></p>
+<h3 id="step-2--add-the-minimum-viable-structure">Step 2 — Add the
+minimum viable structure</h3>
+<pre><code>ai-knowledge/
+├── llms.txt        ← Copy the template from this article, fill in your stack
+├── README.md       ← Link to all sections
+└── patterns/
+    └── backend/
+        └── service-layer.md   ← Your most common pattern</code></pre>
+<h3 id="step-3--add-to-claudesettingsjson">Step 3 — Add to
+.claude/settings.json</h3>
+<pre class="json"><code>&quot;knowledge-repo&quot;: {
+  &quot;command&quot;: &quot;npx&quot;,
+  &quot;args&quot;: [
+    &quot;mcp-remote&quot;,
+    &quot;https://gitmcp.io/your-org/ai-knowledge&quot;
+  ]
+}</code></pre>
+<h3 id="step-4--add-query-instructions-to-claudemd">Step 4 — Add query
+instructions to CLAUDE.md</h3>
+<pre class="markdown"><code>## Knowledge Repo
+MCP server: knowledge-repo (via gitmcp.io/your-org/ai-knowledge)
+
+Query it before scaffolding any new file, choosing a library, or 
+implementing auth or security-sensitive code. Use:
+- search_{repo}_documentation(&quot;topic&quot;) for patterns and rules  
+- fetch_{repo}_documentation() for full orientation
+- search_{repo}_code(&quot;snippet&quot;) for code examples</code></pre>
+<h3 id="step-5--test-it">Step 5 — Test it</h3>
+<pre><code>Open Claude Code, type:
+&quot;What patterns does this team use for the service layer? Check the knowledge repo.&quot;</code></pre>
+<p>Claude should call <code>fetch_knowledge-repo_documentation</code> or
+<code>search_knowledge-repo_documentation</code> and return your team's
+actual pattern.</p>
+<h3 id="step-6--expand-iteratively">Step 6 — Expand iteratively</h3>
+<p>Add one document per sprint. Each document you add compounds — every
+future feature that touches that pattern benefits from it. After two
+months, the knowledge repo typically has 20–40 documents covering the
+most-touched areas of your codebase. That coverage produces a measurable
+and consistent uplift in first-pass code quality.</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>Wiring a GitMCP knowledge repo into your existing multi-MCP stack is
+the single highest-leverage, lowest-effort improvement you can make to
+Claude's accuracy in your codebase. It requires:</p>
+<ul>
+<li>A public GitHub repo with structured markdown documentation</li>
+<li>Two lines of config in <code>.claude/settings.json</code></li>
+<li>An <code>llms.txt</code> file that primes Claude on your stack and
+rules</li>
+</ul>
+<p>What you get in return is Claude that generates code aligned with
+your architecture, enforces your security rules, uses your approved
+libraries, and applies your team's patterns — rather than generic "best
+practice" code that requires extensive revision to fit your actual
+system.</p>
+<p>The other MCPs in your stack (filesystem, git, postgres, jira, slack,
+memory) tell Claude about the <em>current state</em> of your project.
+The knowledge repo tells Claude about the <em>intended character</em> of
+your project — how your team thinks, what you value, what you have
+decided. Combined, they close the gap between what Claude generates and
+what your team would write.</p>
+<hr />
+<p><em>Part of the AI &amp; Claude for Software Engineering Teams
+series. See also:</em></p>
+<ul>
+<li><em>Article 13 — Jira/Linear MCP + Building a Custom Knowledge Repo
+MCP Server</em></li>
+<li><em>Article 12 — Git + Claude Code: Automating the Full Commit-to-PR
+Workflow</em></li>
+<li><em>Article 11 — AISFD: AI-Assisted Software Feature Development
+with Claude Code 2.x</em></li>
+</ul>
+
+</body>
+</html>
+
+</body>
+</html>

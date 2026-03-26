@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 10: How to Set Up MCPs — Local and Remote Configuration Guide</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: MCP, Claude AI, Developer Tools, APIs, Setup Guide
+    6. Add subtitle: Step-by-step instructions for configuring every major MCP type — filesystem, Git, GitHub, databases, and custom servers — with troubleshooting and team deployment patterns.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    Terminal showing MCP server setup commands. Clean dark theme with connected services icons floating above.
+    ============================================================
+    RECOMMENDED TAGS:
+    MCP, Claude AI, Developer Tools, APIs, Setup Guide
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 10: How to Set Up MCPs — Local and Remote Configuration Guide</h1>
+
+<p><em>Step-by-step instructions for configuring every major MCP type — filesystem, Git, GitHub, databases, and custom servers — with troubleshooting and team deployment patterns.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: Terminal showing MCP server setup commands. Clean dark theme with connected services icons floating above. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>This is the hands-on article. We're going to configure MCPs from
+scratch — starting with the simplest local filesystem MCP and building
+up to a full multi-MCP development environment with GitHub, databases,
+and Slack integration.</p>
+<p>By the end, you'll have a production-ready MCP setup that makes
+Claude Code genuinely agentic across your development tools.</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    CC["🤖 Claude Code"] --&gt; FS["📁 Filesystem&lt;br/&gt;(stdio)"]
+    CC --&gt; GIT["🔀 Git&lt;br/&gt;(stdio)"]
+    CC --&gt; DB["🗄️ PostgreSQL&lt;br/&gt;(stdio)"]
+    CC --&gt; GH["🐙 GitHub&lt;br/&gt;(remote)"]
+    CC --&gt; SL["💬 Slack&lt;br/&gt;(remote)"]
+    CC --&gt; MEM["🧠 Memory&lt;br/&gt;(stdio)"]
+    CC --&gt; PUP["🌐 Puppeteer&lt;br/&gt;(stdio)"]
+    
+    FS --&gt; LOCAL["💻 Local Machine"]
+    GIT --&gt; LOCAL
+    DB --&gt; DBSRV["🗃️ Database Server"]
+    GH --&gt; CLOUD["☁️ Cloud APIs"]
+    SL --&gt; CLOUD
+    MEM --&gt; LOCAL
+    PUP --&gt; LOCAL
+
+    style CC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style LOCAL fill:#50c878,stroke:#3da360,color:#fff
+    style CLOUD fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style DBSRV fill:#f5a623,stroke:#d4891a,color:#fff</code></pre>
+</figure>
+
+<hr />
+<h2 id="1-the-mcp-configuration-file">1. The MCP Configuration File</h2>
+<p>All MCP configuration lives in Claude Code's configuration file.
+Depending on your setup:</p>
+<pre class="bash"><code># Global config (applies to all projects)
+~/.claude/settings.json    # or
+~/.config/claude/settings.json
+
+# Project-level config (committed to git, shared with team)
+.claude/settings.json</code></pre>
+<p><strong>Priority:</strong> Project-level config overrides global
+config.</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    subgraph PRIORITY["📂 MCP Config Priority (higher overrides lower)"]
+        direction TB
+        P["🏠 Project-level&lt;br/&gt;&lt;code&gt;.claude/settings.json&lt;/code&gt;&lt;br/&gt;&lt;i&gt;Committed to git, shared with team&lt;/i&gt;"]
+        G["🌐 Global&lt;br/&gt;&lt;code&gt;~/.claude/settings.json&lt;/code&gt;&lt;br/&gt;&lt;i&gt;Your personal defaults&lt;/i&gt;"]
+    end
+    P --&gt;|"overrides"| G
+
+    style P fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style G fill:#6c757d,stroke:#495057,color:#fff</code></pre>
+</figure>
+
+<h3 id="config-file-structure">Config File Structure</h3>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;server-name&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;, &quot;/path/to/allow&quot;],
+      &quot;env&quot;: {
+        &quot;OPTIONAL_ENV_VAR&quot;: &quot;value&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>For remote servers:</p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;server-name&quot;: {
+      &quot;type&quot;: &quot;sse&quot;,
+      &quot;url&quot;: &quot;https://mcp.example.com/sse&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer your-token&quot;
+      }
+    }
+  }
+}</code></pre>
+<hr />
+<h2 id="2-setting-up-local-mcp-servers">2. Setting Up Local MCP
+Servers</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph LOCAL["🏠 Local MCP Servers (stdio) — Zero Network Latency"]
+        direction LR
+        FS["📁 Filesystem&lt;br/&gt;&lt;i&gt;Read/write/list&lt;br/&gt;local files&lt;/i&gt;"]
+        GIT["🔀 Git&lt;br/&gt;&lt;i&gt;Log, diff, blame&lt;br/&gt;branch ops&lt;/i&gt;"]
+        SQL["🗃️ SQLite&lt;br/&gt;&lt;i&gt;Query local&lt;br/&gt;databases&lt;/i&gt;"]
+        PG["🐘 PostgreSQL&lt;br/&gt;&lt;i&gt;Query dev&lt;br/&gt;database&lt;/i&gt;"]
+        MEM["🧠 Memory&lt;br/&gt;&lt;i&gt;Persistent KV store&lt;br/&gt;across sessions&lt;/i&gt;"]
+        PUP["🌐 Puppeteer&lt;br/&gt;&lt;i&gt;Browser automation&lt;br/&gt;&amp; screenshots&lt;/i&gt;"]
+    end
+
+    style LOCAL fill:#d4edda,stroke:#28a745</code></pre>
+</figure>
+
+<h3 id="21-filesystem-mcp">2.1 Filesystem MCP</h3>
+<p>The filesystem MCP gives Claude read and/or write access to specified
+directories.</p>
+<p><strong>Installation and configuration:</strong></p>
+<pre class="json"><code>// .claude/settings.json
+{
+  &quot;mcpServers&quot;: {
+    &quot;filesystem&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;,
+        &quot;@modelcontextprotocol/server-filesystem&quot;,
+        &quot;/home/user/projects/my-project&quot;,
+        &quot;/home/user/documents/specs&quot;
+      ]
+    }
+  }
+}</code></pre>
+<p><strong>Security tip:</strong> List specific directories — do not
+give access to <code>/</code> or <code>~</code>. Limit to what Claude
+genuinely needs.</p>
+<p><strong>Available tools after setup:</strong></p>
+<ul>
+<li><code>read_file</code> — Read any file in the allowed
+directories</li>
+<li><code>write_file</code> — Create or overwrite files</li>
+<li><code>edit_file</code> — Make targeted edits to existing files</li>
+<li><code>list_directory</code> — List directory contents</li>
+<li><code>create_directory</code> — Create new directories</li>
+<li><code>move_file</code> — Move/rename files</li>
+<li><code>search_files</code> — Search for files by pattern</li>
+<li><code>get_file_info</code> — Get metadata (size, modified date)</li>
+</ul>
+<p><strong>Test it:</strong></p>
+<pre><code>claude&gt; list the files in the project root
+claude&gt; read the package.json and tell me the dependencies
+claude&gt; create a new file called NOTES.md with a summary of the project</code></pre>
+<hr />
+<h3 id="22-git-mcp">2.2 Git MCP</h3>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;git&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;uvx&quot;,
+      &quot;args&quot;: [&quot;mcp-server-git&quot;, &quot;--repository&quot;, &quot;/path/to/your/repo&quot;]
+    }
+  }
+}</code></pre>
+<p><strong>Prerequisite:</strong> Install <code>uv</code> (Python
+package manager):</p>
+<pre class="bash"><code># macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Or via Homebrew
+brew install uv</code></pre>
+<p><strong>Available tools:</strong></p>
+<ul>
+<li><code>git_log</code> — Commit history with diffs</li>
+<li><code>git_diff</code> — Diff between commits or working tree</li>
+<li><code>git_status</code> — Working tree status</li>
+<li><code>git_show</code> — Show specific commit details</li>
+<li><code>git_branch</code> — List/manage branches</li>
+<li><code>git_blame</code> — Line-by-line authorship</li>
+</ul>
+<p><strong>Example workflows:</strong></p>
+<pre><code>&gt; What changed in the last 5 commits?
+&gt; Show me the diff for the auth module between main and feature/oauth
+&gt; Who last modified src/services/payment.ts and when?
+&gt; List all branches containing changes to the database schema</code></pre>
+<hr />
+<h3 id="23-sqlite-mcp">2.3 SQLite MCP</h3>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;sqlite&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;uvx&quot;,
+      &quot;args&quot;: [&quot;mcp-server-sqlite&quot;, &quot;--db-path&quot;, &quot;./dev.db&quot;]
+    }
+  }
+}</code></pre>
+<p><strong>Available tools:</strong></p>
+<ul>
+<li><code>read_query</code> — Execute SELECT queries</li>
+<li><code>write_query</code> — Execute INSERT/UPDATE/DELETE (use with
+care)</li>
+<li><code>list_tables</code> — Show all tables</li>
+<li><code>describe_table</code> — Show table schema</li>
+</ul>
+<p><strong>Example workflows:</strong></p>
+<pre><code>&gt; Show me the schema for all tables
+&gt; How many users were created this week?
+&gt; Find all orders with status &#39;pending&#39; older than 7 days</code></pre>
+<hr />
+<h3 id="24-postgresql-mcp">2.4 PostgreSQL MCP</h3>
+<pre class="bash"><code># Install the server
+npm install -g @modelcontextprotocol/server-postgres</code></pre>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;postgres&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;,
+        &quot;@modelcontextprotocol/server-postgres&quot;,
+        &quot;postgresql://username:password@localhost:5432/dbname&quot;
+      ]
+    }
+  }
+}</code></pre>
+<p><strong>Security critical:</strong> For the PostgreSQL MCP:</p>
+<ul>
+<li>Use a <strong>read-only database user</strong> for most tasks</li>
+<li>Never connect with a superuser or production write credentials</li>
+<li>Use a separate dev/staging database, not production</li>
+</ul>
+<pre class="sql"><code>-- Create a read-only user for Claude
+CREATE USER claude_readonly WITH PASSWORD &#39;secure_password&#39;;
+GRANT CONNECT ON DATABASE your_db TO claude_readonly;
+GRANT USAGE ON SCHEMA public TO claude_readonly;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO claude_readonly;</code></pre>
+<hr />
+<h3 id="25-memory-mcp">2.5 Memory MCP</h3>
+<p>The memory MCP gives Claude persistent memory that survives across
+sessions.</p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;memory&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-memory&quot;]
+    }
+  }
+}</code></pre>
+<p><strong>Available tools:</strong></p>
+<ul>
+<li><code>create_entities</code> — Store facts about people, projects,
+concepts</li>
+<li><code>create_relations</code> — Create relationships between
+entities</li>
+<li><code>add_observations</code> — Add notes to existing entities</li>
+<li><code>search_nodes</code> — Search memory graph</li>
+<li><code>open_nodes</code> — Retrieve specific entities</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code>&gt; Remember that we decided to use Event Sourcing for the audit log module
+&gt; Remember that Sarah is our DBA and should be tagged on any migration PRs
+&gt; What have we decided about the payment service architecture?</code></pre>
+<hr />
+<h3 id="26-puppeteer-mcp-browser-automation">2.6 Puppeteer MCP (Browser
+Automation)</h3>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;puppeteer&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-puppeteer&quot;]
+    }
+  }
+}</code></pre>
+<p><strong>Available tools:</strong></p>
+<ul>
+<li><code>puppeteer_navigate</code> — Navigate to a URL</li>
+<li><code>puppeteer_screenshot</code> — Take a screenshot</li>
+<li><code>puppeteer_click</code> — Click an element</li>
+<li><code>puppeteer_fill</code> — Fill form fields</li>
+<li><code>puppeteer_evaluate</code> — Execute JavaScript</li>
+</ul>
+<p><strong>Example workflows:</strong></p>
+<pre><code>&gt; Navigate to localhost:3000/login and take a screenshot
+&gt; Check if the payment form validation works by filling in invalid data
+&gt; Screenshot the dashboard and describe any UI issues</code></pre>
+<hr />
+<h2 id="3-setting-up-remote-mcp-servers">3. Setting Up Remote MCP
+Servers</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph REMOTE["🌐 Remote MCP Servers (HTTP/SSE) — Cloud APIs"]
+        direction LR
+        GH["🐙 GitHub&lt;br/&gt;&lt;i&gt;Issues, PRs,&lt;br/&gt;code search&lt;/i&gt;"]
+        SL["💬 Slack&lt;br/&gt;&lt;i&gt;Messages, channels,&lt;br/&gt;search history&lt;/i&gt;"]
+        AWS["☁️ AWS&lt;br/&gt;&lt;i&gt;S3, Lambda,&lt;br/&gt;CloudWatch&lt;/i&gt;"]
+    end
+
+    NOTE["🔑 All require authentication tokens&lt;br/&gt;stored in environment variables"]
+    REMOTE --&gt; NOTE
+
+    style REMOTE fill:#f0f4ff,stroke:#4a90d9
+    style NOTE fill:#fff3cd,stroke:#ffc107</code></pre>
+</figure>
+
+<h3 id="31-github-mcp">3.1 GitHub MCP</h3>
+<pre class="bash"><code># Set GitHub token as environment variable
+export GITHUB_PERSONAL_ACCESS_TOKEN=&quot;ghp_your_token_here&quot;</code></pre>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;github&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+      &quot;env&quot;: {
+        &quot;GITHUB_PERSONAL_ACCESS_TOKEN&quot;: &quot;${GITHUB_PERSONAL_ACCESS_TOKEN}&quot;
+      }
+    }
+  }
+}</code></pre>
+<p><strong>Creating a GitHub token:</strong></p>
+<ol type="1">
+<li>GitHub → Settings → Developer settings → Personal access tokens</li>
+<li>Generate new token (Fine-grained recommended)</li>
+<li>Required scopes: <code>repo</code>, <code>read:org</code>,
+<code>read:user</code></li>
+<li>For issue creation: also <code>write:issues</code></li>
+</ol>
+<p><strong>Available tools:</strong></p>
+<ul>
+<li><code>get_file_contents</code> — Read any file in any repo</li>
+<li><code>create_or_update_file</code> — Create/edit files</li>
+<li><code>list_issues</code> / <code>create_issue</code> /
+<code>update_issue</code></li>
+<li><code>list_pull_requests</code> /
+<code>create_pull_request</code></li>
+<li><code>get_commit</code> / <code>list_commits</code></li>
+<li><code>search_repositories</code> / <code>search_code</code> /
+<code>search_issues</code></li>
+<li><code>create_branch</code> / <code>list_branches</code></li>
+</ul>
+<p><strong>Example workflows:</strong></p>
+<pre><code>&gt; Show me all open PRs in the backend repo assigned to me
+&gt; Create a GitHub issue for the null pointer bug we just found
+&gt; Search for all files in the frontend repo that import from &#39;../utils/auth&#39;
+&gt; What were the last 10 commits to main? Summarise the changes.</code></pre>
+<hr />
+<h3 id="32-slack-mcp">3.2 Slack MCP</h3>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;slack&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-slack&quot;],
+      &quot;env&quot;: {
+        &quot;SLACK_BOT_TOKEN&quot;: &quot;xoxb-your-bot-token&quot;,
+        &quot;SLACK_TEAM_ID&quot;: &quot;T0XXXXXXX&quot;
+      }
+    }
+  }
+}</code></pre>
+<p><strong>Creating a Slack Bot:</strong></p>
+<ol type="1">
+<li>Go to <a
+href="https://api.slack.com/apps">api.slack.com/apps</a></li>
+<li>Create New App → From Scratch</li>
+<li>Add OAuth Scopes: <code>channels:read</code>,
+<code>channels:history</code>, <code>chat:write</code>,
+<code>users:read</code></li>
+<li>Install to Workspace → Copy Bot Token</li>
+</ol>
+<p><strong>Available tools:</strong></p>
+<ul>
+<li><code>slack_list_channels</code> — List workspace channels</li>
+<li><code>slack_post_message</code> — Post a message</li>
+<li><code>slack_reply_to_thread</code> — Reply in a thread</li>
+<li><code>slack_get_channel_history</code> — Read recent messages</li>
+</ul>
+<p><strong>Example workflows:</strong></p>
+<pre><code>&gt; Post a message to #deployments: &quot;API v2.3.1 deployed to production at 14:32 UTC&quot;
+&gt; What was discussed in #incidents in the last 24 hours?
+&gt; Send a thread reply to the last message in #backend about the auth bug</code></pre>
+<hr />
+<h3 id="33-aws-mcp">3.3 AWS MCP</h3>
+<pre class="bash"><code># Ensure AWS CLI is configured
+aws configure
+# Or use environment variables
+export AWS_ACCESS_KEY_ID=&quot;...&quot;
+export AWS_SECRET_ACCESS_KEY=&quot;...&quot;
+export AWS_DEFAULT_REGION=&quot;eu-west-1&quot;</code></pre>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;aws&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@aws-sdk/mcp-server-aws&quot;],
+      &quot;env&quot;: {
+        &quot;AWS_PROFILE&quot;: &quot;your-profile-name&quot;
+      }
+    }
+  }
+}</code></pre>
+<p><strong>Example workflows:</strong></p>
+<pre><code>&gt; List all ECS services in the production cluster
+&gt; What&#39;s the current CPU utilisation of the payment-service task?
+&gt; Show me the last 50 CloudWatch log events for the auth service
+&gt; Which Lambda functions haven&#39;t been invoked in the last 30 days?</code></pre>
+<hr />
+<h2 id="4-complete-multi-mcp-configuration">4. Complete Multi-MCP
+Configuration</h2>
+<p>Here's a production-ready configuration for a typical development
+environment:</p>
+<pre class="json"><code>// .claude/settings.json
+{
+  &quot;mcpServers&quot;: {
+    &quot;filesystem&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;,
+        &quot;@modelcontextprotocol/server-filesystem&quot;,
+        &quot;/Users/dev/projects/my-app&quot;,
+        &quot;/Users/dev/projects/my-app-docs&quot;
+      ]
+    },
+    &quot;git&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;uvx&quot;,
+      &quot;args&quot;: [&quot;mcp-server-git&quot;, &quot;--repository&quot;, &quot;/Users/dev/projects/my-app&quot;]
+    },
+    &quot;postgres-dev&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;,
+        &quot;@modelcontextprotocol/server-postgres&quot;,
+        &quot;postgresql://claude_readonly:password@localhost:5432/myapp_dev&quot;
+      ]
+    },
+    &quot;github&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+      &quot;env&quot;: {
+        &quot;GITHUB_PERSONAL_ACCESS_TOKEN&quot;: &quot;${GITHUB_PERSONAL_ACCESS_TOKEN}&quot;
+      }
+    },
+    &quot;slack&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-slack&quot;],
+      &quot;env&quot;: {
+        &quot;SLACK_BOT_TOKEN&quot;: &quot;${SLACK_BOT_TOKEN}&quot;,
+        &quot;SLACK_TEAM_ID&quot;: &quot;${SLACK_TEAM_ID}&quot;
+      }
+    },
+    &quot;memory&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-memory&quot;]
+    }
+  }
+}</code></pre>
+<p><strong>The matching <code>.env</code> file (never commit
+this):</strong></p>
+<pre class="bash"><code>GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxxxxxxxxxxx
+SLACK_BOT_TOKEN=xoxb-xxxxxxxxxxxx
+SLACK_TEAM_ID=T0XXXXXXX
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxx</code></pre>
+<hr />
+<h2 id="5-building-a-custom-mcp-server">5. Building a Custom MCP
+Server</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    A["1️⃣ Define&lt;br/&gt;Tools &amp; Resources"] --&gt; B["2️⃣ Implement&lt;br/&gt;Handler Functions"] --&gt; C["3️⃣ Register&lt;br/&gt;with FastMCP SDK"] --&gt; D["4️⃣ Add to&lt;br/&gt;settings.json"] --&gt; E["5️⃣ Test via&lt;br/&gt;claude --mcp-debug"]
+
+    style A fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style B fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style C fill:#f5a623,stroke:#d4891a,color:#fff
+    style D fill:#50c878,stroke:#3da360,color:#fff
+    style E fill:#17a2b8,stroke:#138496,color:#fff</code></pre>
+</figure>
+
+<p>When no existing MCP meets your needs, build your own.</p>
+<h3 id="full-custom-server-example">Full Custom Server Example</h3>
+<p>This example creates an MCP server for an internal company API:</p>
+<pre class="typescript"><code>// internal-api-mcp/src/index.ts
+
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+import { StdioServerTransport } from &quot;@modelcontextprotocol/sdk/server/stdio.js&quot;;
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from &quot;@modelcontextprotocol/sdk/types.js&quot;;
+import axios from &quot;axios&quot;;
+
+const API_BASE = process.env.INTERNAL_API_URL!;
+const API_KEY = process.env.INTERNAL_API_KEY!;
+
+const api = axios.create({
+  baseURL: API_BASE,
+  headers: { Authorization: `Bearer ${API_KEY}` },
+});
+
+const server = new Server(
+  { name: &quot;internal-api&quot;, version: &quot;1.0.0&quot; },
+  { capabilities: { tools: {} } }
+);
+
+// Define available tools
+server.setRequestHandler(ListToolsRequestSchema, async () =&gt; ({
+  tools: [
+    {
+      name: &quot;get_customer&quot;,
+      description: &quot;Retrieve customer details from internal CRM&quot;,
+      inputSchema: {
+        type: &quot;object&quot;,
+        properties: {
+          customerId: {
+            type: &quot;string&quot;,
+            description: &quot;Customer UUID&quot;
+          }
+        },
+        required: [&quot;customerId&quot;]
+      }
+    },
+    {
+      name: &quot;list_active_subscriptions&quot;,
+      description: &quot;List all active subscriptions for a customer&quot;,
+      inputSchema: {
+        type: &quot;object&quot;,
+        properties: {
+          customerId: { type: &quot;string&quot; },
+          includeTrials: { 
+            type: &quot;boolean&quot;,
+            description: &quot;Include trial subscriptions&quot;,
+            default: false
+          }
+        },
+        required: [&quot;customerId&quot;]
+      }
+    },
+    {
+      name: &quot;create_support_ticket&quot;,
+      description: &quot;Create a support ticket in internal ticketing system&quot;,
+      inputSchema: {
+        type: &quot;object&quot;,
+        properties: {
+          title: { type: &quot;string&quot; },
+          description: { type: &quot;string&quot; },
+          priority: { 
+            type: &quot;string&quot;,
+            enum: [&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;, &quot;critical&quot;]
+          },
+          customerId: { type: &quot;string&quot;, description: &quot;Related customer (optional)&quot; }
+        },
+        required: [&quot;title&quot;, &quot;description&quot;, &quot;priority&quot;]
+      }
+    }
+  ]
+}));
+
+// Implement tool handlers
+server.setRequestHandler(CallToolRequestSchema, async (request) =&gt; {
+  const { name, arguments: args } = request.params;
+
+  try {
+    switch (name) {
+      case &quot;get_customer&quot;: {
+        const response = await api.get(`/customers/${args.customerId}`);
+        return {
+          content: [{
+            type: &quot;text&quot;,
+            text: JSON.stringify(response.data, null, 2)
+          }]
+        };
+      }
+
+      case &quot;list_active_subscriptions&quot;: {
+        const response = await api.get(`/customers/${args.customerId}/subscriptions`, {
+          params: { 
+            status: &quot;active&quot;,
+            includeTrials: args.includeTrials ?? false
+          }
+        });
+        return {
+          content: [{
+            type: &quot;text&quot;,
+            text: JSON.stringify(response.data, null, 2)
+          }]
+        };
+      }
+
+      case &quot;create_support_ticket&quot;: {
+        const response = await api.post(&quot;/tickets&quot;, {
+          title: args.title,
+          description: args.description,
+          priority: args.priority,
+          customerId: args.customerId,
+          source: &quot;claude-mcp&quot;
+        });
+        return {
+          content: [{
+            type: &quot;text&quot;,
+            text: `Ticket created: #${response.data.id} - ${response.data.url}`
+          }]
+        };
+      }
+
+      default:
+        throw new Error(`Unknown tool: ${name}`);
+    }
+  } catch (error: any) {
+    return {
+      content: [{
+        type: &quot;text&quot;,
+        text: `Error: ${error.message}`
+      }],
+      isError: true
+    };
+  }
+});
+
+// Start server
+const transport = new StdioServerTransport();
+await server.connect(transport);
+console.error(&quot;Internal API MCP server running&quot;);</code></pre>
+<p><strong>Package setup (<code>package.json</code>):</strong></p>
+<pre class="json"><code>{
+  &quot;name&quot;: &quot;internal-api-mcp&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;type&quot;: &quot;module&quot;,
+  &quot;bin&quot;: {
+    &quot;internal-api-mcp&quot;: &quot;./dist/index.js&quot;
+  },
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;tsc&quot;,
+    &quot;start&quot;: &quot;node dist/index.js&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;@modelcontextprotocol/sdk&quot;: &quot;^1.0.0&quot;,
+    &quot;axios&quot;: &quot;^1.6.0&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;typescript&quot;: &quot;^5.0.0&quot;
+  }
+}</code></pre>
+<p><strong>Configuration:</strong></p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;internal-api&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;node&quot;,
+      &quot;args&quot;: [&quot;/path/to/internal-api-mcp/dist/index.js&quot;],
+      &quot;env&quot;: {
+        &quot;INTERNAL_API_URL&quot;: &quot;https://api.internal.company.com&quot;,
+        &quot;INTERNAL_API_KEY&quot;: &quot;${INTERNAL_API_KEY}&quot;
+      }
+    }
+  }
+}</code></pre>
+<hr />
+<h2 id="6-verifying-mcp-setup">6. Verifying MCP Setup</h2>
+<pre class="bash"><code># Start Claude Code and list available tools
+claude
+
+# In the Claude REPL:
+&gt; /mcp    # List all connected MCP servers and their status
+
+# Or in terminal:
+claude --list-tools
+
+# Test individual tools:
+&gt; Use the filesystem MCP to list the files in the current directory
+&gt; Use the github MCP to list my open PRs
+&gt; Use the postgres MCP to show me the tables in the database</code></pre>
+<hr />
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    START["❌ MCP Not Working?"] --&gt; Q1{"Server shows&lt;br/&gt;in /mcp?"}
+    Q1 --&gt;|"No"| A1["Check settings.json&lt;br/&gt;path and syntax"]
+    Q1 --&gt;|"Yes"| Q2{"Tools&lt;br/&gt;available?"}
+    Q2 --&gt;|"No"| A2["Check command/args&lt;br/&gt;npx path correct?"]
+    Q2 --&gt;|"Yes"| Q3{"Auth&lt;br/&gt;error?"}
+    Q3 --&gt;|"Yes"| A3["Check env vars&lt;br/&gt;API keys exported?"]
+    Q3 --&gt;|"No"| Q4{"Timeout?"}
+    Q4 --&gt;|"Yes"| A4["Network issue&lt;br/&gt;Check firewall/proxy"]
+    Q4 --&gt;|"No"| A5["Run claude --mcp-debug&lt;br/&gt;Check server logs"]
+
+    style START fill:#e74c3c,stroke:#c0392b,color:#fff
+    style A1 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A2 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A3 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A4 fill:#f5a623,stroke:#d4891a,color:#fff
+    style A5 fill:#4a90d9,stroke:#2d6cb4,color:#fff</code></pre>
+</figure>
+
+<h2 id="7-troubleshooting-common-issues">7. Troubleshooting Common
+Issues</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Symptom</th>
+<th style="text-align: left;">Likely Cause</th>
+<th style="text-align: left;">Diagnosis</th>
+<th style="text-align: left;">Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>MCP server not
+starting</strong></td>
+<td style="text-align: left;">Missing dependency or wrong Node
+version</td>
+<td style="text-align: left;"><code>node --version</code> (need
+18+)</td>
+<td style="text-align: left;"><code>nvm use 20</code> then
+reinstall</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>"command not found"
+error</strong></td>
+<td style="text-align: left;">npx cache issue or global install
+missing</td>
+<td
+style="text-align: left;"><code>npx -y @modelcontextprotocol/server-filesystem /tmp</code></td>
+<td style="text-align: left;">Clear npx cache:
+<code>npm cache clean --force</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Auth error on remote
+MCP</strong></td>
+<td style="text-align: left;">Missing or expired env var</td>
+<td
+style="text-align: left;"><code>echo $GITHUB_PERSONAL_ACCESS_TOKEN</code></td>
+<td style="text-align: left;">Verify token set; check token scopes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Timeout on first use</strong></td>
+<td style="text-align: left;">Server startup too slow</td>
+<td style="text-align: left;">Check logs with <code>--debug</code>
+flag</td>
+<td style="text-align: left;">Add <code>"timeout": 30000</code> to
+server config</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>"Permission denied" on
+filesystem</strong></td>
+<td style="text-align: left;">Path not granted in config</td>
+<td style="text-align: left;"><code>ls -la /path/you/granted</code></td>
+<td style="text-align: left;">Add path to <code>args</code> array in
+settings.json</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Claude doesn't use the
+MCP</strong></td>
+<td style="text-align: left;">MCP not loaded or name mismatch</td>
+<td style="text-align: left;">Check Claude Code startup output</td>
+<td style="text-align: left;">Restart Claude Code; verify server
+name</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Rate limit errors</strong></td>
+<td style="text-align: left;">Too many parallel MCP calls</td>
+<td style="text-align: left;">Check API usage dashboard</td>
+<td style="text-align: left;">Reduce parallel MCP usage; add retry
+logic</td>
+</tr>
+</tbody>
+</table>
+<h3 id="debugging-commands">Debugging Commands</h3>
+<pre class="bash"><code># Test a server command directly before adding to config
+npx -y @modelcontextprotocol/server-filesystem /tmp
+
+# Verify environment variables are set
+echo $GITHUB_PERSONAL_ACCESS_TOKEN
+echo $SLACK_BOT_TOKEN
+
+# Test a remote API token manually
+curl -H &quot;Authorization: Bearer $GITHUB_PERSONAL_ACCESS_TOKEN&quot; \
+  https://api.github.com/user
+
+# Restart Claude Code with debug output
+claude --debug</code></pre>
+<hr />
+<h2 id="8-team-deployment-pattern">8. Team Deployment Pattern</h2>
+<p>For team-wide MCP setup:</p>
+<p><strong>Step 1: Commit <code>.claude/settings.json</code> to the
+repo</strong> (with env var placeholders)</p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;github&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+      &quot;env&quot;: {
+        &quot;GITHUB_PERSONAL_ACCESS_TOKEN&quot;: &quot;${GITHUB_PERSONAL_ACCESS_TOKEN}&quot;
+      }
+    }
+  }
+}</code></pre>
+<p><strong>Step 2: Create <code>.env.example</code></strong> with
+required variables (no values):</p>
+<pre class="bash"><code>GITHUB_PERSONAL_ACCESS_TOKEN=
+SLACK_BOT_TOKEN=
+ANTHROPIC_API_KEY=</code></pre>
+<p><strong>Step 3: Document setup in README.md:</strong></p>
+<pre class="markdown"><code>## Claude Code Setup
+
+1. Install: `npm install -g @anthropic-ai/claude-code`
+2. Copy `.env.example` to `.env` and fill in values
+3. Run `source .env` or use direnv
+4. Run `claude` in project root — MCPs will auto-configure</code></pre>
+<p><strong>Step 4: Add to onboarding docs</strong> so new team members
+have everything they need on day one.</p>
+<hr />
+<h2 id="summary-complete-mcp-setup-checklist">Summary: Complete MCP
+Setup Checklist</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Category</th>
+<th style="text-align: left;">MCP Server</th>
+<th style="text-align: center;">Priority</th>
+<th style="text-align: left;">Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Local — All Projects</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-filesystem</code></td>
+<td style="text-align: center;">🔴 High</td>
+<td style="text-align: left;">File read/write within project</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Local — All Projects</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-git</code></td>
+<td style="text-align: center;">🔴 High</td>
+<td style="text-align: left;">Git history, blame, diffs</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Local — Databases</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-sqlite</code></td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Local dev database queries</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Local — Databases</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-postgres</code></td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">PostgreSQL queries</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Local — Memory</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-memory</code></td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Persistent project context</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Local — Browser</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-puppeteer</code></td>
+<td style="text-align: center;">🟢 Optional</td>
+<td style="text-align: left;">Browser automation, testing</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Remote — Source</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-github</code></td>
+<td style="text-align: center;">🔴 High</td>
+<td style="text-align: left;">PR reviews, issue management</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Remote — Comms</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-slack</code></td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Team communication context</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Remote — PM</strong></td>
+<td style="text-align: left;"><code>@linear/mcp-server</code></td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Linear ticket management</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Remote — PM</strong></td>
+<td style="text-align: left;"><code>mcp-jira-server</code></td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Jira issue management</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Remote — Infra</strong></td>
+<td
+style="text-align: left;"><code>@modelcontextprotocol/server-aws-kb-retrieval</code></td>
+<td style="text-align: center;">🟢 Optional</td>
+<td style="text-align: left;">AWS infrastructure queries</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Custom</strong></td>
+<td style="text-align: left;">Build your own</td>
+<td style="text-align: center;">🟢 Optional</td>
+<td style="text-align: left;">Internal APIs, proprietary data</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="series-summary">Series Summary</h2>
+<p>Over these first 10 articles in the series, we've covered the
+complete journey from understanding AI fundamentals to deploying a
+production-grade Claude-powered development environment:</p>
+<ol type="1">
+<li><strong>What AI is</strong> — LLMs, transformers, tokens,
+limitations</li>
+<li><strong>Where to use AI</strong> — Role-by-role application map</li>
+<li><strong>Available models</strong> — OpenAI, Anthropic, Google, Meta,
+Mistral</li>
+<li><strong>Model selection</strong> — Task-to-model matching
+framework</li>
+<li><strong>Setup</strong> — Claude Code CLI, VS Code integration, shell
+workflows</li>
+<li><strong>Role workflows</strong> — DEV, QA, and BA-specific
+patterns</li>
+<li><strong>Prompt engineering</strong> — The principles of high-quality
+prompts</li>
+<li><strong>CLAUDE.md system</strong> — Project context files for 95%
+accuracy</li>
+<li><strong>MCP theory</strong> — Types, benefits, and use cases</li>
+<li><strong>MCP setup</strong> — Complete local and remote configuration
+guide</li>
+</ol>
+<p>The developers who master these tools aren't replacing their skills —
+they're multiplying their output. The goal isn't less thinking; it's
+using your thinking for the problems that actually require it.</p>
+<hr />
+<p><em>This concludes the foundational 10 articles of the 14-part series
+on AI in Software Engineering. Each article can be used as a standalone
+reference or read in sequence. Articles 11–14 continue with advanced
+topics: Claude Code 2.x, Git integration, GitMCP, and Jira/Linear MCP
+workflows.</em></p>
+
+</body>
+</html>

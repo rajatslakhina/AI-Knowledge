@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 11: Maximising Developer Productivity with Claude Code 2.x — The Complete AISFD Playbook</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: Claude AI, AISFD, AI-Assisted Development, Developer Productivity
+    6. Add subtitle: Claude Code 2.1.0 shipped 1,096 commits and fundamentally repositioned itself from coding assistant to development infrastructure. Here's the complete playbook for AI-Assisted Software Feature Development (AISFD) — model selection, feature mastery, and daily workflows that compound over time.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    Developer reviewing AI-generated code on one screen while planning on another. High-productivity aesthetic.
+    ============================================================
+    RECOMMENDED TAGS:
+    Claude AI, AISFD, AI-Assisted Development, Developer Productivity
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 11: Maximising Developer Productivity with Claude Code 2.x — The Complete AISFD Playbook</h1>
+
+<p><em>Claude Code 2.1.0 shipped 1,096 commits and fundamentally repositioned itself from coding assistant to development infrastructure. Here's the complete playbook for AI-Assisted Software Feature Development (AISFD) — model selection, feature mastery, and daily workflows that compound over time.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: Developer reviewing AI-generated code on one screen while planning on another. High-productivity aesthetic. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>Andrej Karpathy described a shift in early 2026 that resonated across
+the engineering community: he'd gone from <strong>80% manual coding +
+20% agents</strong> to <strong>80% agent coding + 20% edits and
+touchups</strong> in a matter of weeks — noting that the change felt
+more like a threshold crossed than a gradual transition. He wasn't
+alone. The inflection point was real, and for most developers it arrived
+with two things happening simultaneously: Claude Code 2.x's
+architectural maturation, and Claude Sonnet 4.6 matching near-Opus
+quality at Sonnet pricing.</p>
+<p>This article is the practical guide that sits at the intersection of
+those two things. It covers:</p>
+<ol type="1">
+<li>What AISFD (AI-Assisted Software Feature Development) actually means
+as a workflow philosophy</li>
+<li>Every major Claude Code 2.x feature — what it is, when to use it,
+with examples</li>
+<li>A precise model selection strategy for each task in a developer's
+day</li>
+<li>Real workflows from feature request to merged PR, powered entirely
+by Claude Code</li>
+</ol>
+<p>This is the article you read once, then keep on your second
+screen.</p>
+<hr />
+<h2 id="1-what-is-aisfd">1. What Is AISFD?</h2>
+<p><strong>AI-Assisted Software Feature Development (AISFD)</strong> is
+a development methodology where AI agents handle the majority of
+implementation work while the developer operates at the level of
+architecture, intent, and judgment.</p>
+<p>The mental model shift is fundamental:</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph TRAD["Traditional Development"]
+        direction LR
+        T1["👨‍💻 Developer"] --&gt; T2["✍️ Writes Code"] --&gt; T3["🔍 Reviews"] --&gt; T4["🚀 Ships"]
+    end
+
+    subgraph AISFD_FLOW["AISFD — AI-Assisted Feature Development"]
+        direction LR
+        A1["👨‍💻 Developer"] --&gt; A2["📋 Defines Intent&lt;br/&gt;+ Context"] --&gt; A3["🤖 AI&lt;br/&gt;Implements"] --&gt; A4["🔍 Developer&lt;br/&gt;Reviews"] --&gt; A5["🚀 Ships"]
+    end
+
+    style TRAD fill:#ffe5e5,stroke:#e74c3c
+    style AISFD_FLOW fill:#d4edda,stroke:#28a745
+    style A3 fill:#7b68ee,stroke:#5a4dbd,color:#fff</code></pre>
+</figure>
+
+<p>The developer's job doesn't disappear — it upgrades. You stop being
+the one who types; you become the one who thinks clearly, provides the
+right context, and exercises judgment on outputs. The value moves from
+execution to architecture, from typing to reviewing.</p>
+<p><strong>The three AISFD principles:</strong></p>
+<ol type="1">
+<li><p><strong>Context is the multiplier.</strong> The quality of
+Claude's output is a direct function of the quality of context you
+provide (CLAUDE.md, domain model, reference files). Invest here
+first.</p></li>
+<li><p><strong>Decompose, don't dump.</strong> Complex features work
+better as a sequence of focused agent tasks than as a single giant
+prompt. Each task builds context the next one uses.</p></li>
+<li><p><strong>Review is non-negotiable.</strong> AISFD doesn't mean
+unreviewed code in production. It means faster cycles to a reviewed,
+tested, shipped feature.</p></li>
+</ol>
+<hr />
+<h2 id="2-claude-code-2x--feature-reference">2. Claude Code 2.x —
+Feature Reference</h2>
+<p>Claude Code has evolved from a terminal chatbot into a layered
+platform. Understanding its full capability set is the difference
+between using 20% of it and using 80%.</p>
+<p>Here is the complete feature stack, in order of how they were
+added:</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>timeline
+    title Claude Code Platform Evolution (2024-2026)
+    section Foundation
+        Nov 2024 : 🔌 MCP Integration : External tools &amp; services
+    section Growth
+        Jul 2025 : 🔀 Subagents : Parallel isolated agents
+        Sep 2025 : ⚡ Hooks : Lifecycle automation
+        Oct 2025 : 📚 Skills/Plugins : Reusable prompt workflows
+    section Maturity
+        Jan 2026 : 📋 Tasks : Persistent DAG task management
+        Feb 2026 : 🤖 Agent Teams : Multi-agent collaboration
+        Feb 2026 : ♾️ Context Compaction : Infinite conversations</code></pre>
+</figure>
+
+<blockquote>
+<p>🧱 <strong>Core Agent Loop</strong> (file ops, bash, web, git) is
+always available as the foundation layer.</p>
+</blockquote>
+<p>Let's go deep on each.</p>
+<hr />
+<h3 id="21-core-agent-loop--the-foundation">2.1 Core Agent Loop — The
+Foundation</h3>
+<p>At its core, Claude Code runs a simple but powerful loop: Claude
+produces a message; if it contains a tool call, the tool executes and
+feeds results back; no tool call ends the turn.</p>
+<p><strong>The 14 built-in tools:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Tools</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>File operations</td>
+<td>Read, Write, Edit, MultiEdit, Glob</td>
+</tr>
+<tr>
+<td>Search</td>
+<td>Grep, WebSearch, WebFetch</td>
+</tr>
+<tr>
+<td>Shell</td>
+<td>Bash</td>
+</tr>
+<tr>
+<td>Agent control</td>
+<td>Task (spawn subagent), TodoRead, TodoWrite</td>
+</tr>
+<tr>
+<td>Git integration</td>
+<td>Native git awareness</td>
+</tr>
+<tr>
+<td>Notebook</td>
+<td>NotebookRead, NotebookEdit</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key keyboard shortcuts:</strong></p>
+<pre><code>Ctrl+C / ESC     → Interrupt current action
+Shift+Tab        → Toggle Plan Mode (Claude plans before acting)
+Ctrl+S           → Stash current prompt (save draft, come back)
+Shift+Enter      → New line without submitting (v2.1.0+)
+/resume          → Resume a previous session (up to 50 shown)
+/fork            → Fork current conversation into a new branch
+/plan [text]     → Enter plan mode with optional description
+/rename          → Rename current session (updates terminal tab)
+/tag             → Tag a session for later retrieval
+Ctrl+F           → Kill all background agents (two-press confirm)</code></pre>
+<p><strong>Single-command mode (for scripting and CI):</strong></p>
+<pre class="bash"><code># Run a task without entering the REPL
+claude -p &quot;Generate a changelog from git log since the last tag&quot;
+
+# Pipe input
+git diff main...HEAD | claude -p &quot;Review this diff for security issues&quot;
+
+# Headless mode (CI/CD, skips startup API calls)
+claude --headless -p &quot;Run the test suite and summarise failures&quot;</code></pre>
+<hr />
+<h3 id="22-plan-mode--think-before-acting">2.2 Plan Mode — Think Before
+Acting</h3>
+<p>One of the most important but underused features. Activate with
+<code>Shift+Tab</code>.</p>
+<p>In Plan Mode, Claude reads the full context, explores the codebase,
+and produces a structured plan <strong>before writing a single line of
+code</strong>. You review the plan, add comments, and then approve.</p>
+<pre><code>Without Plan Mode:
+You: &quot;Add OAuth login&quot;
+Claude: [immediately starts editing 8 files] → 40% chance of wrong direction
+
+With Plan Mode (Shift+Tab):
+You: &quot;Add OAuth login&quot;
+Claude: [reads auth.service.ts, package.json, existing routes]
+        → &quot;Here&#39;s my plan:
+           1. Install passport.js + passport-google-oauth20
+           2. Add GoogleStrategy to auth.service.ts
+           3. Add /auth/google and /auth/google/callback routes
+           4. Update User model to add googleId field
+           5. Update environment variables
+           Shall I proceed?&quot;
+You: [review → add note: &quot;Use our existing AppError class, not passport errors&quot;]
+Claude: [proceeds with corrected approach]</code></pre>
+<p><strong>Use Plan Mode for:</strong></p>
+<ul>
+<li>Any feature that touches 3+ files</li>
+<li>Tasks involving database migrations</li>
+<li>Any refactoring</li>
+<li>Anything you're not sure about the approach for</li>
+</ul>
+<p><strong>Tip:</strong>
+<code>/plan fix the broken payment webhook</code> enters plan mode with
+a description and immediately starts.</p>
+<hr />
+<h3 id="23-subagents--parallelism-and-isolation">2.3 Subagents —
+Parallelism and Isolation</h3>
+<p>Subagents are separate Claude instances with their own context
+window, tools, model, and permissions. Your main session spawns them,
+they do work, and they report back a summary.</p>
+<p><strong>Why they matter:</strong> Your main session doesn't get
+polluted with the noise of exploration. And they can run concurrently —
+while one subagent explores the auth module, another reads the database
+schema, and a third searches for similar patterns in the codebase.</p>
+<p><strong>Built-in subagents (auto-invoked by Claude
+Code):</strong></p>
+<ul>
+<li><strong>Explore</strong> — Read-only codebase navigation, uses
+Glob/Grep/Read. Spawned when Claude needs to understand a part of the
+codebase it hasn't seen yet.</li>
+<li><strong>Research</strong> — Web search + fetching. Finds
+documentation, error solutions, API specs.</li>
+<li><strong>Bash</strong> — Isolated shell execution for risky
+commands.</li>
+</ul>
+<p><strong>Creating custom subagents:</strong></p>
+<pre class="markdown"><code>&lt;!-- ~/.claude/agents/security-reviewer.md --&gt;
+---
+name: security-reviewer
+description: Reviews code changes for security vulnerabilities
+model: claude-opus-4-6
+tools: Read, Glob, Grep
+permissionMode: read-only
+---
+
+You are a security engineer performing a thorough security review.
+Focus on: injection vulnerabilities, authentication flaws, insecure 
+direct object references, sensitive data exposure, CSRF, XSS.
+
+For each issue:
+- File and line number
+- Severity: CRITICAL / HIGH / MEDIUM / LOW
+- Description of the vulnerability
+- Concrete fix
+
+Be thorough and adversarial. Assume the attacker has read the source code.</code></pre>
+<p><strong>Invoking subagents:</strong></p>
+<pre><code># Automatic (Claude decides when to spawn)
+&quot;Analyse the entire payments module and identify all error handling gaps&quot;
+
+# Explicit
+&quot;Spawn a security-reviewer subagent on src/controllers/payment.controller.ts&quot;
+
+# Background (non-blocking)
+&quot;Run a security review of the auth module in the background. 
+ Continue with the feature; notify me when it&#39;s done.&quot;</code></pre>
+<p><strong>Per-task model overrides (powerful for cost
+control):</strong></p>
+<pre class="markdown"><code>&lt;!-- ~/.claude/agents/quick-summariser.md --&gt;
+---
+name: quick-summariser
+description: Summarises files and meetings quickly
+model: claude-haiku-4-5-20251001
+tools: Read
+---
+You are a fast summariser. Be concise. Max 5 bullet points.</code></pre>
+<p>Now your main session uses Sonnet 4.6, but summarisation tasks
+automatically use Haiku — no manual switching, no wasted cost.</p>
+<hr />
+<h3 id="24-hooks--automating-the-development-lifecycle">2.4 Hooks —
+Automating the Development Lifecycle</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph LIFECYCLE["⚡ Hook Lifecycle Events"]
+        direction TB
+        PRE["🔒 PreToolUse&lt;br/&gt;&lt;i&gt;Before any tool&lt;/i&gt;&lt;br/&gt;Validate, log, block"]
+        POST["✅ PostToolUse&lt;br/&gt;&lt;i&gt;After tool execution&lt;/i&gt;&lt;br/&gt;Lint, format, notify"]
+        STOP["🏁 Stop&lt;br/&gt;&lt;i&gt;When turn ends&lt;/i&gt;&lt;br/&gt;Test, CI, Slack"]
+        SS["🚀 SubagentStart&lt;br/&gt;&lt;i&gt;Agent spawned&lt;/i&gt;&lt;br/&gt;Log, inject context"]
+        SE["🏁 SubagentStop&lt;br/&gt;&lt;i&gt;Agent finished&lt;/i&gt;&lt;br/&gt;Collect results"]
+        PR["🔑 PermissionRequest&lt;br/&gt;&lt;i&gt;New permission needed&lt;/i&gt;&lt;br/&gt;Custom approval"]
+    end
+
+    PRE --&gt; POST --&gt; STOP
+    SS --&gt; SE
+
+    style LIFECYCLE fill:#f8f9fa,stroke:#6c757d
+    style PRE fill:#f5a623,stroke:#d4891a,color:#fff
+    style POST fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style STOP fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>Hooks are scripts that fire automatically at specific points in
+Claude Code's execution. They're the difference between Claude being a
+tool you operate and Claude being infrastructure that runs your
+development process.</p>
+<p><strong>Hook lifecycle events:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>When It Fires</th>
+<th>Use Cases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PreToolUse</code></td>
+<td>Before any tool execution</td>
+<td>Validate permissions, log actions, block risky ops</td>
+</tr>
+<tr>
+<td><code>PostToolUse</code></td>
+<td>After tool execution</td>
+<td>Run linters, auto-format, notify</td>
+</tr>
+<tr>
+<td><code>Stop</code></td>
+<td>When Claude finishes a turn</td>
+<td>Run tests, trigger CI, send Slack notification</td>
+</tr>
+<tr>
+<td><code>SubagentStart</code></td>
+<td>When a subagent is spawned</td>
+<td>Log agent activity, inject context</td>
+</tr>
+<tr>
+<td><code>SubagentStop</code></td>
+<td>When a subagent finishes</td>
+<td>Collect results, update tracking</td>
+</tr>
+<tr>
+<td><code>PermissionRequest</code></td>
+<td>When Claude requests new permissions</td>
+<td>Custom approval logic</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example hooks in
+<code>.claude/settings.json</code>:</strong></p>
+<pre class="json"><code>{
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write|Edit|MultiEdit&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;npm run lint -- --fix ${CLAUDE_TOOL_INPUT_PATH} 2&gt;/dev/null || true&quot;,
+            &quot;async&quot;: true
+          }
+        ]
+      }
+    ],
+    &quot;Stop&quot;: [
+      {
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;node scripts/run-affected-tests.js&quot;,
+            &quot;async&quot;: false
+          }
+        ]
+      }
+    ],
+    &quot;PreToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Bash&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;scripts/validate-bash-safety.sh&quot;
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<p><strong>HTTP hooks (new in 2.x):</strong></p>
+<pre class="json"><code>{
+  &quot;hooks&quot;: {
+    &quot;Stop&quot;: [
+      {
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;http&quot;,
+            &quot;url&quot;: &quot;https://your-team-webhook.company.com/claude-events&quot;,
+            &quot;headers&quot;: {
+              &quot;Authorization&quot;: &quot;Bearer ${TEAM_WEBHOOK_TOKEN}&quot;
+            }
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<p><strong>Real-world hook patterns:</strong></p>
+<pre class="bash"><code># Hook: Auto-run affected tests after file edits
+# scripts/run-affected-tests.js
+const changedFiles = JSON.parse(process.env.CLAUDE_CHANGED_FILES || &#39;[]&#39;);
+const testFiles = changedFiles.map(f =&gt; f.replace(&#39;src/&#39;, &#39;src/__tests__/&#39;).replace(&#39;.ts&#39;, &#39;.test.ts&#39;));
+const existing = testFiles.filter(f =&gt; fs.existsSync(f));
+if (existing.length &gt; 0) {
+  execSync(`npx jest ${existing.join(&#39; &#39;)} --passWithNoTests`, { stdio: &#39;inherit&#39; });
+}</code></pre>
+<pre class="bash"><code># Hook: Slack notification when Claude finishes a long task
+# scripts/notify-slack.sh
+SUMMARY=&quot;${CLAUDE_LAST_MESSAGE}&quot;
+DURATION=&quot;${CLAUDE_TURN_DURATION_SECONDS}&quot;
+if [ &quot;$DURATION&quot; -gt 120 ]; then
+  curl -X POST &quot;$SLACK_WEBHOOK&quot; \
+    -d &quot;{\&quot;text\&quot;: \&quot;✅ Claude finished a ${DURATION}s task: ${SUMMARY}\&quot;}&quot;
+fi</code></pre>
+<hr />
+<h3 id="25-skills--reusable-prompt-workflows">2.5 Skills — Reusable
+Prompt Workflows</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph SKILLS["📚 Skills — Reusable Prompt Workflows"]
+        direction LR
+        S1["📄 Markdown files&lt;br/&gt;in .claude/skills/"]
+        S2["⚡ Invoked as&lt;br/&gt;slash commands"]
+        S3["🤖 Auto-activated&lt;br/&gt;when relevant"]
+        S4["🔀 Can spawn&lt;br/&gt;isolated subagents"]
+        S5["🔄 Hot-reload&lt;br/&gt;without restart"]
+    end
+
+    DEV["👨‍💻 /review"] --&gt; S1
+    S1 --&gt; CLAUDE["🤖 Claude follows&lt;br/&gt;skill instructions&lt;br/&gt;consistently"]
+
+    style SKILLS fill:#f0f4ff,stroke:#4a90d9
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff</code></pre>
+</figure>
+
+<p>Skills are Markdown files that encode repeatable workflows. They're
+invoked as slash commands, auto-activated by Claude when relevant, and
+since v2.1.0, they can spawn isolated subagents, restrict tools,
+hot-reload without restart, and be shared via plugins.</p>
+<p><strong>Skills vs. CLAUDE.md:</strong></p>
+<ul>
+<li>CLAUDE.md = persistent context (always loaded, background
+knowledge)</li>
+<li>Skills = on-demand workflows (loaded when invoked or detected)</li>
+</ul>
+<p><strong>Creating a skill:</strong></p>
+<pre class="markdown"><code>&lt;!-- .claude/skills/code-review.md --&gt;
+---
+name: code-review
+description: Comprehensive code review for quality, security, and performance
+tools: Read, Glob, Grep
+model: claude-sonnet-4-6
+---
+
+Perform a thorough code review of the specified file or diff.
+
+Review in this exact order:
+1. **Security** — injection, auth, data exposure, CSRF/XSS
+2. **Correctness** — logic errors, edge cases, null handling
+3. **Performance** — N+1 queries, unnecessary computations, memory leaks
+4. **Code Quality** — naming, complexity, DRY violations, SOLID principles
+5. **Test Coverage** — missing test cases for your findings
+
+For each finding:
+- Severity: CRITICAL / HIGH / MEDIUM / LOW
+- File:Line reference
+- What the issue is
+- Exactly how to fix it
+
+At the end: overall quality score (1-10) with one-line summary.</code></pre>
+<pre class="markdown"><code>&lt;!-- .claude/skills/feature-scaffold.md --&gt;
+---
+name: feature-scaffold
+description: Scaffolds a new feature following project architecture
+---
+
+Scaffold a new feature module. Steps:
+1. Read CLAUDE.md to understand architecture patterns
+2. Read the reference implementation in src/services/auth.service.ts
+3. Create in order:
+   - Zod validation schema in src/validators/[feature].validator.ts
+   - Repository in src/repositories/[feature].repository.ts
+   - Service in src/services/[feature].service.ts
+   - Controller in src/controllers/[feature].controller.ts
+   - Routes in src/routes/[feature].routes.ts
+   - Register route in src/app.ts
+4. After each file: run TypeScript compiler check
+5. Generate test file at src/__tests__/[feature].test.ts
+
+Feature to scaffold: $0</code></pre>
+<p><strong>Invoking skills:</strong></p>
+<pre><code># Slash command
+/code-review src/controllers/payment.controller.ts
+
+# With argument shorthand ($0, $1 etc — new in v2.1.0)
+/feature-scaffold subscription
+
+# Auto-activation (Claude detects the task matches the skill)
+&quot;Review the auth module for security issues&quot;  
+→ Claude auto-activates code-review skill</code></pre>
+<p><strong>Hot reload (v2.1.0+):</strong> Edit a skill file → changes
+take effect immediately. No restart.</p>
+<p><strong>Skill in a <code>.claude/skills/</code> within
+<code>--add-dir</code> directories</strong> are loaded automatically,
+enabling per-project skill libraries.</p>
+<hr />
+<h3 id="26-tasks--persistent-work-across-sessions">2.6 Tasks —
+Persistent Work Across Sessions</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    T1["📋 Task Created&lt;br/&gt;&lt;i&gt;Persistent across&lt;br/&gt;sessions&lt;/i&gt;"] --&gt; T2["🔀 Subtasks&lt;br/&gt;&lt;i&gt;DAG structure&lt;br/&gt;with dependencies&lt;/i&gt;"]
+    T2 --&gt; T3["🤖 Agents Execute&lt;br/&gt;&lt;i&gt;Each subtask&lt;br/&gt;independently&lt;/i&gt;"]
+    T3 --&gt; T4["✅ Results Merged&lt;br/&gt;&lt;i&gt;Combined into&lt;br/&gt;final output&lt;/i&gt;"]
+
+    style T1 fill:#f5a623,stroke:#d4891a,color:#fff
+    style T2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style T3 fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style T4 fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>Tasks (introduced Jan 2026) solve the problem of work that spans
+multiple sessions or is too complex for a single conversation. They use
+a DAG (Directed Acyclic Graph) structure — tasks can have dependencies,
+so Claude won't start "Run Tests" until both "Build API" and "Configure
+Auth" are complete.</p>
+<p><strong>What makes Tasks different from a todo list:</strong></p>
+<ul>
+<li>Stored on local filesystem (<code>~/.claude/tasks</code>) — survives
+context compaction</li>
+<li>Dependency enforcement — prevents the "hallucinated completion"
+error where Claude tests code it hasn't written yet</li>
+<li>Persist across sessions — close Claude Code, come back tomorrow,
+pick up where you left off</li>
+<li>Shared task lists in Agent Teams — multiple agents update the same
+list</li>
+</ul>
+<p><strong>Activating Tasks:</strong></p>
+<pre class="bash"><code># Disable old system if needed during transition
+export CLAUDE_CODE_ENABLE_TASKS=true
+
+# In Claude Code REPL:
+Ctrl+T           # View shared task list (in Agent Teams)
+/tasks           # View current session tasks</code></pre>
+<p><strong>Real-world Tasks example:</strong></p>
+<pre><code>&quot;Break this epic into tasks and implement them in order:
+
+Epic: Add multi-currency support to the checkout flow
+
+I want you to:
+1. Create tasks for each step
+2. Mark dependencies (schema before service, service before controller)
+3. Implement each task in order, running tests after each
+4. Don&#39;t start a task until its dependencies are complete
+5. Report summary when done&quot;</code></pre>
+<p>Claude creates:</p>
+<pre><code>Tasks:
+[1] Update Prisma schema (currency, exchangeRate fields)    → no deps
+[2] Create CurrencyService with exchange rate fetching      → depends on [1]
+[3] Update OrderRepository for multi-currency amounts       → depends on [1]
+[4] Update checkout Controller to handle currency param     → depends on [2,3]
+[5] Update frontend checkout form                           → depends on [4]
+[6] Write integration tests                                 → depends on [4]
+[7] Update API documentation                                → depends on [4]</code></pre>
+<p>This graph is persisted. If context compaction occurs mid-task,
+Claude picks up from the last completed task automatically.</p>
+<hr />
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph SUB["🔀 Subagents — Isolated Workers"]
+        direction TB
+        S1["Main Agent assigns task"]
+        S2["Subagent works alone"]
+        S3["Reports results back"]
+        S1 --&gt; S2 --&gt; S3
+    end
+    subgraph TEAM["🤖 Agent Teams — Collaborative Squad"]
+        direction TB
+        T1["Team Lead coordinates"]
+        T2["Agents work in parallel"]
+        T3["Share task list + challenge each other"]
+        T4["Produce combined output"]
+        T1 --&gt; T2 --&gt; T3 --&gt; T4
+    end
+
+    style SUB fill:#f0f4ff,stroke:#4a90d9
+    style TEAM fill:#fff3cd,stroke:#ffc107</code></pre>
+</figure>
+
+<blockquote>
+<p>💡 <strong>Rule of thumb:</strong> Use <strong>subagents</strong> for
+isolated tasks that don't need coordination. Use <strong>Agent
+Teams</strong> when agents need to share context and challenge each
+other's work.</p>
+</blockquote>
+<h3 id="27-agent-teams--collaborative-multi-agent-development">2.7 Agent
+Teams — Collaborative Multi-Agent Development</h3>
+<p>Agent Teams (released Feb 5, 2026 alongside Opus 4.6) are the most
+powerful and most expensive Claude Code feature. Where subagents are
+isolated workers that report back, Agent Teams are a collaborative
+squad: one Claude leads, others are teammates — they share a task list,
+can challenge each other's findings, and work in parallel.</p>
+<p><strong>Architecture:</strong></p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    LEAD["👑 Team Lead&lt;br/&gt;&lt;b&gt;Opus 4.6&lt;/b&gt;&lt;br/&gt;Coordinates work"]
+    LEAD --&gt; A["👨‍💻 Agent A&lt;br/&gt;&lt;b&gt;Backend Dev&lt;/b&gt;&lt;br/&gt;Sonnet 4.6"]
+    LEAD --&gt; B["🔒 Agent B&lt;br/&gt;&lt;b&gt;Security&lt;/b&gt;&lt;br/&gt;Opus 4.6"]
+    LEAD --&gt; C["🧪 Agent C&lt;br/&gt;&lt;b&gt;Test Writer&lt;/b&gt;&lt;br/&gt;Sonnet 4.6"]
+    
+    A &lt;--&gt; TASKS["📋 Shared Task List&lt;br/&gt;&lt;i&gt;All agents read &amp; update&lt;/i&gt;"]
+    B &lt;--&gt; TASKS
+    C &lt;--&gt; TASKS
+
+    style LEAD fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style A fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style B fill:#e74c3c,stroke:#c0392b,color:#fff
+    style C fill:#50c878,stroke:#3da360,color:#fff
+    style TASKS fill:#f5a623,stroke:#d4891a,color:#fff</code></pre>
+</figure>
+
+<p><strong>Enabling Agent Teams:</strong></p>
+<pre class="bash"><code>export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+claude</code></pre>
+<p><strong>Agent Teams keyboard shortcuts:</strong></p>
+<pre><code>Shift+T          → Toggle team view
+Shift+Down       → Cycle through teammates
+Ctrl+T           → Open shared task list</code></pre>
+<p><strong>Creating a team in a prompt:</strong></p>
+<pre><code>&quot;Create an agent team with 3 members to review and refactor the payment module:
+
+- Team Lead: coordinate the work and produce the final report
+- Security Analyst: focus on authentication, authorization, and data exposure
+- Performance Engineer: identify N+1 queries, slow paths, caching opportunities
+
+Shared goal: produce a prioritised action plan with specific code fixes.
+Working files: src/services/payment.service.ts, src/repositories/payment.repository.ts&quot;</code></pre>
+<p><strong>When Agent Teams are worth the cost:</strong></p>
+<ul>
+<li>Security + performance + correctness review simultaneously (3
+specialists)</li>
+<li>Large feature implementations where frontend and backend can develop
+in parallel</li>
+<li>Code migration where different modules can be converted
+concurrently</li>
+<li>The famous Anthropic example: 16 agents building a C compiler in
+Rust — 100,000 lines over two weeks</li>
+</ul>
+<p><strong>When NOT to use Agent Teams:</strong></p>
+<ul>
+<li>Anything a single well-prompted Sonnet 4.6 can handle — the token
+cost is real</li>
+<li>Sequential tasks with no parallelism opportunity</li>
+<li>Tasks where the overhead of coordination exceeds the benefit</li>
+</ul>
+<hr />
+<h3 id="28-context-compaction--infinite-conversations">2.8 Context
+Compaction — Infinite Conversations</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    A["🕐 9AM&lt;br/&gt;Start feature&lt;br/&gt;Full context"] --&gt; B["🕐 12PM&lt;br/&gt;100+ tool calls&lt;br/&gt;Context filling up"]
+    B --&gt; C["⚡ Auto-Compaction&lt;br/&gt;Summarise old history&lt;br/&gt;Keep key decisions"]
+    C --&gt; D["🕐 6PM&lt;br/&gt;Still working&lt;br/&gt;Context fresh"]
+
+    style A fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style B fill:#f5a623,stroke:#d4891a,color:#fff
+    style C fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style D fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>Context compaction (v2.x, using the Claude 4.6 API feature)
+automatically summarises earlier conversation history when the context
+window approaches its limit. The result: effectively infinite
+conversations within a single session.</p>
+<p><strong>Why this matters for AISFD:</strong> Long feature development
+sessions used to hit context limits and lose important history. With
+compaction, a session that started implementing a feature at 9am can
+still have relevant context at 6pm, even if hundreds of tool calls have
+occurred.</p>
+<pre class="bash"><code># Compaction is automatic — no configuration needed
+# But you can trigger it manually:
+/compact
+
+# Or summarise from a specific message:
+# Click the message, then select &quot;Summarise from here&quot;</code></pre>
+<p><strong>Tip:</strong> Compaction preserves images in the summariser
+request (recent fix), enabling prompt cache reuse for cheaper and faster
+subsequent compaction.</p>
+<hr />
+<h3 id="29-git-worktrees--parallel-feature-development">2.9 Git
+Worktrees — Parallel Feature Development</h3>
+<p>Git worktrees let Claude work on multiple branches simultaneously
+without interfering. Combine with subagents for parallel feature
+development.</p>
+<pre class="bash"><code># Claude Code handles worktree creation and navigation
+&quot;Create a worktree for feature/payment-refactor and implement the 
+ PaymentService refactor there, without touching the main working directory&quot;</code></pre>
+<p><strong>Subagents with worktree isolation (new in 2.x):</strong></p>
+<pre class="markdown"><code>&lt;!-- Agent definition with worktree isolation --&gt;
+---
+name: feature-implementer
+description: Implements features in isolated git worktrees
+subagentIsolation: worktree
+---</code></pre>
+<p>This spawns the agent in a fresh worktree — any file changes are
+completely isolated from your main session until you review and
+merge.</p>
+<hr />
+<h3 id="210-the-teleport-feature-v210">2.10 The /teleport Feature
+(v2.1.0)</h3>
+<p><code>/teleport</code> moves your active CLI session to the claude.ai
+web interface — or <code>claude --teleport</code> starts a web session
+directly. This enables:</p>
+<ul>
+<li>Handing off a terminal session to a colleague via the web UI</li>
+<li>Continuing a complex session on a different machine</li>
+<li>Accessing your session from mobile</li>
+</ul>
+<pre class="bash"><code># Teleport current session to the web
+/teleport
+
+# Or start a web session from terminal
+claude --teleport</code></pre>
+<hr />
+<h2 id="3-the-complete-aisfd-model-selection-guide">3. The Complete
+AISFD Model Selection Guide</h2>
+<p>This is the decision framework for choosing the right model for every
+task in your development day. Updated for Claude Code 2.x and the Sonnet
+4.6 reality where near-Opus quality is available at Sonnet pricing.</p>
+<h3 id="the-hierarchy">The Hierarchy</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    subgraph HIERARCHY["🎯 AISFD Model Selection Hierarchy"]
+        direction TB
+        DEFAULT["&lt;b&gt;DEFAULT: Sonnet 4.6&lt;/b&gt;&lt;br/&gt;Use for 80% of tasks"]
+        UP["⬆️ UPGRADE to Opus 4.6&lt;br/&gt;When Sonnet output quality&lt;br/&gt;is genuinely insufficient"]
+        DOWN["⬇️ DOWNGRADE to Haiku 4.5&lt;br/&gt;For high-volume, simple tasks&lt;br/&gt;(classification, extraction)"]
+        
+        DOWN --&gt; DEFAULT --&gt; UP
+    end
+
+    style DEFAULT fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style UP fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style DOWN fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<pre><code>Task complexity
+     ↑
+     │  Opus 4.6 ─────────────── Multi-agent orchestration
+     │                           10h+ autonomous tasks
+     │                           Novel architectural problems
+     │                           Highest-stakes irreversible actions
+     │
+     │  Sonnet 4.6 ─────────────  DEFAULT for 90%+ of development tasks
+     │  (NEW DEFAULT)             Coding, debugging, review, testing, docs
+     │                           Computer use (72.5% OSWorld)
+     │                           Long-context analysis (1M beta)
+     │                           Agent subagent work
+     │
+     │  Haiku 4.5 ───────────────  Speed + volume tier
+     │                           Summarisation, classification
+     │                           Real-time applications
+     │                           Routing/triage
+     ↓
+Task simplicity</code></pre>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    T["📋 Ticket"] --&gt; PLAN["📐 Plan Mode&lt;br/&gt;&lt;i&gt;Shift+Tab&lt;/i&gt;&lt;br/&gt;Design approach"]
+    PLAN --&gt; IMPL["💻 Implement&lt;br/&gt;&lt;i&gt;Sonnet 4.6&lt;/i&gt;&lt;br/&gt;Code generation"]
+    IMPL --&gt; TEST["🧪 Tests&lt;br/&gt;&lt;i&gt;Sonnet 4.6&lt;/i&gt;&lt;br/&gt;Unit + Integration"]
+    TEST --&gt; REVIEW["🔍 Self-Review&lt;br/&gt;&lt;i&gt;Sonnet/Opus&lt;/i&gt;&lt;br/&gt;Quality check"]
+    REVIEW --&gt; HOOKS["⚡ Hooks Fire&lt;br/&gt;&lt;i&gt;Lint + Build + Test&lt;/i&gt;"]
+    HOOKS --&gt;|"Pass"| PR["📝 PR Created&lt;br/&gt;&lt;i&gt;Auto-description&lt;/i&gt;"]
+    HOOKS --&gt;|"Fail"| FIX["🔧 Auto-Fix&lt;br/&gt;&lt;i&gt;Claude iterates&lt;/i&gt;"]
+    FIX --&gt; HOOKS
+    PR --&gt; MERGE["🎉 Merged"]
+
+    style T fill:#f5a623,stroke:#d4891a,color:#fff
+    style PLAN fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style IMPL fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style REVIEW fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style HOOKS fill:#f5a623,stroke:#d4891a,color:#fff
+    style MERGE fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<h3 id="task-by-task-model-reference">Task-by-Task Model Reference</h3>
+<h4 id="feature-development">Feature Development</h4>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Model</th>
+<th>Why</th>
+<th>Example Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New feature scaffold</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Near-Opus code quality, 5× cheaper</td>
+<td><code>/feature-scaffold user-invitations</code></td>
+</tr>
+<tr>
+<td>Complex algorithm design</td>
+<td><strong>Opus 4.6</strong></td>
+<td>Novel reasoning needed</td>
+<td><code>"Design a conflict-free CRDT for our collaborative editing"</code></td>
+</tr>
+<tr>
+<td>API endpoint implementation</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Pattern-following, well-defined</td>
+<td><code>"Implement POST /subscriptions following auth.controller.ts"</code></td>
+</tr>
+<tr>
+<td>Database migration</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Well-defined, needs care</td>
+<td><code>"Write Prisma migration for adding soft-delete to orders"</code></td>
+</tr>
+<tr>
+<td>Frontend component</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Design + code quality</td>
+<td><code>"Build a paginated data table component with sort and filter"</code></td>
+</tr>
+<tr>
+<td>Large codebase refactor</td>
+<td><strong>Sonnet 4.6</strong> + Tasks</td>
+<td>Long-horizon, sequential</td>
+<td>Use Tasks DAG for dependency management</td>
+</tr>
+<tr>
+<td>Parallel module migration</td>
+<td><strong>Opus 4.6</strong> + Agent Teams</td>
+<td>Genuinely parallel workstreams</td>
+<td>3 agents on 3 modules simultaneously</td>
+</tr>
+</tbody>
+</table>
+<h4 id="code-review-and-quality">Code Review and Quality</h4>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Model</th>
+<th>Why</th>
+<th>Example Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard PR review</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Excellent review quality</td>
+<td>`git diff main</td>
+</tr>
+<tr>
+<td>Security-critical review</td>
+<td><strong>Opus 4.6</strong> security-reviewer subagent</td>
+<td>Adversarial depth needed</td>
+<td>Custom subagent with Opus 4.6</td>
+</tr>
+<tr>
+<td>Team-wide review (3+ dimensions)</td>
+<td><strong>Opus 4.6</strong> Agent Teams</td>
+<td>Parallel specialist review</td>
+<td>Security + Perf + Correctness agents</td>
+</tr>
+<tr>
+<td>Quick style/lint check</td>
+<td><strong>Haiku 4.5</strong></td>
+<td>Speed, simple task</td>
+<td>Auto-hook on PostToolUse</td>
+</tr>
+<tr>
+<td>Architecture review</td>
+<td><strong>Opus 4.6</strong></td>
+<td>Novel judgment needed</td>
+<td><code>"Review system design for [feature]"</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="testing">Testing</h4>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Model</th>
+<th>Why</th>
+<th>Example Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit test generation</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Strong pattern recognition</td>
+<td><code>"Write Jest tests for PaymentService"</code></td>
+</tr>
+<tr>
+<td>E2E Playwright tests</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Multi-step generation</td>
+<td><code>"Write Playwright tests for checkout flow"</code></td>
+</tr>
+<tr>
+<td>Test data factories</td>
+<td><strong>Haiku 4.5</strong></td>
+<td>Simple, high-volume</td>
+<td><code>"Generate 50 test users with edge-case data"</code></td>
+</tr>
+<tr>
+<td>Test strategy planning</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Reasoning + patterns</td>
+<td><code>"Plan the test strategy for the billing module"</code></td>
+</tr>
+<tr>
+<td>Mutation testing analysis</td>
+<td><strong>Opus 4.6</strong></td>
+<td>Complex reasoning on failures</td>
+<td><code>"Analyse why these mutation tests survived"</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="debugging">Debugging</h4>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Model</th>
+<th>Why</th>
+<th>Example Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stack trace analysis</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Strong debugging, near-Opus</td>
+<td>`cat error.log</td>
+</tr>
+<tr>
+<td>Intermittent/concurrency bug</td>
+<td><strong>Opus 4.6</strong></td>
+<td>Subtle reasoning required</td>
+<td><code>"This race condition only appears under load..."</code></td>
+</tr>
+<tr>
+<td>Performance profiling</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Pattern recognition</td>
+<td><code>"Explain this Datadog flame graph"</code></td>
+</tr>
+<tr>
+<td>Quick syntax error</td>
+<td><strong>Haiku 4.5</strong></td>
+<td>Trivial, fast</td>
+<td>Inline in editor</td>
+</tr>
+</tbody>
+</table>
+<h4 id="documentation">Documentation</h4>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Model</th>
+<th>Why</th>
+<th>Example Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JSDoc / docstrings</td>
+<td><strong>Haiku 4.5</strong></td>
+<td>Simple, high-volume</td>
+<td>Hook on PostToolUse</td>
+</tr>
+<tr>
+<td>README generation</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Quality writing</td>
+<td><code>"Write README for this module"</code></td>
+</tr>
+<tr>
+<td>Architecture decision record</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Structured reasoning</td>
+<td><code>"Write ADR for choosing Event Sourcing"</code></td>
+</tr>
+<tr>
+<td>API documentation</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Completeness needed</td>
+<td><code>"Document all endpoints in payment.routes.ts"</code></td>
+</tr>
+<tr>
+<td>Long-form technical design doc</td>
+<td><strong>Opus 4.6</strong></td>
+<td>Deep synthesis</td>
+<td><code>"Write technical design for our new auth system"</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="git-and-release">Git and Release</h4>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Model</th>
+<th>Why</th>
+<th>Example Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commit message</td>
+<td><strong>Haiku 4.5</strong></td>
+<td>Fast, simple</td>
+<td>`git diff --staged</td>
+</tr>
+<tr>
+<td>PR description</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Clear, complete writing</td>
+<td><code>claude -p "Write PR description for this branch"</code></td>
+</tr>
+<tr>
+<td>Changelog generation</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Synthesis from git log</td>
+<td>`git log --oneline v1.2..HEAD</td>
+</tr>
+<tr>
+<td>Release notes</td>
+<td><strong>Sonnet 4.6</strong></td>
+<td>Quality, stakeholder-facing</td>
+<td><code>"Draft release notes for v2.3.0"</code></td>
+</tr>
+<tr>
+<td>Hotfix analysis</td>
+<td><strong>Sonnet 4.6</strong> → Opus if unclear</td>
+<td>Debugging clarity</td>
+<td><code>"Is this safe to hotfix? [diff]"</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-the-aisfd-daily-development-workflow">4. The AISFD Daily
+Development Workflow</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph AM["☀️ Morning (15 min)"]
+        M1["📋 Review backlog&lt;br/&gt;&lt;i&gt;Haiku for summaries&lt;/i&gt;"]
+        M2["🎯 Plan today's work&lt;br/&gt;&lt;i&gt;Sonnet for analysis&lt;/i&gt;"]
+    end
+    subgraph DEV["💻 Feature Dev (bulk of day)"]
+        D1["📐 Plan Mode"] --&gt; D2["💻 Implement&lt;br/&gt;&lt;i&gt;Sonnet 4.6&lt;/i&gt;"]
+        D2 --&gt; D3["🧪 Write Tests&lt;br/&gt;&lt;i&gt;Sonnet 4.6&lt;/i&gt;"]
+        D3 --&gt; D4["🔍 Self-Review"]
+        D4 --&gt;|"Issues found"| D2
+        D4 --&gt;|"Clean"| D5["✅ Commit"]
+    end
+    subgraph PM["🌙 End of Day"]
+        E1["📝 PR with description"]
+        E2["📋 Update tickets"]
+        E3["💬 Slack summary"]
+    end
+    
+    AM --&gt; DEV --&gt; PM
+
+    style AM fill:#fff3cd,stroke:#ffc107
+    style DEV fill:#d4edda,stroke:#28a745
+    style PM fill:#f0f4ff,stroke:#4a90d9</code></pre>
+</figure>
+
+<p>This is a concrete, hour-by-hour workflow for a developer using AISFD
+with Claude Code 2.x.</p>
+<h3 id="morning-sprint-planning-15-minutes">Morning: Sprint Planning (15
+minutes)</h3>
+<pre class="bash"><code>cd my-project
+claude
+
+# 1. Understand today&#39;s tasks in context
+&gt; What is the state of feature/subscription-billing? 
+  Read the PR, the related JIRA ticket in context, and the current implementation.
+
+# 2. Break down the day&#39;s work into a Task graph
+&gt; I need to implement: coupon code validation, proration for mid-cycle upgrades,
+  and dunning emails for failed payments.
+  Create a Tasks DAG with correct dependencies and suggest the implementation order.
+
+# Claude creates the task graph. You review and approve.</code></pre>
+<h3 id="feature-implementation-the-aisfd-loop">Feature Implementation:
+The AISFD Loop</h3>
+<pre class="bash"><code># Step 1: Plan before touching any files
+[Shift+Tab] → Plan Mode
+
+&gt; Implement coupon code validation for the checkout flow.
+  Reference: src/services/auth.service.ts for coding patterns.
+  Constraints: Coupons can be single-use or multi-use, percentage or fixed amount,
+  can expire, and can be restricted to specific plan tiers.
+
+# Claude reads the codebase, proposes a plan.
+# You review: &quot;Good. Add validation that a coupon can&#39;t be applied to 
+#              a plan it&#39;s not eligible for.&quot;
+# Claude proceeds with your note incorporated.</code></pre>
+<pre class="bash"><code># Step 2: Scaffold (let Claude do the boilerplate)
+/feature-scaffold coupon
+
+# Claude creates: validator, repository, service, controller, routes.
+# TypeScript check after each file. Takes ~3 minutes.</code></pre>
+<pre class="bash"><code># Step 3: Implement the business logic
+&gt; Implement the business logic in CouponService.
+  Rules are in CLAUDE.md under &quot;Discount Rules&quot;.
+  Edge cases to handle:
+  - Coupon already used by this user
+  - Coupon expired (check both date and usage limit)
+  - Coupon not valid for the selected plan tier
+  - Concurrent redemption (race condition — use database transaction)
+
+# Sonnet 4.6 handles this well. Near-Opus reasoning on well-specified problems.</code></pre>
+<pre class="bash"><code># Step 4: Tests run automatically (hook)
+# PostToolUse hook fires: lint runs, affected tests run.
+# If tests fail, Claude sees the output and fixes immediately.</code></pre>
+<pre class="bash"><code># Step 5: Spawn a background security review while you continue
+&gt; Run a security-reviewer subagent on the new CouponService in the background.
+  Continue implementing the proration logic. Notify me when the review is done.
+
+# You keep working. Security review happens in parallel.
+# When complete, Claude reports the findings.</code></pre>
+<h3 id="mid-feature-hard-problem-escalation">Mid-Feature: Hard Problem
+Escalation</h3>
+<pre class="bash"><code># Proration maths are complex. Escalate to Opus.
+claude --model claude-opus-4-6
+
+&gt; The proration calculation needs to handle:
+  - Mid-cycle upgrades with different billing cycles (monthly/annual)
+  - Credits from partial periods at different rates
+  - Tax recalculation after proration
+  - Currency conversion for multi-currency accounts
+  
+  Design the proration engine. Start with the data model, then the algorithm.
+  Show your reasoning step by step before writing code.</code></pre>
+<h3 id="end-of-day-review-and-commit">End-of-Day: Review and Commit</h3>
+<pre class="bash"><code># Automated pre-commit review
+git diff --staged | claude -p \
+  &quot;You are a senior engineer. Review this diff.
+   Flag: security issues, logic bugs, missing error handling, test gaps.
+   If all clear, output only: LGTM. Otherwise list issues.&quot;</code></pre>
+<pre class="bash"><code># If LGTM, generate commit message
+git diff --staged | claude-fast \
+  &quot;Write a conventional commit message. 
+   Output only the commit message, nothing else.&quot;</code></pre>
+<pre class="bash"><code># Generate PR description
+claude -p &quot;Write a PR description for the current branch vs main.
+  Format: What, Why, How to test, Screenshots placeholder.&quot;</code></pre>
+<hr />
+<h2 id="5-power-workflows--putting-it-all-together">5. Power Workflows —
+Putting It All Together</h2>
+<h3 id="workflow-full-feature-from-ticket-to-pr-solo">Workflow: Full
+Feature from Ticket to PR (Solo)</h3>
+<pre class="bash"><code># 1. Read the JIRA ticket (via JIRA MCP if configured)
+&quot;Read JIRA ticket PROJ-234 and explain what needs to be built&quot;
+
+# 2. Plan with Task graph
+[Shift+Tab]
+&quot;Plan the full implementation of PROJ-234 with a Tasks DAG&quot;
+
+# 3. Scaffold
+/feature-scaffold [feature-name]
+
+# 4. Implement (Sonnet 4.6 default)
+&quot;Implement each task in the DAG. Run tests after each. Report blockers.&quot;
+
+# 5. Background security review runs via hook/subagent
+
+# 6. Auto-PR description
+claude -p &quot;Write the PR description for this branch&quot;
+
+# Time: ~2-4 hours vs ~2-3 days manually</code></pre>
+<h3 id="workflow-team-code-review-agent-teams">Workflow: Team Code
+Review (Agent Teams)</h3>
+<pre class="bash"><code>export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+&quot;Create a 3-agent review team for PR #247:
+ - Lead: synthesise findings and produce the final review comment
+ - Security Analyst (Opus 4.6): authentication, data handling, injection risks
+ - Architecture Reviewer (Sonnet 4.6): SOLID, patterns, maintainability
+
+ Post the consolidated review to GitHub via the GitHub MCP.&quot;</code></pre>
+<h3 id="workflow-incident-debug-background--logs-mcp">Workflow: Incident
+Debug (Background + Logs MCP)</h3>
+<pre class="bash"><code># With Datadog MCP and GitHub MCP configured:
+&quot;We have a production incident — payment service 500s.
+ Tasks:
+ 1. Query Datadog logs for payment-service errors in the last 30 minutes
+ 2. Identify the error pattern and frequency
+ 3. Read the last 5 commits to the payment service in GitHub
+ 4. Correlate: which commit likely introduced this?
+ 5. Show me the specific code change that&#39;s the likely culprit
+ 6. Propose a minimal hotfix&quot;
+
+# What would take 30 minutes manually: ~4 minutes with Claude Code + MCPs</code></pre>
+<h3 id="workflow-continuous-cicd-integration">Workflow: Continuous CI/CD
+Integration</h3>
+<pre class="bash"><code># In your CI pipeline (headless mode)
+- name: AI Code Review
+  run: |
+    git diff ${{ github.base_ref }}...${{ github.sha }} | \
+    claude --headless -p \
+      &quot;Review this PR diff for: security vulnerabilities, logic errors, 
+       missing tests. If critical issues found, exit 1. Else exit 0.&quot;</code></pre>
+<hr />
+<h2 id="6-aisfd-anti-patterns">6. AISFD Anti-Patterns</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph ANTI["🚫 AISFD Anti-Patterns — Don't Do These"]
+        direction TB
+        A1["❌ &lt;b&gt;Dump and pray&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Pasting 10K lines without context&lt;/i&gt;"]
+        A2["❌ &lt;b&gt;Opus for everything&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Using flagship model for simple tasks&lt;/i&gt;"]
+        A3["❌ &lt;b&gt;No CLAUDE.md&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Skipping context = generic outputs&lt;/i&gt;"]
+        A4["❌ &lt;b&gt;Skip review&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Shipping unreviewed AI code&lt;/i&gt;"]
+        A5["❌ &lt;b&gt;One giant prompt&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Instead of decomposed steps&lt;/i&gt;"]
+    end
+
+    style ANTI fill:#ffe5e5,stroke:#e74c3c</code></pre>
+</figure>
+
+<p>Avoid these common mistakes:</p>
+<p><strong>Anti-pattern 1: The Mega-Prompt</strong></p>
+<pre><code>Bad:  &quot;Build the entire subscription billing system&quot;
+Good: Use Plan Mode + Tasks DAG — decompose into implementable units</code></pre>
+<p><strong>Anti-pattern 2: Skipping Plan Mode</strong> For any task &gt;
+3 files, skipping <code>Shift+Tab</code> means Claude starts coding
+before understanding the full picture. Costs more tokens to fix than
+Plan Mode costs to run.</p>
+<p><strong>Anti-pattern 3: Using Opus for Everything</strong>
+Post-Sonnet 4.6, defaulting to Opus is a 5× cost overpay for equivalent
+output on ~90% of tasks. Audit your usage.</p>
+<p><strong>Anti-pattern 4: No Hooks</strong> Without PostToolUse hooks
+running your linter and tests, Claude can go multiple steps before
+discovering a downstream test failure. Set up hooks early — they change
+the feedback loop fundamentally.</p>
+<p><strong>Anti-pattern 5: No CLAUDE.md</strong> Claude without
+CLAUDE.md generates technically correct code that violates your
+project's patterns, architecture, and conventions. The first 2 hours you
+spend on CLAUDE.md saves 2 minutes per prompt for the life of the
+project.</p>
+<p><strong>Anti-pattern 6: Accepting Without Review</strong> AISFD
+doesn't mean unreviewed code. The review is faster, not absent. Ship
+nothing you haven't read.</p>
+<hr />
+<h2 id="7-claude-code-2x-setup-checklist">7. Claude Code 2.x Setup
+Checklist</h2>
+<pre class="bash"><code># 1. Install / update to latest
+npm install -g @anthropic-ai/claude-code
+claude update
+
+# 2. Verify version (should be 2.x)
+claude --version
+
+# 3. Set default model (Sonnet 4.6 is now the right default)
+echo &#39;export ANTHROPIC_MODEL=&quot;claude-sonnet-4-6&quot;&#39; &gt;&gt; ~/.zshrc
+
+# 4. Set up global CLAUDE.md
+mkdir -p ~/.claude
+touch ~/.claude/CLAUDE.md   # See Article 8 for content
+
+# 5. Create project CLAUDE.md (see Article 8)
+touch CLAUDE.md
+
+# 6. Create skills directory
+mkdir -p .claude/skills
+# Add code-review.md, feature-scaffold.md, etc.
+
+# 7. Create agents directory
+mkdir -p ~/.claude/agents
+# Add security-reviewer.md with Opus model
+
+# 8. Configure hooks in .claude/settings.json
+
+# 9. Configure MCPs in .claude/settings.json (see Article 10)
+
+# 10. Enable Agent Teams (experimental)
+echo &#39;export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1&#39; &gt;&gt; ~/.zshrc</code></pre>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>Claude Code 2.x paired with Claude Sonnet 4.6 has fundamentally
+changed what a single developer can accomplish. The key principles:</p>
+<p><strong>Use Sonnet 4.6 as your default.</strong> It delivers
+near-Opus quality on 90%+ of development tasks at one-fifth the cost.
+The economics make sense at every scale.</p>
+<p><strong>Reserve Opus 4.6 for specific scenarios:</strong> multi-agent
+team orchestration, 10h+ autonomous tasks, novel reasoning problems,
+highest-stakes reviews. The capability difference is real but the use
+cases are narrower than before.</p>
+<p><strong>Use Haiku 4.5 aggressively for volume.</strong> Commit
+messages, summarisation, routing, quick lookups — Haiku's speed and cost
+profile is a perfect fit.</p>
+<p><strong>Invest in infrastructure once.</strong> CLAUDE.md, Skills,
+Hooks, and custom subagents are investments with compounding returns.
+Every hour you spend on them saves minutes per prompt indefinitely.</p>
+<p><strong>Plan Mode is not optional.</strong> For any non-trivial task,
+<code>Shift+Tab</code> before starting is the highest-ROI habit you can
+build.</p>
+<p>The developers extracting the most value from AISFD in 2026 are the
+ones who treat Claude Code as infrastructure, not a chatbot. They've
+wired it into their CI, their hooks, their review process, and their
+daily workflow. They're not faster because they type less — they're
+faster because they've automated the mechanical parts of software
+development and freed their thinking for the parts that actually require
+it.</p>
+<hr />
+<p><em>This is Article 11 in the AI-Assisted Development series.
+Previous articles cover model fundamentals, setup, CLAUDE.md
+configuration, effective prompting, and MCP setup.</em></p>
+
+</body>
+</html>

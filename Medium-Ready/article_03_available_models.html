@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 3: Which AI Models Are Available? A Developer's Map of the LLM Landscape</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. For each 📊 Diagram placeholder:
+       a. Copy the mermaid code
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download as SVG
+       d. In Medium: delete the code block, insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags and subtitle in Medium editor
+    6. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    Landscape shot of different AI model logos/brands arranged in a grid or constellation. Tech blue tones.
+    ============================================================
+    RECOMMENDED TAGS: AI, Claude AI, GPT, Gemini, LLM, Machine Learning
+    ============================================================
+    SUBTITLE: GPT, Claude, Gemini, Llama, Mistral — cutting through the noise to understand what each model family offers and when to choose each.
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 3: Which AI Models Are Available? A Developer's Map of the LLM Landscape</h1>
+<p><em>GPT, Claude, Gemini, Llama, Mistral — cutting through the noise to understand what each model family offers and when to choose each.</em></p>
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>The LLM landscape in 2025–2026 is rich, noisy, and moves fast. New
+model releases and benchmarks appear weekly, each claiming to be "state
+of the art." For developers building real products, the signal-to-noise
+ratio can be brutal.</p>
+<p>This article maps the major model families, their capabilities, and
+their practical trade-offs — so you can make informed decisions rather
+than chasing benchmarks.</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>mindmap
+  root((🌐 LLM&lt;br/&gt;Landscape&lt;br/&gt;2025-26))
+    🟣 Anthropic
+      Claude Opus 4.6
+      Claude Sonnet 4.6
+      Claude Haiku 4.5
+    🟢 OpenAI
+      GPT-5.2
+      GPT-5.2 mini
+      GPT-5.2 Codex
+      o4 / o4-mini
+    🔵 Google
+      Gemini 3.1 Pro
+      Gemini 3.1 Flash
+      Gemini 3.0 Flash
+    🟠 Meta
+      Llama 4 Scout
+      Llama 4 Maverick
+      Llama 4 Behemoth
+    🔴 Mistral
+      Mistral Large 3
+      Mixtral 8x22B
+      Codestral 2025
+    ⚫ Others
+      Cohere Command R+
+      xAI Grok 3.5
+      DeepSeek V3</code></pre>
+</figure>
+
+<hr />
+<h2 id="1-the-major-players">1. The Major Players</h2>
+<h3 id="11-anthropic--claude-family">1.1 Anthropic — Claude Family</h3>
+<p>Anthropic was founded in 2021 by former OpenAI researchers, including
+Dario and Daniela Amodei. Their mission is "AI safety" — building
+powerful AI while ensuring it remains aligned, honest, and harmless.
+This philosophy is baked into Claude at the model level (Constitutional
+AI).</p>
+<p><strong>Current Claude Model Family:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">API String</th>
+<th style="text-align: center;">Context</th>
+<th style="text-align: left;">Best For</th>
+<th style="text-align: right;">Price (input/output per MTok)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Claude Opus 4.6</strong></td>
+<td style="text-align: left;"><code>claude-opus-4-6</code></td>
+<td style="text-align: center;">200K (1M β)</td>
+<td style="text-align: left;">Complex reasoning, architecture, agent
+teams</td>
+<td style="text-align: right;">$15 / $75</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Claude Sonnet 4.6</strong></td>
+<td style="text-align: left;"><code>claude-sonnet-4-6</code></td>
+<td style="text-align: center;">200K</td>
+<td style="text-align: left;">Coding, daily dev, balanced
+quality/speed</td>
+<td style="text-align: right;">$3 / $15</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Claude Haiku 4.5</strong></td>
+<td style="text-align: left;"><code>claude-haiku-4-5-20251001</code></td>
+<td style="text-align: center;">200K</td>
+<td style="text-align: left;">High-volume, fast tasks,
+summarisation</td>
+<td style="text-align: right;">$0.80 / $4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key strengths:</strong></p>
+<ul>
+<li>Best-in-class for long-context tasks (200K window)</li>
+<li>Exceptional instruction-following</li>
+<li>Strong coding ability, particularly for complex multi-file tasks</li>
+<li>Excellent at nuanced writing and communication</li>
+<li>Consistent, predictable output format</li>
+<li>Strong safety — less likely to produce harmful or misleading content</li>
+</ul>
+<p><strong>Unique differentiators:</strong></p>
+<ul>
+<li>Constitutional AI training results in outputs that are more reliable
+and less prone to "going off the rails"</li>
+<li>Claude is known for being honest about its uncertainty</li>
+<li>Strongest performance on tasks requiring nuanced reasoning across
+large documents</li>
+<li><strong>Benchmarks (Sonnet 4.6):</strong> SWE-bench 79.6% · OSWorld
+72.5% | <strong>Opus 4.6:</strong> METR autonomous task horizon 14h 30min</li>
+</ul>
+<hr />
+<h3 id="12-openai--gpt-family">1.2 OpenAI — GPT Family</h3>
+<p>OpenAI is the company that popularised LLMs with ChatGPT in late
+2022. Their GPT-5 and o-series models remain the strongest competitors
+to Claude in the enterprise and developer market.</p>
+<p><strong>Current OpenAI Models:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model</th>
+<th style="text-align: center;">Context</th>
+<th style="text-align: left;">Best For</th>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>GPT-5.2</strong></td>
+<td style="text-align: center;">200K</td>
+<td style="text-align: left;">General purpose, multimodal, agentic</td>
+<td style="text-align: left;">Full text + image + audio + video</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>GPT-5.2 mini</strong></td>
+<td style="text-align: center;">200K</td>
+<td style="text-align: left;">Fast, cost-effective tasks</td>
+<td style="text-align: left;">Best OpenAI budget option</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>GPT-5.2-Codex</strong></td>
+<td style="text-align: center;">200K</td>
+<td style="text-align: left;">Agentic coding, autonomous dev tasks</td>
+<td style="text-align: left;">Powers GitHub Copilot Workspace</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>o4</strong></td>
+<td style="text-align: center;">200K</td>
+<td style="text-align: left;">Advanced reasoning, maths, research</td>
+<td style="text-align: left;">Extended thinking before answer</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>o4-mini</strong></td>
+<td style="text-align: center;">200K</td>
+<td style="text-align: left;">Fast reasoning, cost-efficient</td>
+<td style="text-align: left;">Best OpenAI reasoning/cost ratio</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="13-google-deepmind--gemini-family">1.3 Google DeepMind — Gemini Family</h3>
+<p>Google's Gemini 3 models are deeply integrated into the Google
+ecosystem and hold the record for the largest production context windows available.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">API String</th>
+<th style="text-align: center;">Context</th>
+<th style="text-align: left;">Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Gemini 3.1 Pro</strong></td>
+<td style="text-align: left;"><code>gemini-3.1-pro-preview</code></td>
+<td style="text-align: center;">1M</td>
+<td style="text-align: left;">Long-context reasoning, whole-codebase analysis</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Gemini 3.1 Flash</strong></td>
+<td style="text-align: left;"><code>gemini-3.1-flash</code></td>
+<td style="text-align: center;">1M</td>
+<td style="text-align: left;">Fast long-document processing, scale</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Gemini 3.0 Flash</strong></td>
+<td style="text-align: left;"><code>gemini-3.0-flash</code></td>
+<td style="text-align: center;">1M</td>
+<td style="text-align: left;">Real-time apps, voice, high-volume</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="14-meta--llama-family">1.4 Meta — Llama Family</h3>
+<p>Meta's Llama 4 models are open-weights — you can download the weights
+and run them yourself. This is a fundamental differentiator for data
+privacy, custom training, or on-premises deployment.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">Architecture</th>
+<th style="text-align: center;">Context</th>
+<th style="text-align: left;">Best For</th>
+<th style="text-align: center;">Self-hostable?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Llama 4 Scout</strong></td>
+<td style="text-align: left;">MoE (17B active / 109B total)</td>
+<td style="text-align: center;">10M</td>
+<td style="text-align: left;">Edge, single-GPU local, fast inference</td>
+<td style="text-align: center;">✅ Consumer GPU</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Llama 4 Maverick</strong></td>
+<td style="text-align: left;">MoE (17B active / 400B total)</td>
+<td style="text-align: center;">1M</td>
+<td style="text-align: left;">Strong coding and reasoning, self-hosted</td>
+<td style="text-align: center;">✅ Multi-GPU</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Llama 4 Behemoth</strong></td>
+<td style="text-align: left;">~2T parameters</td>
+<td style="text-align: center;">1M</td>
+<td style="text-align: left;">Frontier-class research, teacher model</td>
+<td style="text-align: center;">⚠️ Research only</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="15-mistral-ai">1.5 Mistral AI</h3>
+<p>French AI lab producing highly efficient open and commercial models,
+known for punching above their weight in quality-per-parameter.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model</th>
+<th style="text-align: center;">Type</th>
+<th style="text-align: center;">Self-host?</th>
+<th style="text-align: left;">Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Mistral Large 3</strong></td>
+<td style="text-align: center;">Proprietary</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: left;">Complex reasoning, multilingual, 128K context</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mixtral 8x22B</strong></td>
+<td style="text-align: center;">Open MoE</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: left;">General purpose, strong cost efficiency</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Codestral 2025</strong></td>
+<td style="text-align: center;">Open</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: left;">Code gen, fill-in-the-middle, IDE completion</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mistral Small 3</strong></td>
+<td style="text-align: center;">Open</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: left;">Fast, lightweight, embedded tasks</td>
+</tr>
+</tbody>
+</table>
+<hr />
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    START["🤔 Which Model Type?"] --&gt; Q1{"Data leaves&lt;br/&gt;your infra?"}
+    Q1 --&gt;|"Not acceptable"| OPEN["🔓 Open Source&lt;br/&gt;Llama 4, Mistral"]
+    Q1 --&gt;|"OK with DPA"| Q2{"Setup&lt;br/&gt;effort?"}
+    Q2 --&gt;|"Minutes"| CLOSED["🔒 Closed API&lt;br/&gt;Claude, GPT, Gemini"]
+    Q2 --&gt;|"Days OK"| Q3{"Fine-tuning&lt;br/&gt;needed?"}
+    Q3 --&gt;|"Yes"| OPEN
+    Q3 --&gt;|"No"| CLOSED
+
+    OPEN --&gt; O1["✅ Zero API cost&lt;br/&gt;✅ Full control&lt;br/&gt;⚠️ Infra management"]
+    CLOSED --&gt; C1["✅ Instant setup&lt;br/&gt;✅ Managed uptime&lt;br/&gt;⚠️ Per-token costs"]
+
+    style START fill:#f5a623,stroke:#d4891a,color:#fff
+    style OPEN fill:#50c878,stroke:#3da360,color:#fff
+    style CLOSED fill:#4a90d9,stroke:#2d6cb4,color:#fff</code></pre>
+</figure>
+
+<h2 id="2-open-source-vs-closed-source-the-core-trade-off">2. Open-Source vs. Closed-Source: The Core Trade-off</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: left;">🔒 Closed (Claude, GPT-5.2, Gemini)</th>
+<th style="text-align: left;">🔓 Open (Llama 4, Mistral)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Quality</strong></td>
+<td style="text-align: left;">Frontier — Claude Sonnet 4.6 SWE-bench 79.6%</td>
+<td style="text-align: left;">Llama 4 Maverick competitive with GPT-5.2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Data privacy</strong></td>
+<td style="text-align: left;">Data leaves your infrastructure</td>
+<td style="text-align: left;">Full on-premises, zero data sharing</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Cost model</strong></td>
+<td style="text-align: left;">Per-token API fees (predictable)</td>
+<td style="text-align: left;">Infrastructure cost only (variable)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Customisation</strong></td>
+<td style="text-align: left;">Prompt-only, limited system fine-tuning</td>
+<td style="text-align: left;">Full LoRA / QLoRA fine-tuning</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Setup effort</strong></td>
+<td style="text-align: left;">API key + SDK — minutes</td>
+<td style="text-align: left;">GPU infra + vLLM/Ollama — hours/days</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-specialised-models-worth-knowing">3. Specialised Models Worth Knowing</h2>
+<h3 id="code-specialised">Code-Specialised</h3>
+<ul>
+<li><strong>GitHub Copilot</strong> (GPT-5.2-Codex based) — IDE autocomplete and agentic PR generation</li>
+<li><strong>Codestral 2025</strong> (Mistral) — Code generation, strong on fill-in-the-middle</li>
+<li><strong>DeepSeek V3</strong> — Strong open-source code model, cost-efficient</li>
+<li><strong>Llama 4 Maverick</strong> — Meta's general-purpose model with strong coding</li>
+</ul>
+<h3 id="embedding-models">Embedding Models</h3>
+<ul>
+<li><strong>OpenAI text-embedding-3-large</strong> — Strong general-purpose embeddings</li>
+<li><strong>Cohere Embed v3</strong> — Best-in-class for retrieval/RAG</li>
+<li><strong>all-MiniLM-L6-v2</strong> (Sentence Transformers) — Lightweight, local-first</li>
+</ul>
+<hr />
+<h2 id="4-model-comparison-by-task">4. Model Comparison by Task</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Task</th>
+<th style="text-align: left;">🥇 Best Choice</th>
+<th style="text-align: left;">🥈 Runner-Up</th>
+<th style="text-align: left;">💰 Budget Option</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Complex coding</td>
+<td style="text-align: left;">Claude Sonnet 4.6</td>
+<td style="text-align: left;">GPT-5.2-Codex</td>
+<td style="text-align: left;">Codestral 2025</td>
+</tr>
+<tr>
+<td style="text-align: left;">Long document analysis</td>
+<td style="text-align: left;">Gemini 3.1 Pro (1M ctx)</td>
+<td style="text-align: left;">Claude Opus 4.6</td>
+<td style="text-align: left;">Claude Sonnet 4.6</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mathematical / algorithmic reasoning</td>
+<td style="text-align: left;">o4</td>
+<td style="text-align: left;">Gemini 3.1 Pro</td>
+<td style="text-align: left;">Llama 4 Maverick</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fast API calls</td>
+<td style="text-align: left;">Claude Haiku 4.5</td>
+<td style="text-align: left;">GPT-5.2 mini</td>
+<td style="text-align: left;">Mistral Small 3</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAG / retrieval</td>
+<td style="text-align: left;">Claude Sonnet 4.6</td>
+<td style="text-align: left;">Command R+</td>
+<td style="text-align: left;">Llama 4 Scout</td>
+</tr>
+<tr>
+<td style="text-align: left;">Privacy-sensitive tasks</td>
+<td style="text-align: left;">Llama 4 Scout (local)</td>
+<td style="text-align: left;">Mistral Large 3</td>
+<td style="text-align: left;">Llama 4 Maverick</td>
+</tr>
+</tbody>
+</table>
+<hr />
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    A["💬 Chat&lt;br/&gt;Interface&lt;br/&gt;&lt;i&gt;2022-2023&lt;/i&gt;"] --&gt; B["🔧 Tool Use&lt;br/&gt;Function Calling&lt;br/&gt;&lt;i&gt;2023-2024&lt;/i&gt;"] --&gt; C["🖥️ Computer Use&lt;br/&gt;Autonomous UI&lt;br/&gt;&lt;i&gt;2024-2025&lt;/i&gt;"] --&gt; D["🤖 Agentic Systems&lt;br/&gt;Multi-Agent Teams&lt;br/&gt;&lt;i&gt;2025-2026&lt;/i&gt;"]
+
+    style A fill:#6c757d,stroke:#495057,color:#fff
+    style B fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style C fill:#f5a623,stroke:#d4891a,color:#fff
+    style D fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<h2 id="summary">Summary</h2>
+<ul>
+<li><strong>Anthropic Claude</strong> — Best for coding, long-context, reliable instruction-following</li>
+<li><strong>OpenAI GPT-5.2 / o4</strong> — Strongest multimodal, best reasoning (o4), massive ecosystem</li>
+<li><strong>Google Gemini 3.1 Pro</strong> — Longest context (1M tokens), deeply integrated in Google stack</li>
+<li><strong>Meta Llama 4</strong> — Best open-source option, Llama 4 Scout runs locally on consumer hardware</li>
+<li><strong>Mistral</strong> — Efficient, multilingual, Codestral 2025 is the strongest open-source code model</li>
+</ul>
+<hr />
+<p><em>Next: Article 4 — Model Purpose and Task Matching: Which Model Wins at What?</em></p>
+
+</body>
+</html>

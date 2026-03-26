@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 4: Model Purpose and Task Matching — Which AI Model Wins at What?</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. For each 📊 Diagram placeholder:
+       a. Copy the mermaid code
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download as SVG
+       d. In Medium: delete the code block, insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags and subtitle in Medium editor
+    6. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    A decision tree or routing diagram aesthetic. Different AI models at nodes. Clean infographic style.
+    ============================================================
+    RECOMMENDED TAGS: AI, Claude AI, LLM, Developer Tools, Software Engineering
+    ============================================================
+    SUBTITLE: A practical decision framework for choosing the right model for every task — from code generation to data analysis, document review to real-time APIs.
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 4: Model Purpose and Task Matching — Which AI Model Wins at What?</h1>
+<p><em>A practical decision framework for choosing the right model for every task — from code generation to data analysis, document review to real-time APIs.</em></p>
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>Having many models is only useful if you know which one to reach for.
+Using a Ferrari to deliver pizza works, but it's wasteful. Using a moped
+to win a race works, but you'll lose.</p>
+<p>Model selection is an engineering decision with measurable
+consequences: quality, latency, and cost all vary by 2–10× depending on
+which model you use for which task. This article gives you a concrete
+framework for making those decisions.</p>
+<hr />
+<h2 id="1-the-model-selection-framework">1. The Model Selection
+Framework</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    START["🤔 Choose a Model"] --&gt; Q1{"Cognitive&lt;br/&gt;Demand?"}
+    Q1 --&gt;|"Low"| Q1L["Summarise, classify,&lt;br/&gt;extract, format"]
+    Q1 --&gt;|"Medium"| Q1M["Code gen, docs,&lt;br/&gt;analysis"]
+    Q1 --&gt;|"High"| Q1H["Multi-step reasoning,&lt;br/&gt;architecture"]
+
+    Q1L --&gt; Q2L{"Context Size?"}
+    Q1M --&gt; Q2M{"Context Size?"}
+    Q1H --&gt; Q2H{"Context Size?"}
+
+    Q2L --&gt;|"&lt; 100K"| HAIKU["⚡ Haiku 4.5&lt;br/&gt;$0.80/$4 MTok"]
+    Q2L --&gt;|"&gt; 100K"| SONNET1["💡 Sonnet 4.6"]
+    Q2M --&gt;|"&lt; 200K"| SONNET2["💡 Sonnet 4.6&lt;br/&gt;$3/$15 MTok"]
+    Q2M --&gt;|"&gt; 200K"| GEMINI1["🔵 Gemini 3.1 Pro&lt;br/&gt;1M context"]
+    Q2H --&gt;|"&lt; 200K"| OPUS["🟣 Opus 4.6&lt;br/&gt;$15/$75 MTok"]
+    Q2H --&gt;|"&gt; 200K"| GEMINI2["🔵 Gemini 3.1 Pro"]
+
+    style START fill:#f5a623,stroke:#d4891a,color:#fff
+    style HAIKU fill:#50c878,stroke:#3da360,color:#fff
+    style SONNET1 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style SONNET2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style OPUS fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style GEMINI1 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style GEMINI2 fill:#e74c3c,stroke:#c0392b,color:#fff</code></pre>
+</figure>
+
+<p>Before picking a model, answer four questions:</p>
+<p><strong>1. What is the cognitive demand?</strong></p>
+<ul>
+<li>Low: Summarise, classify, extract, format</li>
+<li>Medium: Generate code, write docs, analyse requirements</li>
+<li>High: Multi-step reasoning, architectural decisions, complex
+debugging</li>
+</ul>
+<p><strong>2. How large is the context?</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Context Size</th>
+<th style="text-align: left;">Suitable Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">&lt; 8K tokens</td>
+<td style="text-align: left;">Any model — even Haiku 4.5</td>
+</tr>
+<tr>
+<td style="text-align: left;">8K – 100K</td>
+<td style="text-align: left;">Any modern model</td>
+</tr>
+<tr>
+<td style="text-align: left;">100K – 200K</td>
+<td style="text-align: left;">Claude Sonnet 4.6 / Opus 4.6, GPT-5.2</td>
+</tr>
+<tr>
+<td style="text-align: left;">200K – 1M</td>
+<td style="text-align: left;">Gemini 3.1 Pro (native 1M) or Claude 200K
++ chunking strategy</td>
+</tr>
+</tbody>
+</table>
+<p><strong>3. What are the latency requirements?</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Tier</th>
+<th style="text-align: center;">Target</th>
+<th style="text-align: left;">Best Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Real-time</td>
+<td style="text-align: center;">&lt; 500ms</td>
+<td style="text-align: left;">Haiku 4.5, GPT-5.2 mini, Gemini 3.1 Flash,
+Groq + Llama 4 Scout</td>
+</tr>
+<tr>
+<td style="text-align: left;">Interactive</td>
+<td style="text-align: center;">&lt; 5s</td>
+<td style="text-align: left;">Sonnet 4.6, GPT-5.2, Gemini 3.1 Flash</td>
+</tr>
+<tr>
+<td style="text-align: left;">Batch</td>
+<td style="text-align: center;">Minutes OK</td>
+<td style="text-align: left;">Opus 4.6, o4, Gemini 3.1 Pro</td>
+</tr>
+</tbody>
+</table>
+<p><strong>4. What are the cost constraints?</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Volume</th>
+<th style="text-align: center;">Price Sensitivity</th>
+<th style="text-align: left;">Recommended Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">High volume</td>
+<td style="text-align: center;">🔴 Cost-critical</td>
+<td style="text-align: left;">Haiku 4.5 ($0.80/$4 MTok), GPT-5.2 mini, Mistral Small
+3</td>
+</tr>
+<tr>
+<td style="text-align: left;">Moderate volume</td>
+<td style="text-align: center;">🟡 Balanced</td>
+<td style="text-align: left;">Sonnet 4.6 ($3/$15 MTok), GPT-5.2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Low volume</td>
+<td style="text-align: center;">🟢 Quality-first</td>
+<td style="text-align: left;">Opus 4.6 ($15/$75 MTok), o4, Gemini 3.1 Pro</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-the-claude-model-family-deep-dive">2. The Claude Model Family
+Deep-Dive</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph CLAUDE["🟣 Claude Model Family — When to Use Each"]
+        direction LR
+        O["🏆 Opus 4.6&lt;br/&gt;━━━━━━━━━&lt;br/&gt;Architecture decisions&lt;br/&gt;200-page spec review&lt;br/&gt;Security audits&lt;br/&gt;Research synthesis&lt;br/&gt;━━━━━━━━━&lt;br/&gt;⏱️ 15-60s · 💰 $15/$75"]
+        S["⚡ Sonnet 4.6&lt;br/&gt;━━━━━━━━━&lt;br/&gt;Daily coding&lt;br/&gt;Test generation&lt;br/&gt;Documentation&lt;br/&gt;Code review&lt;br/&gt;━━━━━━━━━&lt;br/&gt;⏱️ 3-15s · 💰 $3/$15"]
+        H["🚀 Haiku 4.5&lt;br/&gt;━━━━━━━━━&lt;br/&gt;Classification&lt;br/&gt;Summarisation&lt;br/&gt;Data extraction&lt;br/&gt;High-volume APIs&lt;br/&gt;━━━━━━━━━&lt;br/&gt;⏱️ &lt; 3s · 💰 $0.80/$4"]
+    end
+
+    style O fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style S fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style H fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>Since we're building toward a Claude-focused setup in this series,
+let's thoroughly understand the Claude model tiers.</p>
+<h3 id="claude-opus-46">Claude Opus 4.6</h3>
+<p><strong>The Flagship — Highest Intelligence</strong></p>
+<p>Opus is Anthropic's most capable model. Use it when the task demands
+maximum reasoning depth, nuanced judgment, or working through genuinely
+difficult problems.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Complex, multi-step reasoning across domains</li>
+<li>Deep analysis of large documents (200K context)</li>
+<li>Sophisticated code architecture and design</li>
+<li>Research synthesis from multiple sources</li>
+<li>Tasks where a wrong answer has serious consequences</li>
+</ul>
+<p><strong>Typical latency:</strong> 15–60 seconds for complex requests
+<strong>Relative cost:</strong> Highest in the Claude family</p>
+<p><strong>Best for:</strong></p>
+<pre><code>✓ Designing system architecture from complex requirements
+✓ Reviewing and synthesising 50+ page technical specs
+✓ Complex debugging across multiple interdependent modules
+✓ High-stakes code reviews (security, data integrity)
+✓ Research reports combining 10+ sources
+✓ Generating comprehensive test strategies</code></pre>
+<p><strong>Example use case:</strong></p>
+<blockquote>
+<p>"Here is our 200-page technical specification document. Identify all
+the architectural decision points, flag any contradictions, and produce
+a risk-ranked list of implementation challenges."</p>
+</blockquote>
+<hr />
+<h3 id="claude-sonnet-46">Claude Sonnet 4.6</h3>
+<p><strong>The Workhorse — Best Performance-per-Dollar</strong></p>
+<p>Sonnet is the model most developers will use most of the time. It's
+fast enough for interactive use, capable enough for almost all
+development tasks, and costs significantly less than Opus.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Excellent code generation and review</li>
+<li>Strong reasoning on moderate-complexity problems</li>
+<li>Great at following complex, multi-part instructions</li>
+<li>Handles 200K context with strong recall</li>
+<li>Reliable formatting (JSON, XML, markdown)</li>
+</ul>
+<p><strong>Typical latency:</strong> 3–15 seconds <strong>Relative
+cost:</strong> ~5x cheaper than Opus</p>
+<p><strong>Best for:</strong></p>
+<pre><code>✓ Daily coding assistance (new features, refactoring, bug fixing)
+✓ Test case generation
+✓ Documentation writing
+✓ Code review
+✓ User story writing
+✓ Data transformation and analysis
+✓ API integration code
+✓ Most production AI features in applications</code></pre>
+<p><strong>Rule of thumb:</strong> Default to Sonnet. Upgrade to Opus
+only when Sonnet's output quality is genuinely insufficient.</p>
+<hr />
+<h3 id="claude-haiku-45">Claude Haiku 4.5</h3>
+<p><strong>The Speed Tier — Fast and Cheap</strong></p>
+<p>Haiku is Anthropic's fastest and most cost-efficient model. It
+sacrifices some reasoning depth for dramatically improved speed and
+lower cost.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Sub-second to 2-second response times</li>
+<li>Very low cost per token</li>
+<li>Surprisingly capable for well-defined, bounded tasks</li>
+<li>Good at classification, extraction, and formatting</li>
+</ul>
+<p><strong>Typical latency:</strong> 0.5–3 seconds <strong>Relative
+cost:</strong> ~25x cheaper than Opus</p>
+<p><strong>Best for:</strong></p>
+<pre><code>✓ Real-time applications (chatbots, autocomplete)
+✓ High-volume batch processing (processing thousands of documents)
+✓ Simple classification and extraction tasks
+✓ Summarising short texts
+✓ Generating short-form content
+✓ Routing/triage tasks (classifying before sending to a better model)
+✓ Simple Q&amp;A on well-defined topics</code></pre>
+<p><strong>Pattern: Haiku as Router</strong></p>
+<pre><code>User query → Haiku classifies intent →
+  Simple task → Haiku answers
+  Complex task → Route to Sonnet
+  Critical task → Route to Opus</code></pre>
+<p>This tiered routing pattern can reduce costs by 60–80% while
+maintaining quality where it matters.</p>
+<hr />
+<h2 id="3-openai-model-deep-dive">3. OpenAI Model Deep-Dive</h2>
+<h3 id="gpt-52-the-multimodal-powerhouse">GPT-5.2: The Multimodal
+Powerhouse</h3>
+<p>Best when your task involves images, diagrams, screenshots, or audio
+alongside text. GPT-5.2 is fully multimodal — text, image, audio, and
+video in a single API call.</p>
+<p><strong>Unique strengths:</strong></p>
+<ul>
+<li>Process images directly (UI screenshots, diagrams, charts,
+handwritten notes)</li>
+<li>Real-time audio input/output (voice apps)</li>
+<li>GPT-5.2-Codex variant purpose-built for agentic software
+development</li>
+<li>Massive ecosystem (thousands of examples, integrations,
+plugins)</li>
+</ul>
+<h3 id="o4-the-reasoning-model">o4: The Reasoning Model</h3>
+<p>OpenAI's o4 "thinks before it answers" — they spend tokens on
+internal chain-of-thought reasoning before producing output. This
+dramatically improves performance on:</p>
+<ul>
+<li>Mathematical proofs</li>
+<li>Complex algorithm design</li>
+<li>Multi-step logical puzzles</li>
+<li>Competitive programming problems</li>
+</ul>
+<p><strong>Trade-off:</strong> Much slower (30–120 seconds for hard
+problems). Not for interactive use.</p>
+<p><strong>When to use o4:</strong></p>
+<pre><code>✓ The problem involves multiple logical steps that must all be correct
+✓ Competitive programming or algorithmic challenges
+✓ Complex mathematical or statistical analysis
+✓ When standard LLMs give plausible-but-wrong answers</code></pre>
+<hr />
+<h2 id="4-gemini-31-pro-the-long-context-king">4. Gemini 3.1 Pro: The
+Long-Context King</h2>
+<p>When you need to process genuinely massive amounts of context — an
+entire codebase, a year of meeting transcripts, a library of
+documentation — Gemini 3.1 Pro's 1 million token window is
+unmatched.</p>
+<p><strong>Practical threshold:</strong> When your context exceeds 200K
+tokens and you can't (or don't want to) implement chunking, Gemini 3.1
+Pro is the right choice.</p>
+<p><strong>Best for:</strong></p>
+<pre><code>✓ Analysing an entire codebase at once
+✓ Processing large research corpora
+✓ Full-book analysis and synthesis
+✓ End-to-end tracing across a long conversation history
+✓ Processing large log files</code></pre>
+<hr />
+<h2 id="5-when-to-use-localopen-source-models">5. When to Use
+Local/Open-Source Models</h2>
+<p>Use Llama, Mistral, or other open models when:</p>
+<p><strong>Data privacy is paramount</strong> Healthcare records,
+financial data, legal documents, proprietary IP — anything you cannot
+send to third-party APIs.</p>
+<p><strong>Volume makes API cost prohibitive</strong> At very high
+volumes (millions of requests/day), running your own inference cluster
+can be cheaper than API costs.</p>
+<p><strong>Custom fine-tuning is required</strong> Proprietary
+terminology, domain-specific tasks, or unique style requirements that
+can't be addressed via prompting.</p>
+<p><strong>Latency must be sub-100ms</strong> Running inference
+on-premises with dedicated hardware can achieve latencies impossible
+with API calls.</p>
+<pre><code>Decision tree for open vs. closed models:
+├─ Data sensitivity HIGH → Local Llama / Mistral
+├─ Volume &gt; 10M requests/month → Evaluate self-hosting
+├─ Need fine-tuning → Local open-source
+├─ Need max quality → Claude Opus 4.6 / GPT-5.2
+└─ Default → Claude Sonnet 4.6 (best quality/cost at $3/$15 MTok)</code></pre>
+<hr />
+<h2 id="6-task-to-model-mapping-reference">6. Task-to-Model Mapping
+Reference</h2>
+<h3 id="development-tasks">Development Tasks</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Task</th>
+<th style="text-align: left;">✅ Primary</th>
+<th style="text-align: left;">🔄 Fallback</th>
+<th style="text-align: left;">❌ Avoid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Feature implementation</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">GPT-5.2-Codex</td>
+<td style="text-align: left;">Haiku (complex tasks)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Code review</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bug fix — simple</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bug fix — complex</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">Haiku</td>
+</tr>
+<tr>
+<td style="text-align: left;">Architecture design</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku</td>
+</tr>
+<tr>
+<td style="text-align: left;">Refactoring large codebase</td>
+<td style="text-align: left;">Sonnet 4.6 (200K ctx)</td>
+<td style="text-align: left;">Gemini 3.1 Pro (1M ctx)</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">SQL query generation</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Regex generation</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Algorithm / complexity design</td>
+<td style="text-align: left;">o4</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">Haiku</td>
+</tr>
+<tr>
+<td style="text-align: left;">API documentation</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="qa-tasks">QA Tasks</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Task</th>
+<th style="text-align: left;">✅ Primary</th>
+<th style="text-align: left;">🔄 Fallback</th>
+<th style="text-align: left;">❌ Avoid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Unit test generation</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">E2E test scenarios</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">Haiku</td>
+</tr>
+<tr>
+<td style="text-align: left;">Test data generation</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bug report writing</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Accessibility review</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">GPT-5.2 (vision)</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Load test scripting</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Test plan writing</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exploratory test charters</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">Haiku</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ba-tasks">BA Tasks</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Task</th>
+<th style="text-align: left;">✅ Primary</th>
+<th style="text-align: left;">🔄 Fallback</th>
+<th style="text-align: left;">❌ Avoid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">User story writing</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Requirements extraction</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Stakeholder communication</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gap analysis</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku</td>
+</tr>
+<tr>
+<td style="text-align: left;">Data analysis</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Gemini 3.1 Pro (large data)</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Meeting summarisation</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Process diagram (Mermaid)</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku 4.5</td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Competitive analysis</td>
+<td style="text-align: left;">Opus 4.6</td>
+<td style="text-align: left;">Sonnet 4.6</td>
+<td style="text-align: left;">Haiku</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-multi-model-workflows">7. Multi-Model Workflows</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph P1["Pattern 1: Quality Tiers"]
+        direction TB
+        P1A["Haiku&lt;br/&gt;Draft"] --&gt; P1B["Sonnet&lt;br/&gt;Refine"] --&gt; P1C["Opus&lt;br/&gt;Final QA"]
+    end
+    subgraph P2["Pattern 2: Draft + Review"]
+        direction TB
+        P2A["Sonnet&lt;br/&gt;Generate Code"] --&gt; P2B["Opus&lt;br/&gt;Review + Critique"]
+    end
+    subgraph P3["Pattern 3: Extract → Reason"]
+        direction TB
+        P3A["Haiku&lt;br/&gt;Extract Data"] --&gt; P3B["Sonnet&lt;br/&gt;Analyse Patterns"]
+    end
+    subgraph P4["Pattern 4: RAG Pipeline"]
+        direction TB
+        P4A["Embedding&lt;br/&gt;Model Index"] --&gt; P4B["Haiku&lt;br/&gt;Retrieve"] --&gt; P4C["Sonnet&lt;br/&gt;Synthesise"]
+    end
+
+    style P1 fill:#f0f4ff,stroke:#4a90d9
+    style P2 fill:#fff8f0,stroke:#f5a623
+    style P3 fill:#f0fff4,stroke:#50c878
+    style P4 fill:#f5f0ff,stroke:#7b68ee</code></pre>
+</figure>
+
+<p>The most sophisticated AI-powered engineering workflows use multiple
+models in sequence:</p>
+<h3 id="pattern-1-quality-tiers">Pattern 1: Quality Tiers</h3>
+<pre><code>Incoming task → Classify complexity (Haiku)
+├─ Simple → Haiku answers
+├─ Medium → Sonnet answers
+└─ Complex → Opus answers</code></pre>
+<h3 id="pattern-2-draft--review">Pattern 2: Draft + Review</h3>
+<pre><code>Initial code draft (Sonnet) →
+Security/logic review (Opus) →
+Final output</code></pre>
+<h3 id="pattern-3-extract-then-reason">Pattern 3: Extract then
+Reason</h3>
+<pre><code>Large document (Gemini 3.1 Pro extracts key sections) →
+Reasoning task on extracted content (Claude Sonnet)</code></pre>
+<h3 id="pattern-4-rag-pipeline">Pattern 4: RAG Pipeline</h3>
+<pre><code>User question →
+Embed question (text-embedding-3-large) →
+Retrieve relevant chunks (vector DB) →
+Synthesise answer (Claude Sonnet 4.6)</code></pre>
+<hr />
+<h2 id="8-cost-optimisation-strategy">8. Cost Optimisation Strategy</h2>
+<p>A practical approach to minimising cost without sacrificing
+quality:</p>
+<ol type="1">
+<li><strong>Start with Haiku</strong> for all tasks during
+development</li>
+<li><strong>Identify failure points</strong> — where does Haiku's output
+fall short?</li>
+<li><strong>Upgrade those specific tasks</strong> to Sonnet</li>
+<li><strong>Repeat</strong> — find the remaining failure points</li>
+<li><strong>Use Opus only</strong> for the tasks that genuinely require
+it</li>
+</ol>
+<p>In practice, most engineering teams find:</p>
+<ul>
+<li>60–70% of tasks: Haiku is sufficient</li>
+<li>25–35% of tasks: Sonnet required</li>
+<li>5–10% of tasks: Opus required</li>
+</ul>
+<p>This tiered approach reduces API costs by 5–10× compared to using
+Opus for everything.</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>Model selection is a cost/quality/latency optimisation problem. The
+key principles:</p>
+<ol type="1">
+<li><strong>Default to Sonnet 4.6</strong> for most development
+work</li>
+<li><strong>Use Haiku</strong> for high-volume, simple, or real-time
+tasks</li>
+<li><strong>Reserve Opus 4.6</strong> for genuinely complex reasoning
+and high-stakes reviews</li>
+<li><strong>Use o4</strong> for algorithmic and mathematical
+problems</li>
+<li><strong>Use Gemini 3.1 Pro</strong> when context exceeds ~150K
+tokens</li>
+<li><strong>Use local Llama 4 Scout/Maverick</strong> when data privacy
+or cost at scale demands it</li>
+</ol>
+<p>Now that we've mapped the landscape, in the next article we'll get
+hands-on: setting up Claude in VS Code and the terminal, configuring
+Claude Code, and establishing a productive daily workflow.</p>
+<hr />
+<p><em>Next: Article 5 — Setting Up Claude in VS Code and Terminal: A
+Complete Setup Guide</em></p>
+
+</body>
+</html>

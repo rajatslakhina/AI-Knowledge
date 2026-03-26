@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 7: How to Write Effective and Optimised Prompts to Get the Best Results</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: Prompt Engineering, Claude AI, AI, Developer Tools, Productivity
+    6. Add subtitle: Prompt engineering is a skill. Master it and you'll get production-quality output from AI. Ignore it and you'll spend more time editing AI output than writing from scratch.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    Close-up of someone typing a prompt at a terminal/chat interface. Focus on the text. Clean and purposeful.
+    ============================================================
+    RECOMMENDED TAGS:
+    Prompt Engineering, Claude AI, AI, Developer Tools, Productivity
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 7: How to Write Effective and Optimised Prompts to Get the Best Results</h1>
+
+<p><em>Prompt engineering is a skill. Master it and you'll get production-quality output from AI. Ignore it and you'll spend more time editing AI output than writing from scratch.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: Close-up of someone typing a prompt at a terminal/chat interface. Focus on the text. Clean and purposeful. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>The most common complaint about AI tools is: "The outputs aren't good
+enough to use." Nine times out of ten, the problem isn't the model —
+it's the prompt.</p>
+<p>Prompt engineering is the discipline of crafting inputs that
+consistently produce high-quality, usable outputs. It's not magic; it's
+structured communication. This article covers the principles, patterns,
+and anti-patterns that separate prompts that produce copy-paste-ready
+output from prompts that produce frustrating first drafts.</p>
+<hr />
+<h2 id="1-the-anatomy-of-a-high-quality-prompt">1. The Anatomy of a
+High-Quality Prompt</h2>
+<p>A high-quality prompt has six components. Not all are required for
+every task, but knowing them lets you decide which to include.</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph PROMPT["🎯 Anatomy of a High-Quality Prompt"]
+        direction TB
+        R["1️⃣ ROLE&lt;br/&gt;Who Claude should be&lt;br/&gt;&lt;i&gt;'You are a senior TypeScript developer...'&lt;/i&gt;"]
+        C["2️⃣ CONTEXT&lt;br/&gt;Background information&lt;br/&gt;&lt;i&gt;'We use Express 4, Prisma ORM, PostgreSQL...'&lt;/i&gt;"]
+        T["3️⃣ TASK&lt;br/&gt;What to do&lt;br/&gt;&lt;i&gt;'Implement a user invitation system...'&lt;/i&gt;"]
+        F["4️⃣ FORMAT&lt;br/&gt;Output structure&lt;br/&gt;&lt;i&gt;'Return as TypeScript with JSDoc...'&lt;/i&gt;"]
+        CO["5️⃣ CONSTRAINTS&lt;br/&gt;Rules to follow&lt;br/&gt;&lt;i&gt;'No any types, max 50 lines per function...'&lt;/i&gt;"]
+        E["6️⃣ EXAMPLES&lt;br/&gt;Expected output demos&lt;br/&gt;&lt;i&gt;'Here is an example of the pattern...'&lt;/i&gt;"]
+        
+        R --&gt; C --&gt; T --&gt; F --&gt; CO --&gt; E
+    end
+
+    style R fill:#e74c3c,stroke:#c0392b,color:#fff
+    style C fill:#f5a623,stroke:#d4891a,color:#fff
+    style T fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style F fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style CO fill:#50c878,stroke:#3da360,color:#fff
+    style E fill:#17a2b8,stroke:#138496,color:#fff</code></pre>
+</figure>
+
+<h3 id="the-difference-it-makes">The Difference It Makes</h3>
+<p><strong>Weak prompt:</strong></p>
+<blockquote>
+<p>"Write me a function to process payments"</p>
+</blockquote>
+<p><strong>Strong prompt:</strong></p>
+<blockquote>
+<p>You are a senior TypeScript developer working on a fintech
+application.</p>
+<p>Context: We use Stripe as our payment processor. Our existing code
+uses async/await, TypeScript strict mode, and follows the repository
+pattern. See reference: <code>src/services/auth.service.ts</code>.</p>
+<p>Task: Write a <code>PaymentService</code> class with a
+<code>processPayment(amount: number, currency: string, paymentMethodId: string, customerId: string): Promise&lt;PaymentResult&gt;</code>
+method.</p>
+<p>Requirements:</p>
+<ul>
+<li>Handle Stripe errors gracefully (card declined, insufficient funds,
+network errors)</li>
+<li>Log all payment attempts (success and failure) using our Winston
+logger</li>
+<li>Return a typed <code>PaymentResult</code> object</li>
+<li>Include JSDoc documentation</li>
+</ul>
+<p>Constraints:</p>
+<ul>
+<li>No try/catch at the controller layer — errors should propagate as
+typed exceptions</li>
+<li>Do not log card numbers or sensitive payment data</li>
+</ul>
+<p>Format: TypeScript class with interfaces, no default exports.</p>
+</blockquote>
+<p>The second prompt produces something you can use immediately. The
+first produces something you'll rewrite.</p>
+<hr />
+<h2 id="2-the-role-pattern">2. The Role Pattern</h2>
+<p>Assigning Claude a role ("You are a...") primes the model to respond
+with the vocabulary, depth, and perspective of that expert.</p>
+<p><strong>Generic role:</strong></p>
+<pre><code>&quot;You are a developer.&quot;</code></pre>
+<p><strong>Effective role:</strong></p>
+<pre><code>&quot;You are a senior backend engineer with 10 years of experience in distributed 
+systems, specifically Node.js microservices on AWS. You prioritise reliability 
+and observability in everything you build.&quot;</code></pre>
+<p>The effective role communicates:</p>
+<ul>
+<li>Seniority level (depth of response)</li>
+<li>Domain specialisation (vocabulary, patterns used)</li>
+<li>Values (what trade-offs the expert makes)</li>
+</ul>
+<p><strong>Role examples by task:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Task</th>
+<th style="text-align: left;">Effective Role Prompt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Code review</td>
+<td style="text-align: left;"><em>"You are a security-focused senior
+engineer who has investigated production incidents caused by the exact
+bugs you're looking for."</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">User stories</td>
+<td style="text-align: left;"><em>"You are a product manager with 8
+years writing stories for agile teams, with deep expertise in BDD and
+acceptance criteria."</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Architecture</td>
+<td style="text-align: left;"><em>"You are a principal engineer who has
+designed systems for millions of users and has strong, reasoned opinions
+about reliability trade-offs."</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Test cases</td>
+<td style="text-align: left;"><em>"You are a QA lead who approaches
+testing adversarially — your job is to break the system, not validate
+that it works."</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Documentation</td>
+<td style="text-align: left;"><em>"You are a technical writer who values
+precision and simplicity and will rewrite any sentence that a junior
+developer would misread."</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Debugging</td>
+<td style="text-align: left;"><em>"You are a senior SRE who has debugged
+hundreds of production incidents and thinks systematically about failure
+modes."</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Refactoring</td>
+<td style="text-align: left;"><em>"You are a senior engineer who
+obsesses over maintainability and has strong opinions about SOLID
+principles."</em></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-the-context-principle">3. The Context Principle</h2>
+<p>Claude can only use information you give it. The single most
+impactful thing you can do to improve output quality is provide more
+relevant context.</p>
+<p><strong>Three types of context:</strong></p>
+<p><strong>1. Codebase context</strong> — What does the existing code
+look like?</p>
+<pre><code>Here is our existing auth service as a reference for coding patterns: [paste file]</code></pre>
+<p><strong>2. Constraints context</strong> — What rules apply?</p>
+<pre><code>Constraints:
+- We are on Node.js 18 (no Fetch API)
+- No new npm dependencies without approval
+- Must work in both EU and US regions (GDPR compliance required)</code></pre>
+<p><strong>3. Goal context</strong> — Why are you doing this?</p>
+<pre><code>Context: This endpoint will be called by our mobile app 10,000 times per second 
+at peak load. Performance is critical.</code></pre>
+<p><strong>The context checklist:</strong></p>
+<ul class="task-list">
+<li><label><input type="checkbox" />What tech stack / language /
+version?</label></li>
+<li><label><input type="checkbox" />What existing patterns should be
+followed?</label></li>
+<li><label><input type="checkbox" />What are the business
+constraints?</label></li>
+<li><label><input type="checkbox" />Who will use this
+output?</label></li>
+<li><label><input type="checkbox" />What has already been
+tried?</label></li>
+</ul>
+<hr />
+<h2 id="4-task-decomposition">4. Task Decomposition</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    BIG["🎯 Big Task&lt;br/&gt;&lt;i&gt;'Build a user management system'&lt;/i&gt;"] 
+    BIG --&gt; S1["Step 1&lt;br/&gt;Design database schema"]
+    BIG --&gt; S2["Step 2&lt;br/&gt;Implement CRUD service"]
+    BIG --&gt; S3["Step 3&lt;br/&gt;Add validation layer"]
+    BIG --&gt; S4["Step 4&lt;br/&gt;Write API endpoints"]
+    BIG --&gt; S5["Step 5&lt;br/&gt;Generate test suite"]
+    
+    S1 --&gt;|"Output feeds"| S2 --&gt;|"Output feeds"| S3 --&gt;|"Output feeds"| S4 --&gt;|"Output feeds"| S5
+
+    style BIG fill:#e74c3c,stroke:#c0392b,color:#fff
+    style S1 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S3 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S4 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S5 fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<blockquote>
+<p>🎯 <strong>Key Principle:</strong> Each step produces output that
+becomes context for the next step. This is how you get
+production-quality results from AI.</p>
+</blockquote>
+<p>For complex tasks, don't ask Claude to do everything in one shot.
+Break it down.</p>
+<p><strong>Anti-pattern (one giant prompt):</strong></p>
+<pre><code>&quot;Write me a complete e-commerce platform with user auth, product catalogue, 
+cart, checkout, payment processing, order management, and admin dashboard.&quot;</code></pre>
+<p><strong>Pattern (decomposed):</strong></p>
+<pre><code>Step 1: &quot;Design the database schema for an e-commerce platform with these 
+        requirements. Output: Prisma schema.&quot;
+
+Step 2: &quot;Based on this schema, write the Prisma seed file with realistic test data.&quot;
+
+Step 3: &quot;Implement the ProductRepository following the repository pattern in 
+        auth.repository.ts.&quot;
+
+Step 4: &quot;Write unit tests for ProductRepository.&quot;</code></pre>
+<p><strong>Why this works:</strong></p>
+<ul>
+<li>Each step's output becomes the context for the next step</li>
+<li>Errors are caught early (step 3 won't go wrong if step 1 schema is
+validated)</li>
+<li>You maintain control of the architecture</li>
+<li>Claude's context window is used efficiently</li>
+</ul>
+<hr />
+<h2 id="5-output-format-specification">5. Output Format
+Specification</h2>
+<p>If you don't specify the output format, Claude will choose one. It
+may be right, but it may not be what you need.</p>
+<p><strong>Specify format explicitly:</strong></p>
+<pre><code>Output format:
+- TypeScript interface definitions first
+- Then the class implementation
+- JSDoc on all public methods
+- No test code in the implementation file
+- Maximum 200 lines</code></pre>
+<p><strong>For structured data, use examples:</strong></p>
+<pre><code>Return JSON in this exact format:
+{
+  &quot;issues&quot;: [
+    {
+      &quot;severity&quot;: &quot;critical|high|medium|low&quot;,
+      &quot;type&quot;: &quot;security|performance|bug|style&quot;,
+      &quot;line&quot;: 42,
+      &quot;description&quot;: &quot;Clear description of the issue&quot;,
+      &quot;fix&quot;: &quot;Specific fix suggestion&quot;
+    }
+  ],
+  &quot;summary&quot;: &quot;Overall assessment in one sentence&quot;
+}</code></pre>
+<p><strong>For documents:</strong></p>
+<pre><code>Format the output as a Markdown document with:
+- H2 sections for each requirement category
+- Tables where comparative data exists
+- Code blocks for any technical examples
+- Bold for key terms
+- No introductory preamble — start directly with the content</code></pre>
+<hr />
+<h2 id="6-constraint-specification">6. Constraint Specification</h2>
+<p>Constraints prevent Claude from doing things you don't want. They're
+as important as the task description.</p>
+<p><strong>Common constraint categories:</strong></p>
+<p><strong>Scope constraints:</strong></p>
+<pre><code>Only modify the auth module. Do not change any other files.
+Do not add any new dependencies.
+The public API must remain identical.</code></pre>
+<p><strong>Quality constraints:</strong></p>
+<pre><code>Code must pass TypeScript strict mode with no errors.
+All functions must have explicit return types.
+Cyclomatic complexity should not exceed 10 per function.</code></pre>
+<p><strong>Style constraints:</strong></p>
+<pre><code>Use functional programming where possible (avoid classes unless required).
+Follow the ESLint rules in .eslintrc.js.
+Match the style of the existing codebase, not your personal preference.</code></pre>
+<p><strong>Safety constraints:</strong></p>
+<pre><code>Do not log or output sensitive data (passwords, tokens, card numbers).
+Validate all inputs before use.
+Use parameterised queries, never string concatenation for SQL.</code></pre>
+<hr />
+<h2 id="7-the-few-shot-pattern">7. The Few-Shot Pattern</h2>
+<p>Showing examples of desired output is one of the most powerful
+techniques in prompt engineering.</p>
+<p><strong>Without examples:</strong></p>
+<pre><code>&quot;Write a commit message for this diff.&quot;</code></pre>
+<p><strong>With examples (few-shot):</strong></p>
+<pre><code>Write a conventional commit message for this diff.
+
+Examples of good commit messages:
+- feat(auth): add OAuth2 login with Google provider
+- fix(cart): resolve race condition in concurrent add-to-cart operations  
+- refactor(payment): extract Stripe service into dedicated module
+- test(orders): add edge cases for zero-quantity order validation
+- docs(api): update authentication endpoints with Bearer token examples
+
+Now write a message for this diff:
+[paste diff]</code></pre>
+<p>The examples teach Claude: format, vocabulary, scope specificity, and
+length.</p>
+<p><strong>When to use few-shot:</strong></p>
+<ul>
+<li>When the output format is precise and unusual</li>
+<li>When tone and style must match existing content</li>
+<li>When the task involves judgment calls (severity rating, code quality
+scoring)</li>
+<li>When you've had Claude get it wrong before</li>
+</ul>
+<hr />
+<h2 id="8-chain-of-thought-prompting">8. Chain-of-Thought Prompting</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    P["📝 Prompt&lt;br/&gt;'Think step&lt;br/&gt;by step'"] --&gt; S1["Step 1&lt;br/&gt;Understand&lt;br/&gt;the problem"] --&gt; S2["Step 2&lt;br/&gt;Break into&lt;br/&gt;sub-tasks"] --&gt; S3["Step 3&lt;br/&gt;Solve each&lt;br/&gt;sub-task"] --&gt; S4["Step 4&lt;br/&gt;Verify &amp;&lt;br/&gt;combine"] --&gt; R["✅ Final&lt;br/&gt;Answer"]
+
+    style P fill:#f5a623,stroke:#d4891a,color:#fff
+    style S1 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S3 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style S4 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style R fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>For complex reasoning tasks, instruct Claude to show its work before
+giving an answer. This dramatically improves accuracy on multi-step
+problems.</p>
+<p><strong>Basic chain-of-thought:</strong></p>
+<pre><code>Before answering, think through this step by step.
+[complex question]</code></pre>
+<p><strong>Structured chain-of-thought:</strong></p>
+<pre><code>Analyse this database query for performance issues.
+
+Use this reasoning process:
+1. First, identify what data the query is accessing
+2. Identify the WHERE clauses and check if indexes exist
+3. Look for N+1 patterns or unnecessary joins
+4. Estimate the data volume at each step
+5. Then recommend optimisations in priority order
+
+Query:
+[paste query]</code></pre>
+<p><strong>When chain-of-thought matters most:</strong></p>
+<ul>
+<li>Complex debugging across multiple files</li>
+<li>Architectural decisions with trade-offs</li>
+<li>Security analysis</li>
+<li>Complex data transformations</li>
+<li>Any task where getting the reasoning wrong leads to a wrong
+answer</li>
+</ul>
+<hr />
+<h2 id="9-the-verification-request-pattern">9. The Verification Request
+Pattern</h2>
+<p>Ask Claude to check its own output. This often catches errors before
+they reach you.</p>
+<pre><code>[After Claude generates code]
+
+Before finalising, verify:
+1. Does the code compile with TypeScript strict mode?
+2. Are there any null pointer risks?
+3. Does it handle all error cases mentioned in requirements?
+4. Is it consistent with the existing code style?
+5. Are there any security concerns?
+
+If you find any issues, fix them and show me the corrected version.</code></pre>
+<hr />
+<h2 id="95-extended-thinking-and-reasoning-model-prompts">9.5 Extended
+Thinking and Reasoning Model Prompts</h2>
+<p>Modern LLMs offer two distinct reasoning modes that require different
+prompting strategies.</p>
+<h3 id="when-to-use-extended-thinking-claude-or-o4-openai">When to Use
+Extended Thinking (Claude) or o4 (OpenAI)</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph CLAUDE_ET["🟣 Claude Extended Thinking"]
+        direction TB
+        CE1["Budget: thinking tokens&lt;br/&gt;(10K-128K)"] --&gt; CE2["Internal reasoning&lt;br/&gt;visible via API"] --&gt; CE3["Best for: complex code,&lt;br/&gt;architecture, multi-step"]
+    end
+    subgraph O4["🟢 OpenAI o4"]
+        direction TB
+        OE1["Budget: reasoning effort&lt;br/&gt;(low/medium/high)"] --&gt; OE2["Chain-of-thought&lt;br/&gt;before answering"] --&gt; OE3["Best for: math, proofs,&lt;br/&gt;algorithmic problems"]
+    end
+
+    style CLAUDE_ET fill:#f0f4ff,stroke:#7b68ee
+    style O4 fill:#f0fff4,stroke:#50c878</code></pre>
+</figure>
+
+<p>These models spend additional tokens on internal reasoning before
+answering. This makes them dramatically better at problems where
+standard prompting gives plausible-but-wrong answers.</p>
+<p><strong>Signal phrases that indicate extended thinking is worth the
+cost:</strong></p>
+<pre><code>&quot;Design a conflict-free algorithm for...&quot;
+&quot;What are all the edge cases in this multi-threaded code?&quot;
+&quot;Analyse all failure modes of this distributed system design...&quot;
+&quot;Verify this mathematical proof...&quot;
+&quot;Find every security vulnerability in this authentication flow...&quot;</code></pre>
+<h3 id="prompting-for-extended-thinking-claude-opus-46">Prompting for
+Extended Thinking (Claude Opus 4.6)</h3>
+<p>Claude's extended thinking mode can be enabled via the API. In
+practice, you can signal that depth is expected:</p>
+<pre><code>Think through this carefully and systematically before answering.
+
+Problem: [complex problem]
+
+I need you to:
+1. First, identify every relevant consideration
+2. Explore the trade-offs for each approach
+3. Check your reasoning for logical gaps
+4. Only then give your final recommendation
+
+This is a production security decision — I need the reasoning, not just the answer.</code></pre>
+<p><strong>What changes when you signal depth:</strong></p>
+<ul>
+<li>Claude explores more solution paths before committing</li>
+<li>More edge cases are surfaced</li>
+<li>Reasoning is made explicit and auditable</li>
+<li>Error rate drops significantly on complex multi-step problems</li>
+</ul>
+<h3 id="prompting-for-o4-openai-reasoning-model">Prompting for o4
+(OpenAI Reasoning Model)</h3>
+<p>o4 always reasons before answering. Your prompt should describe the
+problem precisely and let the model's reasoning do the work:</p>
+<pre><code>Optimise this database query for a table with 50M rows.
+The query runs 12 times per second in production and currently takes 800ms.
+Indexes available: [list indexes]
+
+Query:
+[paste query]
+
+Return: The optimised query + explanation of what made it slow.</code></pre>
+<p><strong>o4 prompting principles:</strong></p>
+<ul>
+<li>Be precise about the problem — verbose context helps</li>
+<li>Don't instruct it to "think step by step" — it already does</li>
+<li>Do specify constraints and success criteria clearly</li>
+<li>Use it for algorithmic, mathematical, and logic problems where
+reasoning depth matters</li>
+</ul>
+<h3 id="costquality-trade-off">Cost/Quality Trade-off</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Approach</th>
+<th style="text-align: center;">Cost</th>
+<th style="text-align: center;">Speed</th>
+<th style="text-align: left;">Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Standard Sonnet 4.6</td>
+<td style="text-align: center;">$</td>
+<td style="text-align: center;">Fast</td>
+<td style="text-align: left;">Most tasks</td>
+</tr>
+<tr>
+<td style="text-align: left;">Claude Opus 4.6 + depth signals</td>
+<td style="text-align: center;">$$$</td>
+<td style="text-align: center;">Slower</td>
+<td style="text-align: left;">Architecture, security, hard bugs</td>
+</tr>
+<tr>
+<td style="text-align: left;">o4 reasoning</td>
+<td style="text-align: center;">$$$</td>
+<td style="text-align: center;">Slow</td>
+<td style="text-align: left;">Maths, algorithms, logic proofs</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gemini 3.1 Pro</td>
+<td style="text-align: center;">$$</td>
+<td style="text-align: center;">Moderate</td>
+<td style="text-align: left;">Long-context analysis</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-anti-patterns-to-avoid">10. Anti-Patterns to Avoid</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph BAD["❌ Anti-Patterns"]
+        direction TB
+        B1["😐 Vague Request&lt;br/&gt;&lt;i&gt;'Write some code'&lt;/i&gt;"]
+        B2["😵 Too Much at Once&lt;br/&gt;&lt;i&gt;'Build entire app'&lt;/i&gt;"]
+        B3["🤷 Missing Context&lt;br/&gt;&lt;i&gt;'Fix the bug'&lt;/i&gt;"]
+    end
+    subgraph GOOD["✅ Best Practices"]
+        direction TB
+        G1["🎯 Specific Request&lt;br/&gt;&lt;i&gt;'Write a TS function&lt;br/&gt;that groups users&lt;br/&gt;by creation month'&lt;/i&gt;"]
+        G2["📋 Decomposed Tasks&lt;br/&gt;&lt;i&gt;'Step 1: Schema&lt;br/&gt;Step 2: Service&lt;br/&gt;Step 3: Tests'&lt;/i&gt;"]
+        G3["📚 Full Context&lt;br/&gt;&lt;i&gt;'Stack: Node/Express/TS&lt;br/&gt;Pattern: Repository&lt;br/&gt;Style: functional'&lt;/i&gt;"]
+    end
+
+    B1 -.-&gt;|"Fix"| G1
+    B2 -.-&gt;|"Fix"| G2
+    B3 -.-&gt;|"Fix"| G3
+
+    style BAD fill:#ffe5e5,stroke:#e74c3c
+    style GOOD fill:#d4edda,stroke:#28a745</code></pre>
+</figure>
+
+<h3 id="101-the-vague-request">10.1 The Vague Request</h3>
+<pre><code>Bad:  &quot;Fix my code&quot;
+Good: &quot;Fix the null pointer error on line 47 of auth.service.ts. The error 
+       occurs when user.profile is undefined. Do not change the function signature.&quot;</code></pre>
+<h3 id="102-asking-for-too-much-at-once">10.2 Asking for Too Much at
+Once</h3>
+<pre><code>Bad:  &quot;Build the entire backend&quot;
+Good: &quot;Implement the POST /users endpoint following the existing GET /users 
+       pattern in users.controller.ts&quot;</code></pre>
+<h3 id="103-missing-context">10.3 Missing Context</h3>
+<pre><code>Bad:  &quot;Write tests for this function&quot;
+Good: &quot;Write Jest unit tests for this function. Use our test helpers from 
+       test/utils.ts. Mock external services using jest.mock(). 
+       Achieve 100% branch coverage.&quot;</code></pre>
+<h3 id="104-no-output-specification">10.4 No Output Specification</h3>
+<pre><code>Bad:  &quot;Explain this code&quot;
+Good: &quot;Explain this code. Target audience: junior developer joining the team.
+       Format: max 200 words, plain English, no jargon. 
+       Include what the code does, why it exists, and any gotchas.&quot;</code></pre>
+<h3 id="105-accepting-first-draft">10.5 Accepting First Draft</h3>
+<p>For any complex task, iterate. The first output is a draft:</p>
+<pre><code>First prompt:  &quot;Implement the payment service&quot;
+Second prompt: &quot;The processPayment function doesn&#39;t handle timeout errors. 
+                Also, the logging is too verbose — only log failures.&quot;
+Third prompt:  &quot;Now write tests for this implementation.&quot;</code></pre>
+<hr />
+<h2 id="105-prompt-caching--reducing-cost-at-scale">10.5 Prompt Caching
+— Reducing Cost at Scale</h2>
+<p>If you're building applications that send the same system prompt or
+large context document to Claude repeatedly, <strong>prompt
+caching</strong> can reduce costs by up to 90% on those repeated
+tokens.</p>
+<h3 id="how-it-works">How It Works</h3>
+<p>Claude caches the beginning of the context window. On subsequent
+calls that start identically, you pay a lower "cache read" price instead
+of the full "cache write" price.</p>
+<p><strong>Cost model:</strong></p>
+<ul>
+<li>Cache write (first call): Normal input price</li>
+<li>Cache read (subsequent calls): ~10% of normal input price</li>
+</ul>
+<h3 id="design-patterns-for-caching">Design Patterns for Caching</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph CACHED["💰 CACHED — Paid Once"]
+        SP["📋 SYSTEM PROMPT&lt;br/&gt;&lt;i&gt;Role, instructions, constraints&lt;/i&gt;"]
+        LC["📚 LARGE CONTEXT&lt;br/&gt;&lt;i&gt;CLAUDE.md, codebase, docs&lt;/i&gt;"]
+    end
+    subgraph VARIABLE["🔄 NOT CACHED — Paid Each Call"]
+        UM["💬 USER MESSAGE&lt;br/&gt;&lt;i&gt;The actual question / task&lt;/i&gt;"]
+    end
+    
+    SP --&gt; LC --&gt; UM
+
+    style CACHED fill:#d4edda,stroke:#28a745
+    style VARIABLE fill:#fff3cd,stroke:#ffc107</code></pre>
+</figure>
+
+<blockquote>
+<p>💡 <strong>Design for caching:</strong> Put large, stable content
+(system prompt + docs) at the top, keep the varying user query short at
+the bottom.</p>
+</blockquote>
+<p><strong>When to design for caching:</strong></p>
+<ul>
+<li>Long system prompts (&gt; 1000 tokens) used repeatedly</li>
+<li>Injecting a large context document (codebase, spec) that doesn't
+change per request</li>
+<li>Batch processing many tasks against the same base context</li>
+</ul>
+<p><strong>Prompt design for cacheability:</strong></p>
+<pre><code>GOOD: [long stable system prompt + docs] + [short varying user query]
+BAD:  [short system prompt] + [different large context each time]</code></pre>
+<p>The stable content should always come first — Claude's cache starts
+at the beginning of the context.</p>
+<hr />
+<h2 id="11-template-library">11. Template Library</h2>
+<p>Save these templates. Adapt for your specific context.</p>
+<h3 id="template-feature-implementation">Template: Feature
+Implementation</h3>
+<pre><code>You are a [role] working on [project description].
+Tech stack: [list]
+Code style: [key conventions]
+
+Task: Implement [specific feature].
+
+Requirements:
+- [req 1]
+- [req 2]
+
+Constraints:
+- [constraint 1]
+- [constraint 2]
+
+Reference: Follow patterns from [existing file].
+
+Output: [specific files/format expected]</code></pre>
+<h3 id="template-code-review">Template: Code Review</h3>
+<pre><code>You are a senior engineer performing a code review.
+Focus: [security/performance/correctness/all]
+
+Review criteria (in priority order):
+1. Security vulnerabilities
+2. Logic errors or edge cases
+3. Performance concerns
+4. Missing error handling
+5. Code quality and maintainability
+
+For each issue found:
+- Location (file:line)
+- Severity (critical/high/medium/low)
+- Description
+- Recommended fix
+
+Code to review:
+[paste code]</code></pre>
+<h3 id="template-test-generation">Template: Test Generation</h3>
+<pre><code>You are a QA engineer writing [Jest/Playwright/pytest] tests.
+Testing framework: [framework and version]
+Test utilities: [list any custom helpers]
+
+Generate comprehensive tests for:
+[paste code/spec]
+
+Required coverage:
+- Happy path
+- Input validation (invalid types, boundary values, null/undefined)
+- Error handling
+- [domain-specific cases]
+
+Format: [describe/it blocks, AAA pattern, etc.]
+Mocking strategy: [how to mock dependencies]</code></pre>
+<h3 id="template-documentation">Template: Documentation</h3>
+<pre><code>You are a technical writer creating developer documentation.
+Audience: [junior dev/senior dev/external API consumer]
+
+Write documentation for:
+[paste code or describe component]
+
+Include:
+- Purpose (1-2 sentences)
+- Parameters/props with types and descriptions
+- Return value
+- Example usage (working code)
+- Error cases
+- Any important caveats or gotchas
+
+Format: [JSDoc/Markdown/OpenAPI]</code></pre>
+<hr />
+<h2 id="12-measuring-prompt-quality">12. Measuring Prompt Quality</h2>
+<p>How do you know if your prompt is good? Run the "5-minute test":</p>
+<ol type="1">
+<li>Give the output to a colleague without showing the prompt</li>
+<li>Ask: "Would you use this as-is or would it need significant
+rework?"</li>
+<li>If significant rework is needed — improve the prompt</li>
+</ol>
+<p>Track your prompt performance:</p>
+<ul>
+<li>What percentage of first outputs are usable without major
+edits?</li>
+<li>How many iterations does a typical task take?</li>
+<li>Which task types consistently produce poor output?</li>
+</ul>
+<p>The goal: 80%+ of your first outputs are usable with minor (&lt; 5
+minute) edits.</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>High-quality prompting is built on six principles:</p>
+<ol type="1">
+<li><strong>Assign a role</strong> — prime the model for expert-level
+response</li>
+<li><strong>Provide context</strong> — give Claude everything it needs,
+nothing it doesn't</li>
+<li><strong>Decompose complex tasks</strong> — break into steps, use
+output as input for the next step</li>
+<li><strong>Specify format</strong> — be explicit about how you want the
+answer structured</li>
+<li><strong>Define constraints</strong> — tell Claude what NOT to do,
+not just what to do</li>
+<li><strong>Show examples</strong> — demonstrate the desired output,
+especially for format and style</li>
+</ol>
+<p>In the next article, we'll cover the files that make Claude
+consistently accurate in your specific project context —
+<code>CLAUDE.md</code>, the <code>.claude</code> folder, and how to
+build a prompt infrastructure that achieves 95%+ accuracy.</p>
+<hr />
+<p><em>Next: Article 8 — The CLAUDE.md System: What Files You Need for
+95% Accuracy</em></p>
+
+</body>
+</html>

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 12: Configuring Claude Code with Git — The Complete Integration Guide</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: Claude AI, Git, Developer Tools, GitHub, Workflow Automation
+    6. Add subtitle: Git is not a tool Claude Code sits alongside. It's infrastructure Claude Code runs on top of. This article covers every layer of the integration — from the basic commit message workflow to parallel worktree development with isolated per-branch MCPs, automated pre-commit hooks, and CI/CD pipelines powered entirely by headless Claude.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    Git branch diagram with Claude AI integrated into the workflow — hooks, commits, PRs with AI assistance markers.
+    ============================================================
+    RECOMMENDED TAGS:
+    Claude AI, Git, Developer Tools, GitHub, Workflow Automation
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 12: Configuring Claude Code with Git — The Complete Integration Guide</h1>
+
+<p><em>Git is not a tool Claude Code sits alongside. It's infrastructure Claude Code runs on top of. This article covers every layer of the integration — from the basic commit message workflow to parallel worktree development with isolated per-branch MCPs, automated pre-commit hooks, and CI/CD pipelines powered entirely by headless Claude.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: Git branch diagram with Claude AI integrated into the workflow — hooks, commits, PRs with AI assistance markers. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>Most developers who start with Claude Code use it for isolated tasks:
+explain this function, refactor that class, write a test. That's fine.
+But Claude Code's most compelling value isn't in isolated tasks — it's
+in workflows where Claude has full context of what's happening in your
+repository, what branch you're on, what's changed, and what needs to
+happen next.</p>
+<p>This article builds that full integration: Claude Code wired
+end-to-end into your git workflow, from the moment you start a new
+feature to the moment a PR is merged.</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    T["📋 Ticket&lt;br/&gt;Assigned"] --&gt; B["🌿 Branch&lt;br/&gt;Created&lt;br/&gt;&lt;i&gt;/git-start-feature&lt;/i&gt;"]
+    B --&gt; I["💻 Implementation&lt;br/&gt;&lt;i&gt;Claude Code&lt;/i&gt;"]
+    I --&gt; C["✅ Commits&lt;br/&gt;&lt;i&gt;/git-commit&lt;/i&gt;&lt;br/&gt;Conventional format"]
+    C --&gt; R["🔍 Self-Review&lt;br/&gt;&lt;i&gt;/git-review&lt;/i&gt;"]
+    R --&gt; PR["📝 PR Created&lt;br/&gt;&lt;i&gt;/git-pr&lt;/i&gt;&lt;br/&gt;Auto-description"]
+    PR --&gt; CI["⚙️ CI/CD&lt;br/&gt;&lt;i&gt;Headless Claude&lt;/i&gt;&lt;br/&gt;Lint + Test + Build"]
+    CI --&gt; HRE["👥 Human&lt;br/&gt;Review"]
+    HRE --&gt; M["🎉 Merged!"]
+
+    style T fill:#f5a623,stroke:#d4891a,color:#fff
+    style I fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style C fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style R fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style PR fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style CI fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style M fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>By the end you'll have:</p>
+<ul>
+<li>CLAUDE.md configured with your team's git conventions (enforced
+automatically)</li>
+<li>Skills for every git workflow (branch creation, commit messages, PR
+descriptions, changelogs)</li>
+<li>Hooks that run quality gates on every action</li>
+<li>Git worktree setup for parallel branch development</li>
+<li>Per-worktree MCP configuration</li>
+<li>CI/CD integration using headless Claude</li>
+<li>A complete feature-delivery workflow from ticket to merged PR</li>
+</ul>
+<hr />
+<h2 id="1-claudemd--encoding-your-git-conventions">1. CLAUDE.md —
+Encoding Your Git Conventions</h2>
+<p>Before Claude touches a single file, it needs to know your team's git
+rules. Add a Git Conventions section to your project
+<code>CLAUDE.md</code>:</p>
+<pre class="markdown"><code>## Git Conventions
+
+### Branch Naming
+- Features:    feature/[TICKET-ID]-short-description    (e.g., feature/PROJ-123-add-oauth-login)
+- Bug fixes:   fix/[TICKET-ID]-short-description        (e.g., fix/PROJ-456-session-timeout-crash)
+- Hotfixes:    hotfix/[TICKET-ID]-description           (e.g., hotfix/PROJ-789-payment-null-ptr)
+- Refactors:   refactor/description                     (e.g., refactor/auth-service-cleanup)
+- Experiments: experiment/description                   (e.g., experiment/redis-cache-strategy)
+
+### Commit Message Format (Conventional Commits)
+
+
+
+&lt;!-- MERMAID_PLACEHOLDER_article_12_git_claude_integration_2 --&gt;
+
+
+
+type(scope): short description [max 72 chars]
+
+[optional body — wrap at 72 chars]
+
+[optional footer: BREAKING CHANGE, ticket refs]
+
+Types: feat | fix | docs | style | refactor | perf | test | chore | ci
+Scopes: auth | api | db | ui | mobile | infra | config
+
+Examples:
+feat(auth): add Google OAuth2 login flow
+fix(api): handle null customer ID in invoice creation
+perf(db): add index on orders.customer_id for faster lookups
+test(auth): add integration tests for token refresh
+
+### PR Rules
+- Title: same format as commit message (Conventional Commits)
+- All PRs target `main` unless explicitly told otherwise
+- PRs require passing CI + 1 approval minimum
+- Draft PRs for work-in-progress (prefix title with &quot;Draft: &quot; or use --draft flag)
+- Link to the Jira/Linear ticket in the PR description
+
+### Branch Protection
+- `main` and `develop` are protected — never push directly
+- Squash merge for feature branches
+- Merge commit for release branches
+
+### What NOT to Do (Git)
+- ❌ Never commit .env files or secrets
+- ❌ Never force-push to shared branches
+- ❌ Never merge without CI passing
+- ❌ Never commit commented-out code
+- ❌ Never commit with &quot;WIP&quot; or &quot;fix&quot; as the entire message
+- ❌ Never include node_modules, dist/, or build/ in commits</code></pre>
+<p>With this in CLAUDE.md, every Claude action — branch creation, commit
+generation, PR descriptions — automatically follows your conventions
+without prompting.</p>
+<hr />
+<h2 id="2-git-skills--reusable-slash-commands-for-every-git-task">2. Git
+Skills — Reusable Slash Commands for Every Git Task</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph SKILLS["📁 .claude/skills/ — Git Workflow Skills"]
+        direction TB
+        S1["🌿 git-start-feature.md&lt;br/&gt;Branch creation + naming"]
+        S2["✅ git-commit.md&lt;br/&gt;Conventional commit format"]
+        S3["📝 git-pr.md&lt;br/&gt;PR description + checklist"]
+        S4["🔍 git-review.md&lt;br/&gt;Self-review before PR"]
+        S5["📋 git-changelog.md&lt;br/&gt;Auto-generated changelog"]
+    end
+
+    DEV["👨‍💻 Developer&lt;br/&gt;types /git-commit"] --&gt; SKILLS
+    SKILLS --&gt; CLAUDE["🤖 Claude follows&lt;br/&gt;team conventions"]
+
+    style SKILLS fill:#f0f4ff,stroke:#4a90d9
+    style CLAUDE fill:#7b68ee,stroke:#5a4dbd,color:#fff</code></pre>
+</figure>
+
+<h3 id="create-and-configure-your-git-skills-directory">Create and
+configure your git skills directory</h3>
+<pre><code>.claude/skills/
+├── git-start-feature.md     # Start a new feature from a ticket
+├── git-commit.md            # Staged diff → conventional commit message
+├── git-pr.md                # Branch diff → full PR description
+├── git-review.md            # Review an existing PR diff
+├── git-changelog.md         # Tag range → categorised changelog
+└── git-cleanup.md           # Identify and clean merged branches</code></pre>
+<hr />
+<h3 id="skill-git-start-featuremd">Skill:
+<code>git-start-feature.md</code></h3>
+<pre class="markdown"><code>&lt;!-- .claude/skills/git-start-feature.md --&gt;
+---
+name: git-start-feature
+description: Create a properly named branch for a feature or fix from a ticket ID
+tools: Bash
+---
+
+Start a new feature branch for ticket: $0
+
+Steps:
+1. Run: git status (confirm clean working directory — warn if dirty)
+2. Run: git checkout main &amp;&amp; git pull origin main
+3. Ask me to confirm the short description for the branch name
+   (derive it from the ticket title if you have it, otherwise ask)
+4. Create branch: git checkout -b feature/$0-[short-description]
+5. Run: git branch --show-current (confirm correct branch)
+6. Output: the exact branch name created, so I can reference it
+
+Branch naming rules (from CLAUDE.md):
+- feature/ prefix for new functionality
+- fix/ prefix for bug fixes
+- hotfix/ prefix for production emergencies
+- Ticket ID first, then hyphenated short description
+- All lowercase, hyphens not underscores</code></pre>
+<hr />
+<h3 id="skill-git-commitmd">Skill: <code>git-commit.md</code></h3>
+<pre class="markdown"><code>&lt;!-- .claude/skills/git-commit.md --&gt;
+---
+name: git-commit
+description: Generate a Conventional Commits message from staged diff
+tools: Bash
+---
+
+Generate a commit message for the staged changes.
+
+Steps:
+1. Run: git diff --staged --stat (understand scope of changes)
+2. Run: git diff --staged (read the actual changes)
+3. Run: git branch --show-current (get branch name for ticket reference)
+4. Generate a Conventional Commits message:
+   - type(scope): short description (max 72 chars)
+   - Body only if changes are complex or non-obvious
+   - Footer: ticket reference extracted from branch name if available
+
+Rules:
+- Choose the most specific type (feat &gt; chore, fix &gt; refactor)
+- Scope = the system area changed (auth, api, db, ui, etc.)
+- Description: imperative present tense (&quot;add&quot; not &quot;added&quot; or &quot;adding&quot;)
+- If multiple unrelated changes are staged: warn me and suggest splitting
+
+Output:
+- The commit message ONLY (no preamble)
+- Immediately after: run `git commit -m &quot;[message]&quot;` — do not wait for confirmation
+  UNLESS the diff contains potential issues (then flag and wait)</code></pre>
+<hr />
+<h3 id="skill-git-prmd">Skill: <code>git-pr.md</code></h3>
+<pre class="markdown"><code>&lt;!-- .claude/skills/git-pr.md --&gt;
+---
+name: git-pr
+description: Generate a complete PR description from current branch vs main
+tools: Bash, Read
+---
+
+Generate a pull request description for this branch.
+
+Steps:
+1. Run: git log main...HEAD --oneline (understand all commits)
+2. Run: git diff main...HEAD --stat (understand file scope)
+3. Run: git diff main...HEAD (read the actual changes)
+4. Read CLAUDE.md for project context and any relevant domain rules
+5. Read any files that changed significantly to understand intent
+
+Generate the PR description in this format:
+
+---
+## What
+[2–3 sentences: what this PR does and what it enables]
+
+## Why
+[1–2 sentences: the business or technical reason this change is needed]
+
+## Changes
+- [bullet list of the meaningful changes — not every file, just the substance]
+
+## How to Test
+1. [Step-by-step testing instructions from a reviewer&#39;s perspective]
+2. [Include setup steps, test data needed, expected outcomes]
+
+## Acceptance Criteria
+[Tick off each AC from the ticket if ticket details are available]
+- [ ] AC1
+- [ ] AC2
+
+## Checklist
+- [ ] Tests added / updated
+- [ ] CLAUDE.md updated if architecture changed
+- [ ] No hardcoded values or credentials
+- [ ] Breaking changes noted in the footer
+- [ ] Ticket linked
+---
+
+Rules:
+- Be specific — reviewers should understand the change without reading the diff
+- Flag any unusual decisions or tradeoffs in the &quot;Why&quot; section
+- If the diff contains something that looks risky, flag it explicitly</code></pre>
+<hr />
+<h3 id="skill-git-reviewmd">Skill: <code>git-review.md</code></h3>
+<pre class="markdown"><code>&lt;!-- .claude/skills/git-review.md --&gt;
+---
+name: git-review
+description: Review a PR diff as a senior engineer before merging
+tools: Bash, Read, Grep
+---
+
+Review the current branch diff vs main as a senior engineer.
+
+Steps:
+1. Run: git diff main...HEAD (read the full diff)
+2. Read the changed files in context (not just the diff)
+3. Check git log for context on what was intended
+
+Review in this order:
+1. **Correctness** — logic errors, off-by-one, null handling, unhandled promises
+2. **Security** — injection, auth gaps, data exposure, missing validation
+3. **Performance** — N+1 queries, blocking operations, missing indexes
+4. **Conventions** — does the code follow CLAUDE.md rules? naming, patterns, layer boundaries?
+5. **Tests** — are changed paths covered? are edge cases tested?
+
+Output format:
+- For each issue: Severity (CRITICAL/HIGH/MEDIUM/LOW) | File:Line | Issue | Fix
+- End with: overall assessment — APPROVE / REQUEST CHANGES / NEEDS DISCUSSION
+- Include: one-line summary of the PR&#39;s purpose based on the diff
+
+CRITICAL and HIGH issues: always block approval.
+MEDIUM and below: flag but note they are non-blocking.</code></pre>
+<hr />
+<h3 id="skill-git-changelogmd">Skill: <code>git-changelog.md</code></h3>
+<pre class="markdown"><code>&lt;!-- .claude/skills/git-changelog.md --&gt;
+---
+name: git-changelog
+description: Generate a categorised changelog between two git tags
+tools: Bash
+---
+
+Generate a changelog for release: $0
+
+Steps:
+1. Run: git tag --sort=-version:refname | head -5 (find recent tags)
+2. Run: git log [previous-tag]...HEAD --oneline --no-merges (get all commits)
+3. Run: git log [previous-tag]...HEAD --format=&quot;%H %s %b&quot; (get full messages)
+
+Categorise commits by Conventional Commit type:
+
+## ✨ New Features
+[feat commits — user-facing features only]
+
+## 🐛 Bug Fixes
+[fix commits]
+
+## ⚡ Performance Improvements
+[perf commits]
+
+## 🔧 Under the Hood
+[refactor, chore, ci, build commits — summarise, don&#39;t list individually]
+
+## 📚 Documentation
+[docs commits — only if substantial]
+
+## ⚠️ Breaking Changes
+[BREAKING CHANGE footer commits — always list these]
+
+Rules:
+- Write for a technical audience but not an internal one
+- Skip WIP, temp, and trivial commits
+- Group related commits into a single entry where appropriate
+- Version: $0
+- Date: today</code></pre>
+<hr />
+<h2 id="3-git-hooks--automated-quality-gates">3. Git Hooks — Automated
+Quality Gates</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph HOOKS["⚡ Git Hook Architecture"]
+        direction TB
+        PRE["🔒 PreToolUse&lt;br/&gt;&lt;b&gt;git-safety-check.sh&lt;/b&gt;&lt;br/&gt;Block force-push, rm -rf"]
+        POST["✅ PostToolUse&lt;br/&gt;&lt;b&gt;post-file-write.sh&lt;/b&gt;&lt;br/&gt;Auto lint + type check"]
+        STOP["🏁 Stop&lt;br/&gt;&lt;b&gt;on-turn-complete.sh&lt;/b&gt;&lt;br/&gt;Run tests + build"]
+    end
+
+    FILE["📝 File Edit"] --&gt; POST
+    GIT_CMD["🔀 Git Command"] --&gt; PRE
+    TURN_END["💬 Turn Complete"] --&gt; STOP
+
+    style HOOKS fill:#f8f9fa,stroke:#6c757d
+    style PRE fill:#e74c3c,stroke:#c0392b,color:#fff
+    style POST fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style STOP fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>These hooks wire Claude's quality checks into your git workflow
+automatically.</p>
+<h3
+id="claudesettingsjson--git-hook-configuration"><code>.claude/settings.json</code>
+— Git Hook Configuration</h3>
+<pre class="json"><code>{
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Bash&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;.claude/scripts/git-safety-check.sh&quot;
+          }
+        ]
+      }
+    ],
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write|Edit|MultiEdit&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;.claude/scripts/post-file-write.sh&quot;,
+            &quot;async&quot;: true
+          }
+        ]
+      }
+    ],
+    &quot;Stop&quot;: [
+      {
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;.claude/scripts/on-turn-complete.sh&quot;,
+            &quot;async&quot;: false
+          }
+        ]
+      }
+    ],
+    &quot;TaskCompleted&quot;: [
+      {
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;.claude/scripts/on-task-complete.sh&quot;,
+            &quot;async&quot;: false
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<hr />
+<h3
+id="claudescriptsgit-safety-checksh--block-dangerous-git-commands"><code>.claude/scripts/git-safety-check.sh</code>
+— Block Dangerous Git Commands</h3>
+<pre class="bash"><code>#!/bin/bash
+# Intercepts PreToolUse on Bash — blocks dangerous git operations
+
+INPUT=$(cat)
+COMMAND=$(echo &quot;$INPUT&quot; | jq -r &#39;.tool_input.command // &quot;&quot;&#39;)
+
+# Block force-push to protected branches
+if echo &quot;$COMMAND&quot; | grep -qE &quot;git push.*(--force|-f)&quot;; then
+  BRANCH=$(git branch --show-current 2&gt;/dev/null)
+  if echo &quot;$BRANCH&quot; | grep -qE &quot;^(main|master|develop|release/)&quot;; then
+    echo &quot;BLOCKED: Force push to protected branch &#39;$BRANCH&#39; is not allowed.&quot; &gt;&amp;2
+    exit 2  # Exit code 2 = block + show stderr to Claude
+  fi
+fi
+
+# Block direct push to main/develop
+if echo &quot;$COMMAND&quot; | grep -qE &quot;git push origin (main|master|develop)$&quot;; then
+  echo &quot;BLOCKED: Direct push to protected branch. Create a PR instead.&quot; &gt;&amp;2
+  exit 2
+fi
+
+# Block commit of .env files
+if echo &quot;$COMMAND&quot; | grep -qE &quot;git (add|commit).*\.env&quot;; then
+  echo &quot;BLOCKED: Attempted to commit .env file. Never commit secrets.&quot; &gt;&amp;2
+  exit 2
+fi
+
+# Warn (don&#39;t block) on large staged file sets
+STAGED_COUNT=$(git diff --staged --name-only 2&gt;/dev/null | wc -l)
+if [ &quot;$STAGED_COUNT&quot; -gt 20 ]; then
+  echo &quot;WARNING: $STAGED_COUNT files staged. Consider splitting into smaller commits.&quot; &gt;&amp;2
+  # Don&#39;t exit — warn only
+fi
+
+exit 0</code></pre>
+<hr />
+<h3
+id="claudescriptspost-file-writesh--auto-lint--type-check"><code>.claude/scripts/post-file-write.sh</code>
+— Auto Lint + Type Check</h3>
+<pre class="bash"><code>#!/bin/bash
+# Runs after every file write/edit
+
+INPUT=$(cat)
+FILE_PATH=$(echo &quot;$INPUT&quot; | jq -r &#39;.tool_input.path // &quot;&quot;&#39;)
+
+if [[ -z &quot;$FILE_PATH&quot; ]]; then exit 0; fi
+
+# TypeScript files: lint + type check
+if [[ &quot;$FILE_PATH&quot; == *.ts || &quot;$FILE_PATH&quot; == *.tsx ]]; then
+  npx eslint --fix &quot;$FILE_PATH&quot; --quiet 2&gt;/dev/null || true
+  # Don&#39;t run full tsc on every write — too slow. Run on Stop hook instead.
+fi
+
+# Check for secrets accidentally added
+if grep -qiE &quot;(password|secret|token|api_key)\s*=\s*[&#39;\&quot;][^&#39;\&quot;]{8,}&quot; &quot;$FILE_PATH&quot; 2&gt;/dev/null; then
+  echo &quot;SECURITY WARNING: Possible hardcoded secret detected in $FILE_PATH&quot; &gt;&amp;2
+fi
+
+exit 0</code></pre>
+<hr />
+<h3
+id="claudescriptson-turn-completesh--type-check--tests-after-each-claude-turn"><code>.claude/scripts/on-turn-complete.sh</code>
+— Type Check + Tests After Each Claude Turn</h3>
+<pre class="bash"><code>#!/bin/bash
+# Runs when Claude finishes a turn (Stop event)
+
+echo &quot;Running post-turn quality checks...&quot;
+
+# TypeScript check
+TS_RESULT=$(npx tsc --noEmit 2&gt;&amp;1)
+if [ $? -ne 0 ]; then
+  echo &quot;TypeScript errors found:&quot;
+  echo &quot;$TS_RESULT&quot; | head -30
+  # Output to stdout — Claude reads this and will fix the errors
+fi
+
+# Run affected tests (files touched this turn)
+CHANGED_FILES=$(git diff --name-only HEAD 2&gt;/dev/null | grep -E &#39;\.(ts|tsx)$&#39; | grep -v &#39;\.test\.&#39;)
+if [ -n &quot;$CHANGED_FILES&quot; ]; then
+  TEST_FILES=$(echo &quot;$CHANGED_FILES&quot; | sed &#39;s|src/|src/__tests__/|&#39; | sed &#39;s|\.ts$|.test.ts|&#39;)
+  EXISTING_TESTS=$(echo &quot;$TEST_FILES&quot; | xargs -I{} sh -c &#39;test -f {} &amp;&amp; echo {}&#39; 2&gt;/dev/null)
+  
+  if [ -n &quot;$EXISTING_TESTS&quot; ]; then
+    echo &quot;Running tests for changed files...&quot;
+    npx jest $EXISTING_TESTS --passWithNoTests 2&gt;&amp;1 | tail -20
+  fi
+fi</code></pre>
+<hr />
+<h3 id="gitignore--claude-specific-entries"><code>.gitignore</code> —
+Claude-specific entries</h3>
+<pre><code># Claude Code
+.claude/settings.local.json   # Local MCP overrides (may have personal tokens)
+.claude/agent-memory-local/   # Local agent memory (not shared)
+.claude/worktrees/            # Worktree directories (git manages these)</code></pre>
+<p>Always commit:</p>
+<ul>
+<li><code>CLAUDE.md</code></li>
+<li><code>.claude/settings.json</code> (no actual tokens — use
+<code>${ENV_VAR}</code> placeholders)</li>
+<li><code>.claude/skills/</code></li>
+<li><code>.claude/agents/</code></li>
+<li><code>.claude/scripts/</code></li>
+<li><code>.claude/context/</code></li>
+</ul>
+<hr />
+<h2 id="4-git-worktrees--parallel-branch-development">4. Git Worktrees —
+Parallel Branch Development</h2>
+<p>Git worktrees let you work on multiple branches simultaneously in
+separate directories, sharing the same <code>.git</code> folder. Claude
+Code 2.x has first-class worktree support via the
+<code>--worktree</code> flag and per-worktree configuration.</p>
+<h3 id="the---worktree-flag-v2149">The <code>--worktree</code> Flag
+(v2.1.49+)</h3>
+<pre class="bash"><code># Start Claude in a new worktree for a feature
+# Creates .claude/worktrees/feature-auth/ with a new branch feature-auth
+claude --worktree feature-PROJ-123-auth
+
+# Simultaneously, start another session on a separate task
+claude --worktree fix-PROJ-456-session-timeout
+
+# Each session:
+# - Gets its own working directory
+# - Gets its own branch
+# - Has its own Claude Code session with independent context
+# - Can have its own MCP configuration
+# - Cannot affect the other session&#39;s files</code></pre>
+<h3 id="when-to-use-worktrees">When to Use Worktrees</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph USE["✅ Use Worktrees When"]
+        U1["Two features on&lt;br/&gt;different files"]
+        U2["Reviewing a colleague's&lt;br/&gt;branch during your work"]
+        U3["Running experiments&lt;br/&gt;without polluting main"]
+        U4["Agent Teams working&lt;br/&gt;parallel sub-features"]
+        U5["Background subagent&lt;br/&gt;doing exploratory work"]
+    end
+    subgraph AVOID["❌ Don't Use When"]
+        A1["Tasks have&lt;br/&gt;sequential dependencies"]
+        A2["Both tasks modify&lt;br/&gt;the same files"]
+        A3["Coordination overhead&lt;br/&gt;exceeds benefit"]
+    end
+
+    style USE fill:#d4edda,stroke:#28a745
+    style AVOID fill:#ffe5e5,stroke:#e74c3c</code></pre>
+</figure>
+
+<h3 id="worktree-directory-structure">Worktree Directory Structure</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph PROJECT["📁 my-project/"]
+        GIT["🗄️ .git/&lt;br/&gt;&lt;i&gt;Shared git history&lt;/i&gt;"]
+        MAIN["📂 main-branch/&lt;br/&gt;CLAUDE.md + .claude/settings.json&lt;br/&gt;&lt;i&gt;Your main working directory&lt;/i&gt;"]
+        subgraph WORKTREES["📂 .claude/worktrees/"]
+            WT1["🌿 feature-PROJ-123-auth/&lt;br/&gt;CLAUDE.md (inherited)&lt;br/&gt;.claude/settings.json&lt;br/&gt;&lt;i&gt;Can override MCPs&lt;/i&gt;"]
+            WT2["🌿 fix-PROJ-456-timeout/&lt;br/&gt;CLAUDE.md (inherited)&lt;br/&gt;.claude/settings.json&lt;br/&gt;&lt;i&gt;Independent MCP config&lt;/i&gt;"]
+        end
+    end
+    
+    GIT -.-&gt;|"shared"| MAIN
+    GIT -.-&gt;|"shared"| WT1
+    GIT -.-&gt;|"shared"| WT2
+
+    style PROJECT fill:#f8f9fa,stroke:#6c757d
+    style MAIN fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style WORKTREES fill:#fff3cd,stroke:#ffc107
+    style WT1 fill:#50c878,stroke:#3da360,color:#fff
+    style WT2 fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<h3 id="per-worktree-mcp-configuration">Per-Worktree MCP
+Configuration</h3>
+<p>Each worktree can have its own <code>.claude/settings.json</code>,
+enabling different MCP servers per task:</p>
+<pre class="json"><code>// .claude/worktrees/feature-PROJ-123-auth/.claude/settings.json
+// This feature needs Playwright for browser auth testing
+{
+  &quot;mcpServers&quot;: {
+    &quot;playwright&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@playwright/mcp@latest&quot;]
+    },
+    &quot;postgres-dev&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-postgres&quot;,
+               &quot;postgresql://claude_readonly:${DB_PASSWORD}@localhost:5432/myapp_dev&quot;]
+    }
+  }
+}</code></pre>
+<pre class="json"><code>// .claude/worktrees/fix-PROJ-456-timeout/.claude/settings.json
+// This fix only needs log access
+{
+  &quot;mcpServers&quot;: {
+    &quot;filesystem&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;, &quot;/var/log/app&quot;]
+    }
+  }
+}</code></pre>
+<h3 id="subagent-worktree-isolation">Subagent Worktree Isolation</h3>
+<p>For risky work, run subagents in temporary worktrees that auto-clean
+up:</p>
+<pre class="markdown"><code>&lt;!-- .claude/agents/experimental-refactor.md --&gt;
+---
+name: experimental-refactor
+description: Runs a refactor in an isolated worktree — auto-deleted if no changes committed
+isolation: worktree
+model: claude-sonnet-4-6
+---
+
+Perform the refactor in an isolated branch. If the approach doesn&#39;t work,
+the worktree will be automatically cleaned up. Report back with:
+1. Whether the refactor succeeded
+2. Files changed
+3. Test results
+4. Whether it should be merged or abandoned</code></pre>
+<h3 id="parallel-feature-development-workflow">Parallel Feature
+Development Workflow</h3>
+<pre class="bash"><code># Terminal 1 — Feature A (auth)
+claude --worktree feature-PROJ-123-auth
+&gt; /feature-scaffold oauth-login
+
+# Terminal 2 — Feature B (payments, unrelated files)
+claude --worktree feature-PROJ-456-payment-methods
+&gt; /feature-scaffold payment-methods
+
+# Terminal 3 — Your main session (review, coordination)
+claude
+&gt; What&#39;s the status of both worktrees? 
+  Check git log in each and summarise what&#39;s been implemented.</code></pre>
+<hr />
+<h2 id="5-full-git--claude-code-settings">5. Full git + Claude Code
+Settings</h2>
+<h3
+id="claudesettingsjson--complete-git-optimised-configuration"><code>.claude/settings.json</code>
+— Complete Git-Optimised Configuration</h3>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;filesystem&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;,
+        &quot;/Users/dev/projects/my-app&quot;,
+        &quot;/Users/dev/projects/my-app-docs&quot;
+      ]
+    },
+    &quot;git&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;uvx&quot;,
+      &quot;args&quot;: [&quot;mcp-server-git&quot;, &quot;--repository&quot;, &quot;/Users/dev/projects/my-app&quot;]
+    },
+    &quot;postgres-dev&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [
+        &quot;-y&quot;, &quot;@modelcontextprotocol/server-postgres&quot;,
+        &quot;postgresql://claude_readonly:${DB_PASSWORD}@localhost:5432/myapp_dev&quot;
+      ]
+    },
+    &quot;github&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;],
+      &quot;env&quot;: {
+        &quot;GITHUB_PERSONAL_ACCESS_TOKEN&quot;: &quot;${GITHUB_PERSONAL_ACCESS_TOKEN}&quot;
+      }
+    },
+    &quot;memory&quot;: {
+      &quot;type&quot;: &quot;stdio&quot;,
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-memory&quot;]
+    }
+  },
+
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Bash&quot;,
+        &quot;hooks&quot;: [{ &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;.claude/scripts/git-safety-check.sh&quot; }]
+      }
+    ],
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write|Edit|MultiEdit&quot;,
+        &quot;hooks&quot;: [{ &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;.claude/scripts/post-file-write.sh&quot;, &quot;async&quot;: true }]
+      }
+    ],
+    &quot;Stop&quot;: [
+      { &quot;hooks&quot;: [{ &quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;.claude/scripts/on-turn-complete.sh&quot; }] }
+    ]
+  },
+
+  &quot;permissions&quot;: {
+    &quot;allow&quot;: [
+      &quot;Bash(git status:*)&quot;,
+      &quot;Bash(git log:*)&quot;,
+      &quot;Bash(git diff:*)&quot;,
+      &quot;Bash(git branch:*)&quot;,
+      &quot;Bash(git checkout:*)&quot;,
+      &quot;Bash(git add:*)&quot;,
+      &quot;Bash(git commit:*)&quot;,
+      &quot;Bash(git push:*)&quot;,
+      &quot;Bash(git worktree:*)&quot;,
+      &quot;Bash(npm run:*)&quot;,
+      &quot;Bash(npx tsc:*)&quot;,
+      &quot;Bash(npx jest:*)&quot;,
+      &quot;Bash(npx eslint:*)&quot;
+    ],
+    &quot;deny&quot;: [
+      &quot;Bash(git push --force:*)&quot;,
+      &quot;Bash(git push -f:*)&quot;,
+      &quot;Bash(rm -rf:*)&quot;
+    ]
+  }
+}</code></pre>
+<hr />
+<h2 id="6-cicd-integration--headless-claude-in-github-actions">6. CI/CD
+Integration — Headless Claude in GitHub Actions</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    PR["📝 PR Opened"] --&gt; GHA["⚙️ GitHub Action&lt;br/&gt;Triggered"]
+    GHA --&gt; DIFF["📄 Get PR Diff"]
+    DIFF --&gt; REVIEW["🤖 Claude Headless&lt;br/&gt;&lt;code&gt;claude -p&lt;/code&gt;&lt;br/&gt;&lt;i&gt;AI Code Review&lt;/i&gt;"]
+    REVIEW --&gt; COMMENT["💬 Post Review&lt;br/&gt;Comment on PR"]
+    REVIEW --&gt; CHANGELOG["📋 Generate&lt;br/&gt;Changelog Entry"]
+    
+    subgraph GATES["Quality Gates"]
+        LINT["✅ Lint"] 
+        TEST["✅ Tests"]
+        BUILD["✅ Build"]
+    end
+    
+    COMMENT --&gt; GATES
+    GATES --&gt;|"All pass"| READY["🟢 Ready for&lt;br/&gt;Human Review"]
+
+    style PR fill:#f5a623,stroke:#d4891a,color:#fff
+    style REVIEW fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style READY fill:#50c878,stroke:#3da360,color:#fff</code></pre>
+</figure>
+
+<p>Claude Code in headless mode (<code>-p</code> flag, no REPL)
+integrates cleanly into GitHub Actions, enabling AI-powered code review,
+changelog generation, and automated quality gates.</p>
+<h3 id="workflow-ai-code-review-on-every-pr">Workflow: AI Code Review on
+Every PR</h3>
+<pre class="yaml"><code># .github/workflows/ai-review.yml
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for accurate diffs
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run AI Review
+        id: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # Get the diff
+          git fetch origin ${{ github.base_ref }}
+          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD)
+          
+          # Run Claude review
+          REVIEW=$(echo &quot;$DIFF&quot; | claude --headless -p \
+            &quot;You are a senior engineer reviewing a PR.
+             Review for: security issues, logic bugs, missing error handling, test gaps.
+             Be specific with file:line references.
+             End with: APPROVE or REQUEST_CHANGES on its own line.&quot;)
+          
+          echo &quot;review&lt;&lt;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;$REVIEW&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+          
+          # Fail the step if Claude requests changes on critical issues
+          if echo &quot;$REVIEW&quot; | grep -q &quot;CRITICAL&quot;; then
+            echo &quot;::error::Critical issues found in AI review&quot;
+            exit 1
+          fi
+
+      - name: Post Review Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🤖 AI Code Review\n\n${{ steps.review.outputs.review }}`
+            })</code></pre>
+<h3 id="workflow-automated-changelog-on-release">Workflow: Automated
+Changelog on Release</h3>
+<pre class="yaml"><code># .github/workflows/changelog.yml
+name: Generate Changelog
+
+on:
+  push:
+    tags:
+      - &#39;v*&#39;
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Generate Changelog
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | sed -n &#39;2p&#39;)
+          COMMITS=$(git log ${PREVIOUS_TAG}..HEAD --format=&quot;%s %b&quot; --no-merges)
+          
+          echo &quot;$COMMITS&quot; | claude --headless -p \
+            &quot;Generate a release changelog from these commits.
+             Version: ${{ github.ref_name }}
+             Categorise into: New Features, Bug Fixes, Performance, Breaking Changes.
+             Write for a developer audience.
+             Output markdown only.&quot; &gt; CHANGELOG_NEW.md
+          
+          # Prepend to existing changelog
+          cat CHANGELOG_NEW.md CHANGELOG.md &gt; CHANGELOG_UPDATED.md
+          mv CHANGELOG_UPDATED.md CHANGELOG.md
+          
+          git config user.name &quot;Claude Code Bot&quot;
+          git config user.email &quot;bot@yourcompany.com&quot;
+          git add CHANGELOG.md
+          git commit -m &quot;docs: update changelog for ${{ github.ref_name }}&quot;
+          git push origin HEAD:main</code></pre>
+<hr />
+<h2 id="7-the-complete-feature-delivery-workflow">7. The Complete
+Feature Delivery Workflow</h2>
+<p>This is the AISFD git workflow from ticket to merged PR, using
+everything covered in this article:</p>
+<pre class="bash"><code># Step 1: Start from a Jira/Linear ticket
+claude
+&gt; /git-start-feature PROJ-123
+# Claude creates branch: feature/PROJ-123-add-oauth-login
+# Pulls latest main first
+
+# Step 2: Plan the implementation
+[Shift+Tab] → Plan Mode
+&gt; Implement Google OAuth login. The ticket says:
+  - Users click &quot;Sign in with Google&quot; on the login page
+  - OAuth flow follows RFC 6749 Authorization Code flow
+  - Store googleId on User model alongside email/password auth
+  - Don&#39;t break existing email/password login
+  
+# Claude reads the codebase, produces a plan.
+# Review and approve.
+
+# Step 3: Implement (Tasks DAG for dependency management)
+&gt; Create a Tasks DAG for this feature and implement in order.
+  Run TypeScript check after each file.
+
+# Step 4: Hooks auto-run lint + tests after each file write
+
+# Step 5: Security review in background while you test manually
+&gt; Spawn a security-reviewer subagent on the new auth files in the background.
+
+# Step 6: Generate commit when ready
+/git-commit
+# Claude reads staged diff, generates conventional commit message, commits.
+
+# Step 7: Generate PR description
+/git-pr
+# Claude reads full branch diff, writes complete PR description.
+
+# Step 8: Create PR via GitHub MCP
+&gt; Create a GitHub PR from this branch to main.
+  Use the PR description we just generated.
+  Add label: &quot;ready-for-review&quot;
+
+# Step 9: CI runs AI review (GitHub Actions)
+# Claude Code in headless mode reviews the PR automatically.
+# Results posted as a PR comment.
+
+# Step 10: Address review comments
+&gt; Read the AI review comment on PR #234 via the GitHub MCP.
+  Implement the fixes. Don&#39;t change anything that was marked APPROVE.
+
+# Step 11: Merge
+&gt; The PR is approved. Squash and merge via GitHub.
+  Delete the remote branch after merging.
+
+# Total time for a standard feature: hours vs days.</code></pre>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>A fully wired Claude + git setup is the difference between Claude as
+a tool and Claude as a development platform. The key pieces:</p>
+<ul>
+<li><strong>CLAUDE.md git conventions</strong> — branch naming, commit
+formats, protection rules all encoded once, applied everywhere</li>
+<li><strong>Git Skills</strong> — <code>/git-start-feature</code>,
+<code>/git-commit</code>, <code>/git-pr</code>,
+<code>/git-review</code>, <code>/git-changelog</code> as reusable slash
+commands</li>
+<li><strong>Safety hooks</strong> — block dangerous operations,
+auto-lint on write, type-check and test on turn completion</li>
+<li><strong>Worktrees</strong> — parallel branch development with
+isolated sessions and per-branch MCP configurations</li>
+<li><strong>CI/CD integration</strong> — headless Claude for automated
+PR review and changelog generation</li>
+</ul>
+<p>The investment in setup is a few hours. The compound return is every
+commit, every PR, every release after that.</p>
+<hr />
+<p><em>This is Article 12 in the AI-Assisted Development
+series.</em></p>
+
+</body>
+</html>

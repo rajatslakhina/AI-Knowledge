@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 8: The CLAUDE.md System — What Files You Need to Achieve 95% Accuracy</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: Claude AI, Developer Tools, Context Engineering, AI Workflow
+    6. Add subtitle: The difference between a generic AI tool and a precision instrument for your codebase is context. This article shows you exactly what files to create, what to put in them, and why they matter.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    A CLAUDE.md file open in a code editor, highlighted with connection lines to Claude AI. Visual metaphor for context.
+    ============================================================
+    RECOMMENDED TAGS:
+    Claude AI, Developer Tools, Context Engineering, AI Workflow
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 8: The CLAUDE.md System — What Files You Need to Achieve 95% Accuracy</h1>
+
+<p><em>The difference between a generic AI tool and a precision instrument for your codebase is context. This article shows you exactly what files to create, what to put in them, and why they matter.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: A CLAUDE.md file open in a code editor, highlighted with connection lines to Claude AI. Visual metaphor for context. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>When you start Claude Code in a project, Claude reads specific files
+to understand your codebase before responding to any request. This isn't
+magic — it's structured context loading. The quality of these files
+directly determines the quality of Claude's outputs.</p>
+<p>Teams that invest time in their <code>CLAUDE.md</code> and
+<code>.claude</code> configuration get:</p>
+<ul>
+<li>Code that matches existing patterns without instruction</li>
+<li>Outputs that follow house style automatically</li>
+<li>Fewer iterations to get usable results</li>
+<li>Consistent behaviour across all team members</li>
+</ul>
+<p>This article covers exactly what files to create, what content to
+include, and how to structure them for maximum effectiveness.</p>
+<hr />
+<h2 id="1-how-claude-code-loads-context">1. How Claude Code Loads
+Context</h2>
+<p>When you run <code>claude</code> in a project directory, Claude Code
+automatically loads files in a specific order:</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    subgraph LOADING["📂 Claude Code Context Loading Order"]
+        direction TB
+        L1["1️⃣ ~/.claude/CLAUDE.md&lt;br/&gt;&lt;b&gt;Global User Preferences&lt;/b&gt;&lt;br/&gt;Your personal style, aliases, defaults"] 
+        L2["2️⃣ /project-root/CLAUDE.md&lt;br/&gt;&lt;b&gt;Project Configuration&lt;/b&gt;&lt;br/&gt;Tech stack, conventions, rules"]
+        L3["3️⃣ /project-root/.claude/&lt;br/&gt;&lt;b&gt;Additional Context Files&lt;/b&gt;&lt;br/&gt;Skills, settings, patterns"]
+        L4["4️⃣ Conversation History&lt;br/&gt;&lt;b&gt;Dynamic Context&lt;/b&gt;&lt;br/&gt;Current session + memory"]
+        L5["5️⃣ Referenced Files&lt;br/&gt;&lt;b&gt;Explicit Includes&lt;/b&gt;&lt;br/&gt;Files you mention in your prompt"]
+        
+        L1 --&gt; L2 --&gt; L3 --&gt; L4 --&gt; L5
+    end
+
+    L5 --&gt; CLAUDE["🧠 Claude's&lt;br/&gt;Working Context"]
+
+    style L1 fill:#6c757d,stroke:#495057,color:#fff
+    style L2 fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style L3 fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style L4 fill:#f5a623,stroke:#d4891a,color:#fff
+    style L5 fill:#50c878,stroke:#3da360,color:#fff
+    style CLAUDE fill:#17a2b8,stroke:#138496,color:#fff</code></pre>
+</figure>
+
+<blockquote>
+<p>⚡ <strong>Key:</strong> Project-level <code>CLAUDE.md</code> is
+where you get the most leverage — invest here first.</p>
+</blockquote>
+<p>Understanding this hierarchy lets you structure context at the right
+level.</p>
+<hr />
+<h2 id="2-claudemd--the-master-configuration-file">2. CLAUDE.md — The
+Master Configuration File</h2>
+<p><code>CLAUDE.md</code> is the most important file in your Claude
+setup. It's automatically loaded at the start of every session in that
+directory. Think of it as the system prompt that Claude reads before you
+say anything.</p>
+<h3 id="location-and-structure">Location and Structure</h3>
+<pre><code>your-project/
+├── CLAUDE.md          ← Project-level (committed to git)
+├── .claude/
+│   ├── commands.md    ← Custom slash commands
+│   ├── context/       ← Additional context files
+│   └── memory.md      ← Persistent project memory
+└── src/</code></pre>
+<h3 id="the-anatomy-of-a-great-claudemd">The Anatomy of a Great
+CLAUDE.md</h3>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>mindmap
+  root((📄 CLAUDE.md&lt;br/&gt;Anatomy))
+    🏗️ Project Overview
+      App description
+      Target users
+      Key objectives
+    ⚙️ Tech Stack
+      Languages &amp; versions
+      Frameworks
+      Databases
+      Build tools
+    📁 Repo Structure
+      Directory layout
+      Module boundaries
+      Entry points
+    🏛️ Architecture Decisions
+      Patterns used
+      Anti-patterns banned
+      ADR references
+    📝 Coding Conventions
+      Naming rules
+      Error handling
+      Async patterns
+      Logging format
+    🧪 Testing Standards
+      Frameworks
+      Coverage targets
+      Naming patterns
+    🔒 Security Rules
+      Auth patterns
+      Input validation
+      Secrets handling</code></pre>
+</figure>
+
+<p>Here's a complete template with explanations of every section:</p>
+<hr />
+<pre class="markdown"><code># CLAUDE.md — [Project Name]
+
+## Project Overview
+[2-3 sentences describing what this project does, who uses it, and its scale]
+
+Example:
+A B2B SaaS platform for invoice management. Serves 500+ enterprise customers.
+The backend is a Node.js REST API; the frontend is a React SPA. 
+Handles ~2M API requests/day during peak.
+
+## Tech Stack
+- **Language:** TypeScript 5.3 (strict mode enabled)
+- **Runtime:** Node.js 20 LTS
+- **Framework:** Express 4.18
+- **Database:** PostgreSQL 15 with Prisma ORM 5.x
+- **Cache:** Redis 7
+- **Testing:** Jest 29, Supertest
+- **Linting:** ESLint + Prettier (configs in root)
+- **CI/CD:** GitHub Actions → AWS ECS
+- **Monitoring:** Datadog (logs + APM)
+
+## Repository Structure</code></pre>
+<p>src/ ├── controllers/ # Route handlers (no business logic) ├──
+services/ # Business logic layer ├── repositories/ # Database access
+layer ├── middleware/ # Express middleware ├── models/ # Prisma schema +
+domain types ├── utils/ # Shared utilities ├── config/ # Configuration
+loading └── <strong>tests</strong>/ # Test files mirroring src
+structure</p>
+<p>Key files:</p>
+<ul>
+<li>src/app.ts → Express app setup</li>
+<li>src/config/index.ts → Environment config</li>
+<li>src/middleware/auth.ts → JWT authentication</li>
+<li>prisma/schema.prisma → Database schema</li>
+</ul>
+<pre><code>
+## Architecture Decisions
+- **Layered architecture:** Controller → Service → Repository (strictly enforced)
+- **No business logic in controllers** — controllers only validate, delegate, and respond
+- **No database access in services** — always go through repositories
+- **Dependency injection** — services receive repositories via constructor
+- **Error handling** — custom AppError class, errors bubble up to error middleware
+- **Never throw raw Error** — always use AppError with HTTP status code
+
+## Coding Conventions
+### TypeScript
+- Strict mode: no `any`, no implicit `any`
+- Explicit return types on all functions
+- Interfaces for data shapes, types for unions/aliases
+- Prefer `interface` over `type` for object shapes
+- Use `readonly` for properties that shouldn&#39;t change
+
+### Naming
+- Files: `kebab-case.ts`
+- Classes: `PascalCase`
+- Functions/variables: `camelCase`
+- Constants: `SCREAMING_SNAKE_CASE`
+- Database tables: `snake_case` (Prisma maps to TypeScript automatically)
+
+### Functions
+- Max 30 lines per function (extract if longer)
+- Max 3 parameters (use object for more)
+- Single responsibility
+- Pure functions preferred; side effects isolated
+
+### Error Handling
+```typescript
+// ALWAYS use AppError, NEVER throw raw Error
+throw new AppError(&#39;User not found&#39;, 404, &#39;USER_NOT_FOUND&#39;);
+
+// Error middleware in app.ts handles all AppErrors
+// Never catch and swallow errors — let them propagate</code></pre>
+<h3 id="asyncawait">Async/Await</h3>
+<ul>
+<li>Always use async/await (no raw Promises or callbacks)</li>
+<li>Always handle errors — either catch or let propagate as
+AppError</li>
+<li>Never <code>await</code> inside a loop — use
+<code>Promise.all()</code></li>
+</ul>
+<h3 id="logging">Logging</h3>
+<pre class="typescript"><code>// Use our Winston logger, never console.log in production code
+import { logger } from &#39;../utils/logger&#39;;
+logger.info(&#39;Order created&#39;, { orderId, customerId });
+logger.error(&#39;Payment failed&#39;, { error: err.message, orderId });
+
+// NEVER log: passwords, tokens, card numbers, or full request bodies</code></pre>
+<h2 id="testing-standards">Testing Standards</h2>
+<ul>
+<li><strong>Unit tests:</strong> Every service method and utility
+function</li>
+<li><strong>Integration tests:</strong> Every controller endpoint</li>
+<li><strong>Test file location:</strong> <code>src/__tests__/</code>
+mirroring <code>src/</code> structure</li>
+<li><strong>Coverage target:</strong> 85% line, 80% branch (enforced in
+CI)</li>
+<li><strong>Test naming:</strong>
+<code>it('should [expected behaviour] when [condition]')</code></li>
+<li><strong>Mocking:</strong> Use jest.mock() for external services;
+real DB for integration tests</li>
+<li><strong>Test data:</strong> Use factories in
+<code>src/__tests__/factories/</code></li>
+</ul>
+<pre class="typescript"><code>// Test structure pattern:
+describe(&#39;ServiceName&#39;, () =&gt; {
+  describe(&#39;methodName&#39;, () =&gt; {
+    it(&#39;should return user when valid id provided&#39;, async () =&gt; {
+      // Arrange
+      const user = createUserFactory();
+      mockUserRepository.findById.mockResolvedValue(user);
+      
+      // Act
+      const result = await userService.findById(user.id);
+      
+      // Assert
+      expect(result).toEqual(user);
+    });
+  });
+});</code></pre>
+<h2 id="database-conventions">Database Conventions</h2>
+<ul>
+<li>All migrations via Prisma (<code>prisma migrate dev</code>)</li>
+<li>Never modify existing migrations — always create new ones</li>
+<li>Soft deletes: use <code>deletedAt</code> timestamp, never hard
+delete user data</li>
+<li>All timestamps: <code>createdAt</code> and <code>updatedAt</code> on
+every model</li>
+<li>UUIDs for all primary keys (never auto-increment integers)</li>
+<li>Indexes: explicitly add indexes for all foreign keys and frequently
+queried fields</li>
+</ul>
+<h2 id="security-rules-critical">Security Rules (CRITICAL)</h2>
+<ul>
+<li>Validate ALL inputs — use Zod schemas at the controller layer</li>
+<li>Parameterised queries ONLY — Prisma handles this automatically</li>
+<li>No sensitive data in logs or error messages</li>
+<li>JWT tokens expire in 15 minutes (access) / 7 days (refresh)</li>
+<li>Rate limiting on all auth endpoints</li>
+<li>RBAC middleware: check permissions before executing any
+operation</li>
+<li>Never expose internal IDs to the API — use public UUIDs</li>
+</ul>
+<h2 id="environment-variables">Environment Variables</h2>
+<p>All config via environment variables. See <code>.env.example</code>
+for required variables. Never hardcode values. Always use
+<code>src/config/index.ts</code> to access config.</p>
+<h2 id="common-patterns-reference-these-when-generating-code">Common
+Patterns (Reference These When Generating Code)</h2>
+<h3 id="creating-a-new-endpoint">Creating a new endpoint:</h3>
+<ol type="1">
+<li>Add Zod validation schema in <code>src/validators/</code></li>
+<li>Add repository method in
+<code>src/repositories/[entity].repository.ts</code></li>
+<li>Add service method in
+<code>src/services/[entity].service.ts</code></li>
+<li>Add controller method in
+<code>src/controllers/[entity].controller.ts</code></li>
+<li>Register route in <code>src/routes/[entity].routes.ts</code></li>
+<li>Add integration test in
+<code>src/__tests__/controllers/[entity].test.ts</code></li>
+</ol>
+<h3 id="reference-implementations">Reference implementations:</h3>
+<ul>
+<li>User endpoint: <code>src/controllers/user.controller.ts</code></li>
+<li>Auth flow: <code>src/services/auth.service.ts</code></li>
+<li>Database query pattern:
+<code>src/repositories/order.repository.ts</code></li>
+</ul>
+<h2 id="what-not-to-do">What NOT to Do</h2>
+<ul>
+<li>❌ Never use <code>any</code> type</li>
+<li>❌ Never access database directly in controllers or services</li>
+<li>❌ Never use console.log in production code</li>
+<li>❌ Never commit .env files</li>
+<li>❌ Never use string concatenation for SQL</li>
+<li>❌ Never catch errors and return null/undefined silently</li>
+<li>❌ Never skip input validation</li>
+<li>❌ Never use synchronous file operations in request handlers</li>
+</ul>
+<pre><code>
+---
+
+## 3. The `.claude` Directory Structure
+
+
+
+&lt;!-- MERMAID_PLACEHOLDER_article_08_claude_md_files_3 --&gt;
+
+
+
+
+For larger projects, a single `CLAUDE.md` can become unwieldy. The `.claude` directory lets you organise context into focused files.
+</code></pre>
+<p>.claude/ ├── commands.md → Custom slash commands for Claude Code ├──
+context/ │ ├── api-contracts.md → API endpoint documentation │ ├──
+domain-model.md → Business domain explanation │ ├── infra.md →
+Infrastructure and deployment context │ └── runbooks.md → Operational
+procedures ├── memory.md → Auto-updated project memory (Claude maintains
+this) └── prompts/ ├── code-review.md → Reusable code review prompt ├──
+test-gen.md → Test generation prompt └── pr-description.md → PR
+description prompt</p>
+<pre><code>
+---
+
+## 4. `.claude/commands.md` — Custom Slash Commands
+
+
+
+&lt;!-- MERMAID_PLACEHOLDER_article_08_claude_md_files_4 --&gt;
+
+
+
+
+Define reusable commands that can be triggered with `/commandname`:
+
+```markdown
+# Custom Claude Commands
+
+## /review
+Perform a thorough code review of the provided code or current file.
+Focus on: security, correctness, performance, and adherence to our coding standards.
+Output: Numbered list sorted by severity. Include line references.
+
+## /test
+Generate comprehensive tests for the specified code.
+Use Jest, follow our AAA pattern, use factories for test data.
+Coverage target: 100% of branches.
+Output: Complete test file ready to drop in src/__tests__/
+
+## /pr
+Generate a pull request description for the current branch changes.
+Format:
+### What changed
+[bullet list of changes]
+### Why
+[business/technical reason]
+### How to test
+[step-by-step testing instructions]
+### Screenshots (if applicable)
+[placeholder]
+
+## /explain
+Explain the specified code as if to a new team member.
+Include: purpose, how it works, dependencies, any gotchas.
+Max 300 words.
+
+## /debug
+Debug the provided error or failing code.
+Process: 
+1. Identify the root cause
+2. Show exactly where the problem is
+3. Provide the minimal fix
+4. Suggest if a broader refactor is needed
+
+## /migrate
+Generate a Prisma migration for the described schema change.
+Include: migration SQL preview, updated schema.prisma, any seed data updates.</code></pre>
+<hr />
+<h2 id="5-claudecontextdomain-modelmd">5.
+<code>.claude/context/domain-model.md</code></h2>
+<p>This file explains the business domain. Without it, Claude generates
+technically correct code that's semantically wrong.</p>
+<pre class="markdown"><code># Domain Model — Invoice Management System
+
+## Core Concepts
+
+### Invoice
+An invoice is a financial document issued by a Vendor to a Customer.
+Key states: DRAFT → SENT → VIEWED → PAID | OVERDUE | DISPUTED | CANCELLED
+- An invoice can only be edited in DRAFT state
+- Moving to SENT sends an email to the customer
+- OVERDUE is set automatically by a daily cron when dueDate &lt; today and status = SENT
+- Payments are applied to invoices via LineItemPayments
+
+### Vendor
+The business using our platform (our customer). Has multiple Users with RBAC roles.
+Roles: OWNER (full access), ADMIN (no billing), ACCOUNTANT (read/write invoices), 
+VIEWER (read only)
+
+### Customer
+A company or individual that receives invoices from a Vendor. 
+- Customers exist within a Vendor&#39;s context — Customer A for Vendor 1 is different 
+  from Customer A for Vendor 2
+- Customers have a paymentTerms field (NET_7, NET_15, NET_30, NET_60)
+- Customer.balance is a denormalised sum of all outstanding invoices
+
+### LineItem
+Individual line on an invoice. Has: description, quantity, unitPrice, taxRate.
+- taxRate is stored as a decimal (0.20 = 20%)
+- totalAmount = quantity × unitPrice × (1 + taxRate)
+- Discounts are NOT applied at line item level — see Invoice.discounts
+
+## Critical Business Rules
+1. An invoice total must ALWAYS equal the sum of its line items + tax - discounts
+2. Currency is stored in ISO 4217 (USD, EUR, GBP) — never as symbols
+3. All monetary values stored as integers in the smallest currency unit (pence/cents)
+4. A vendor cannot be deleted if it has outstanding invoices &gt; 0
+5. Invoice numbers are auto-generated: [VENDOR_PREFIX]-[YEAR]-[SEQUENCE] e.g. ACME-2024-00142
+
+## Common Mistakes to Avoid
+- Do NOT use float for monetary values — always integer pence/cents
+- Do NOT create customer entities for different vendors with the same ID
+- Do NOT allow status transitions that skip states (DRAFT → PAID is invalid)</code></pre>
+<hr />
+<h2 id="6-claudememorymd--persistent-project-memory">6.
+<code>.claude/memory.md</code> — Persistent Project Memory</h2>
+<p>This file is for recording decisions, patterns, and context that have
+accumulated over time. You maintain this, but Claude can help update
+it.</p>
+<pre class="markdown"><code># Project Memory
+
+## Decisions Made
+- 2024-01-15: Chose Prisma over TypeORM because of type safety and migration tooling
+- 2024-02-03: Moved from REST to mixed REST+GraphQL for the dashboard (heavy read queries)
+- 2024-03-10: Deprecated v1 API — v2 must be used for all new features
+- 2024-04-05: Switched from Moment.js to date-fns (lighter bundle)
+
+## Known Issues
+- OrderRepository.findByCustomer is slow for customers with &gt;10k orders — tracked in TECH-234
+- Email service occasionally times out under load — not fixed, wrapped in retry logic
+- getUserByEmail is called N+1 in the invoice batch export — TECH-287
+
+## Deprecated Patterns (Don&#39;t Use)
+- Do not use UserController.getById — deprecated, use getUserProfile instead
+- Do not use the `/api/v1/*` routes — all new code targets `/api/v2/*`
+- Do not use the old AuthService.verify method — use verifyToken from jwt.utils.ts
+
+## Active Experiments
+- Testing Vitest as Jest replacement (branch: experiment/vitest)
+- New queue-based email system in review (PR #234)
+
+## Team Conventions
+- PRs require 2 approvals
+- No feature flags — ship complete features or use branch deploys
+- Hotfixes go to main directly, then backport to release branch</code></pre>
+<hr />
+<h2 id="7-global-claudeclaudemd">7. Global
+<code>~/.claude/CLAUDE.md</code></h2>
+<p>This file applies to ALL your projects. Use it for personal
+preferences that transcend any single project:</p>
+<pre class="markdown"><code># Global Claude Preferences
+
+## My Role
+Senior full-stack engineer. I prefer concise, direct responses.
+Skip explanations unless I ask for them.
+Skip &quot;here&#39;s what I did&quot; summaries — just give me the output.
+
+## Communication Style
+- Be direct and opinionated
+- Flag trade-offs, don&#39;t just present one option without context  
+- If my approach has a problem, tell me before implementing
+- Ask clarifying questions BEFORE writing code, not after
+- When reviewing code, be direct about problems — no sugar-coating
+
+## Code Preferences (Global Defaults)
+- TypeScript when possible
+- Functional programming patterns preferred
+- Explicit over implicit (prefer verbose-but-clear)
+- Tests always (no code without tests)
+
+## What I Don&#39;t Need
+- Explanations of how common language features work
+- Lengthy preambles before code
+- &quot;I hope this helps!&quot; type closings
+- Listing every change made when refactoring</code></pre>
+<hr />
+<h2 id="8-achieving-95-accuracy-the-maturity-model">8. Achieving 95%
+Accuracy: The Maturity Model</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    L1["🔴 Level 1&lt;br/&gt;&lt;b&gt;Basic&lt;/b&gt;&lt;br/&gt;No CLAUDE.md&lt;br/&gt;Generic outputs"] --&gt; L2["🟠 Level 2&lt;br/&gt;&lt;b&gt;Configured&lt;/b&gt;&lt;br/&gt;CLAUDE.md with&lt;br/&gt;stack + conventions"]
+    L2 --&gt; L3["🟡 Level 3&lt;br/&gt;&lt;b&gt;Contextual&lt;/b&gt;&lt;br/&gt;+ .claude/ context&lt;br/&gt;+ domain model"]
+    L3 --&gt; L4["🟢 Level 4&lt;br/&gt;&lt;b&gt;Automated&lt;/b&gt;&lt;br/&gt;+ hooks + MCPs&lt;br/&gt;+ slash commands"]
+    L4 --&gt; L5["⭐ Level 5&lt;br/&gt;&lt;b&gt;95% Accuracy&lt;/b&gt;&lt;br/&gt;Full context stack&lt;br/&gt;Team consistency"]
+
+    style L1 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style L2 fill:#fd7e14,stroke:#e8690a,color:#fff
+    style L3 fill:#ffc107,stroke:#d4a106,color:#333
+    style L4 fill:#50c878,stroke:#3da360,color:#fff
+    style L5 fill:#4a90d9,stroke:#2d6cb4,color:#fff</code></pre>
+</figure>
+
+<p>Build your Claude configuration iteratively:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Level</th>
+<th style="text-align: center;">Accuracy</th>
+<th style="text-align: left;">What to Add</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>1 — Basic</strong></td>
+<td style="text-align: center;">60–70%</td>
+<td style="text-align: left;"><code>CLAUDE.md</code> with tech stack +
+basic coding conventions</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>2 — Intermediate</strong></td>
+<td style="text-align: center;">75–85%</td>
+<td style="text-align: left;">Architecture patterns · security rules ·
+"what NOT to do" · testing conventions</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>3 — Advanced</strong></td>
+<td style="text-align: center;">85–95%</td>
+<td style="text-align: left;">Domain model docs · common patterns ·
+reference implementations · <code>.claude/commands.md</code> ·
+<code>memory.md</code></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>4 — Expert</strong></td>
+<td style="text-align: center;">95%+</td>
+<td style="text-align: left;">All above + actively maintained
+<code>memory.md</code> · per-system context files · calibrated from
+observed failure modes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The core feedback loop:</strong></p>
+<pre><code>Claude produces wrong output
+        ↓
+Ask: &quot;What context was missing?&quot;
+        ↓
+Add that context to CLAUDE.md or the relevant context file
+        ↓
+Claude gets it right automatically next time</code></pre>
+<p>This is a compounding investment — every failure that gets added to
+<code>CLAUDE.md</code> prevents that same failure from ever happening
+again.</p>
+<hr />
+<h2 id="9-complete-file-reference">9. Complete File Reference</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">File</th>
+<th style="text-align: left;">Purpose</th>
+<th style="text-align: center;">Commit?</th>
+<th style="text-align: left;">Who Maintains</th>
+<th style="text-align: left;">Update Frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>CLAUDE.md</code></td>
+<td style="text-align: left;">Main project config — tech stack,
+conventions, rules</td>
+<td style="text-align: center;">✅ Yes</td>
+<td style="text-align: left;">Whole team</td>
+<td style="text-align: left;">On tech stack or convention changes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>.claude/commands.md</code></td>
+<td style="text-align: left;">Custom slash commands (e.g.
+<code>/review</code>, <code>/pr</code>)</td>
+<td style="text-align: center;">✅ Yes</td>
+<td style="text-align: left;">Any dev</td>
+<td style="text-align: left;">As new workflows emerge</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>.claude/context/*.md</code></td>
+<td style="text-align: left;">Domain model, system-specific technical
+context</td>
+<td style="text-align: center;">✅ Yes</td>
+<td style="text-align: left;">Domain owner</td>
+<td style="text-align: left;">When domain rules change</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>.claude/memory.md</code></td>
+<td style="text-align: left;">Evolving project knowledge, past
+decisions</td>
+<td style="text-align: center;">✅ Yes</td>
+<td style="text-align: left;">Team rotating</td>
+<td style="text-align: left;">After significant decisions or bugs</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>~/.claude/CLAUDE.md</code></td>
+<td style="text-align: left;">Personal global preferences and role</td>
+<td style="text-align: center;">❌ Personal</td>
+<td style="text-align: left;">Individual</td>
+<td style="text-align: left;">Per personal preference</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>.env</code></td>
+<td style="text-align: left;">API keys and environment variables</td>
+<td style="text-align: center;">❌ Secrets</td>
+<td style="text-align: left;">DevOps / individual</td>
+<td style="text-align: left;">Per environment change</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>The path to 95% accuracy is simple: give Claude the context it needs
+to behave like a developer who has worked on your project for six
+months. That context lives in:</p>
+<ol type="1">
+<li><strong><code>CLAUDE.md</code></strong> — Tech stack, architecture,
+conventions, do's and don'ts</li>
+<li><strong><code>.claude/context/</code></strong> — Domain model, API
+contracts, infrastructure details</li>
+<li><strong><code>.claude/commands.md</code></strong> — Reusable
+task-specific prompts</li>
+<li><strong><code>.claude/memory.md</code></strong> — Accumulated
+project knowledge</li>
+<li><strong><code>~/.claude/CLAUDE.md</code></strong> — Personal
+preferences across all projects</li>
+</ol>
+<p>In the next article, we'll move to a fundamentally different
+capability: MCPs (Model Context Protocol) — the technology that allows
+Claude to connect to and operate external tools, services, and
+systems.</p>
+<hr />
+<p><em>Next: Article 9 — What Are MCPs? Types, Benefits, and When to Use
+Each</em></p>
+
+</body>
+</html>

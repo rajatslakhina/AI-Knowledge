@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 5: Setting Up Claude in VS Code and Terminal — A Complete Configuration Guide</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: Claude AI, Developer Tools, VS Code, Terminal, Setup Guide
+    6. Add subtitle: From zero to a fully configured Claude development environment — VS Code extensions, Claude Code CLI, shell integration, and model selection workflows.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    A terminal/IDE screenshot showing Claude Code running. Dark theme, green/white text. Authentic dev environment feel.
+    ============================================================
+    RECOMMENDED TAGS:
+    Claude AI, Developer Tools, VS Code, Terminal, Setup Guide
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 5: Setting Up Claude in VS Code and Terminal — A Complete Configuration Guide</h1>
+
+<p><em>From zero to a fully configured Claude development environment — VS Code extensions, Claude Code CLI, shell integration, and model selection workflows.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: A terminal/IDE screenshot showing Claude Code running. Dark theme, green/white text. Authentic dev environment feel. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>Knowing about Claude is one thing. Having it integrated into every
+step of your development workflow is another. This article covers the
+complete setup: Claude Code in the terminal, VS Code integration, API
+key configuration, and how to wire it all together into a productive
+daily workflow.</p>
+<p>By the end of this article you'll have:</p>
+<ul>
+<li>Claude Code running in your terminal</li>
+<li>Claude integrated in VS Code</li>
+<li>A shell alias setup for daily use</li>
+<li>A model selection strategy for your daily workflow</li>
+</ul>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    START["🚀 Setup Claude Dev Environment"] --&gt; A["1️⃣ Prerequisites&lt;br/&gt;Node.js 18+, API key"]
+    A --&gt; B["2️⃣ Install Claude Code&lt;br/&gt;npm install -g @anthropic-ai/claude-code"]
+    B --&gt; C["3️⃣ Authenticate&lt;br/&gt;claude auth login"]
+    C --&gt; D{"VS Code&lt;br/&gt;Integration?"}
+    D --&gt;|"Full IDE"| E["Continue.dev&lt;br/&gt;Extension"]
+    D --&gt;|"Autonomous"| F["Cline&lt;br/&gt;Extension"]
+    D --&gt;|"Hybrid"| G["GitHub Copilot&lt;br/&gt;+ Claude API"]
+    E --&gt; H["4️⃣ Configure&lt;br/&gt;Shell aliases + env vars"]
+    F --&gt; H
+    G --&gt; H
+    H --&gt; I["✅ Ready!&lt;br/&gt;Claude in terminal + IDE"]
+
+    style START fill:#f5a623,stroke:#d4891a,color:#fff
+    style I fill:#50c878,stroke:#3da360,color:#fff
+    style E fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style F fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style G fill:#e74c3c,stroke:#c0392b,color:#fff</code></pre>
+</figure>
+
+<hr />
+<h2 id="1-prerequisites">1. Prerequisites</h2>
+<p>Before we begin:</p>
+<pre class="bash"><code># Verify Node.js version (18+ required for Claude Code)
+node --version  # Should be v18.0.0 or higher
+
+# If you need to update Node.js:
+# Using nvm (recommended):
+nvm install 20
+nvm use 20
+
+# Verify npm
+npm --version</code></pre>
+<p>You'll also need an Anthropic account and API key. Get one at: <a
+href="https://console.anthropic.com">console.anthropic.com</a></p>
+<hr />
+<h2 id="2-installing-claude-code">2. Installing Claude Code</h2>
+<p>Claude Code is Anthropic's official CLI tool for agentic coding in
+the terminal. It's the most powerful way to interact with Claude for
+development tasks.</p>
+<h3 id="installation">Installation</h3>
+<pre class="bash"><code># Install globally via npm
+npm install -g @anthropic-ai/claude-code
+
+# Verify installation
+claude --version</code></pre>
+<h3 id="authentication">Authentication</h3>
+<pre class="bash"><code># Start Claude Code (will prompt for authentication)
+claude
+
+# OR set API key as environment variable
+export ANTHROPIC_API_KEY=&quot;sk-ant-...&quot;
+
+# For persistent configuration, add to your shell profile:
+# ~/.bashrc, ~/.zshrc, or ~/.profile
+echo &#39;export ANTHROPIC_API_KEY=&quot;sk-ant-your-key-here&quot;&#39; &gt;&gt; ~/.zshrc
+source ~/.zshrc</code></pre>
+<blockquote>
+<p><strong>Security note:</strong> Never commit your API key to version
+control. Use environment variables or a secrets manager. Add
+<code>.env</code> to <code>.gitignore</code>.</p>
+</blockquote>
+<h3 id="first-run">First Run</h3>
+<pre class="bash"><code># Navigate to your project
+cd /path/to/your/project
+
+# Start Claude Code
+claude
+
+# You&#39;ll see the interactive REPL:
+# ╔═══════════════════════════════════════╗
+# ║          Claude Code v2.x.x           ║
+# ╚═══════════════════════════════════════╝
+# &gt;</code></pre>
+<hr />
+<h2 id="3-claude-code--core-usage-patterns">3. Claude Code — Core Usage
+Patterns</h2>
+<h3 id="interactive-mode-repl">Interactive Mode (REPL)</h3>
+<pre class="bash"><code># Start interactive session in current directory
+claude
+
+# Claude has full context of your project files
+&gt; Explain what this codebase does
+&gt; Add error handling to the auth service
+&gt; Write tests for the UserRepository class</code></pre>
+<h3 id="single-command-mode">Single Command Mode</h3>
+<pre class="bash"><code># Run a specific task without entering the REPL
+claude &quot;Write a README for this project&quot;
+claude &quot;Find all TODO comments and create a list&quot;
+claude &quot;Review the security of the authentication module&quot;</code></pre>
+<h3 id="piping-input">Piping Input</h3>
+<pre class="bash"><code># Pipe file content to Claude
+cat src/auth/login.ts | claude &quot;Review this code for security issues&quot;
+
+# Pipe git diff for review
+git diff | claude &quot;Summarise what changed and identify any issues&quot;
+
+# Pipe test output
+npm test 2&gt;&amp;1 | claude &quot;Explain these test failures and suggest fixes&quot;</code></pre>
+<h3 id="common-terminal-workflows">Common Terminal Workflows</h3>
+<pre class="bash"><code># Analyse a stack trace
+cat error.log | claude &quot;What is causing this error and how do I fix it?&quot;
+
+# Generate tests for a specific file
+claude &quot;Generate comprehensive Jest tests for src/services/payment.ts&quot;
+
+# Review before committing
+git diff --staged | claude &quot;Code review this diff. Flag any issues before I commit.&quot;
+
+# Explain an unfamiliar codebase
+claude &quot;I&#39;m new to this codebase. Explain the overall architecture and the main data flow.&quot;</code></pre>
+<hr />
+<h2 id="4-selecting-models-in-claude-code">4. Selecting Models in Claude
+Code</h2>
+<pre class="bash"><code># Specify model explicitly
+claude --model claude-opus-4-6 &quot;Design the database schema for this project&quot;
+claude --model claude-sonnet-4-6 &quot;Implement the user registration endpoint&quot;
+claude --model claude-haiku-4-5-20251001 &quot;Summarise this file in 3 bullet points&quot;
+
+# Set default model for the session
+export ANTHROPIC_MODEL=&quot;claude-sonnet-4-6&quot;
+
+# Or set in CLAUDE.md (covered in Article 8)</code></pre>
+<h3 id="recommended-model-aliases">Recommended Model Aliases</h3>
+<p>Add these to your <code>~/.zshrc</code> or
+<code>~/.bashrc</code>:</p>
+<pre class="bash"><code># Model shortcuts
+alias claude-fast=&quot;claude --model claude-haiku-4-5-20251001&quot;
+alias claude-smart=&quot;claude --model claude-sonnet-4-6&quot;
+alias claude-pro=&quot;claude --model claude-opus-4-6&quot;
+
+# Task-specific aliases
+alias ai-review=&quot;git diff --staged | claude-smart &#39;Review this diff for bugs, security issues, and code quality&#39;&quot;
+alias ai-test=&quot;claude-smart &#39;Generate comprehensive tests for&#39;&quot;
+alias ai-docs=&quot;claude-smart &#39;Write documentation for&#39;&quot;
+alias ai-explain=&quot;claude-smart &#39;Explain this code in plain English:&#39;&quot;
+
+# Quick commit message
+alias ai-commit=&quot;git diff --staged | claude-fast &#39;Write a conventional commit message for this diff. Output only the commit message, nothing else.&#39;&quot;</code></pre>
+<hr />
+<h2 id="5-vs-code-setup">5. VS Code Setup</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph OPTIONS["🔧 VS Code AI Integration Options"]
+        direction LR
+        subgraph A["Option A: Continue.dev"]
+            A1["✅ Full IDE integration&lt;br/&gt;✅ Multi-model support&lt;br/&gt;✅ Inline completions&lt;br/&gt;✅ Chat sidebar&lt;br/&gt;⚠️ Requires config"]
+        end
+        subgraph B["Option B: Cline"]
+            B1["✅ Autonomous agent&lt;br/&gt;✅ File creation/editing&lt;br/&gt;✅ Terminal commands&lt;br/&gt;✅ Visual diffs&lt;br/&gt;⚠️ Higher token usage"]
+        end
+        subgraph C["Option C: Copilot + Claude"]
+            C1["✅ Best autocomplete&lt;br/&gt;✅ PR descriptions&lt;br/&gt;✅ Claude via API&lt;br/&gt;⚠️ Two subscriptions&lt;br/&gt;⚠️ Complex setup"]
+        end
+    end
+
+    style A fill:#d4edda,stroke:#28a745
+    style B fill:#fff3cd,stroke:#ffc107
+    style C fill:#f0f4ff,stroke:#4a90d9</code></pre>
+</figure>
+
+<h3
+id="option-a-continuedev-recommended-for-full-ide-integration">Option A:
+Continue.dev (Recommended for Full IDE Integration)</h3>
+<p>Continue is an open-source VS Code extension that connects to any LLM
+including Claude. It's the most powerful VS Code AI integration
+available.</p>
+<p><strong>Installation:</strong></p>
+<ol type="1">
+<li>Open VS Code</li>
+<li>Go to Extensions (<code>Ctrl+Shift+X</code> /
+<code>Cmd+Shift+X</code>)</li>
+<li>Search for "Continue"</li>
+<li>Install "Continue - Codestral, Claude, and more"</li>
+</ol>
+<p><strong>Configuration:</strong> Create or edit
+<code>~/.continue/config.json</code>:</p>
+<pre class="json"><code>{
+  &quot;models&quot;: [
+    {
+      &quot;title&quot;: &quot;Claude Sonnet 4.6&quot;,
+      &quot;provider&quot;: &quot;anthropic&quot;,
+      &quot;model&quot;: &quot;claude-sonnet-4-6&quot;,
+      &quot;apiKey&quot;: &quot;sk-ant-your-key-here&quot;
+    },
+    {
+      &quot;title&quot;: &quot;Claude Haiku 4.5 (Fast)&quot;,
+      &quot;provider&quot;: &quot;anthropic&quot;,
+      &quot;model&quot;: &quot;claude-haiku-4-5-20251001&quot;,
+      &quot;apiKey&quot;: &quot;sk-ant-your-key-here&quot;
+    },
+    {
+      &quot;title&quot;: &quot;Claude Opus 4.6 (Complex Tasks)&quot;,
+      &quot;provider&quot;: &quot;anthropic&quot;,
+      &quot;model&quot;: &quot;claude-opus-4-6&quot;,
+      &quot;apiKey&quot;: &quot;sk-ant-your-key-here&quot;
+    }
+  ],
+  &quot;tabAutocompleteModel&quot;: {
+    &quot;title&quot;: &quot;Claude Haiku 4.5&quot;,
+    &quot;provider&quot;: &quot;anthropic&quot;,
+    &quot;model&quot;: &quot;claude-haiku-4-5-20251001&quot;,
+    &quot;apiKey&quot;: &quot;sk-ant-your-key-here&quot;
+  },
+  &quot;customCommands&quot;: [
+    {
+      &quot;name&quot;: &quot;review&quot;,
+      &quot;description&quot;: &quot;Review current file&quot;,
+      &quot;prompt&quot;: &quot;Review this code for bugs, security issues, and improvements. Be specific.&quot;
+    },
+    {
+      &quot;name&quot;: &quot;test&quot;,
+      &quot;description&quot;: &quot;Generate tests&quot;,
+      &quot;prompt&quot;: &quot;Write comprehensive tests for this code. Cover happy path, edge cases, and error cases.&quot;
+    },
+    {
+      &quot;name&quot;: &quot;docs&quot;,
+      &quot;description&quot;: &quot;Generate documentation&quot;,
+      &quot;prompt&quot;: &quot;Write clear JSDoc/docstring documentation for this code.&quot;
+    }
+  ],
+  &quot;contextProviders&quot;: [
+    {
+      &quot;name&quot;: &quot;code&quot;,
+      &quot;params&quot;: {}
+    },
+    {
+      &quot;name&quot;: &quot;docs&quot;,
+      &quot;params&quot;: {}
+    },
+    {
+      &quot;name&quot;: &quot;git&quot;,
+      &quot;params&quot;: {
+        &quot;Diff with main branch&quot;: true
+      }
+    },
+    {
+      &quot;name&quot;: &quot;terminal&quot;,
+      &quot;params&quot;: {}
+    }
+  ]
+}</code></pre>
+<p><strong>Key Continue Features:</strong></p>
+<ul>
+<li><code>Ctrl+L</code> / <code>Cmd+L</code> — Open chat panel</li>
+<li><code>Ctrl+Shift+L</code> / <code>Cmd+Shift+L</code> — Add current
+file to context</li>
+<li><code>Ctrl+I</code> / <code>Cmd+I</code> — Inline edit (highlight
+code → Cmd+I → describe change)</li>
+<li><code>/review</code>, <code>/test</code>, <code>/docs</code> —
+Custom slash commands</li>
+</ul>
+<hr />
+<h3 id="option-b-cline-autonomous-agent-in-vs-code">Option B: Cline
+(Autonomous Agent in VS Code)</h3>
+<p>Cline is an agentic VS Code extension — it can create files, run
+terminal commands, and complete multi-step tasks autonomously.</p>
+<p><strong>Installation:</strong></p>
+<ol type="1">
+<li>Extensions → Search "Cline"</li>
+<li>Install "Cline (formerly Claude Dev)"</li>
+</ol>
+<p><strong>Configuration:</strong></p>
+<ol type="1">
+<li>Open Cline panel (sidebar)</li>
+<li>Click settings icon</li>
+<li>Set API Provider: Anthropic</li>
+<li>Enter API key</li>
+<li>Select model: <code>claude-sonnet-4-6</code></li>
+</ol>
+<p><strong>Cline is best for:</strong></p>
+<ul>
+<li>Multi-file feature implementation</li>
+<li>Autonomous bug fixing</li>
+<li>Scaffolding new projects</li>
+<li>Complex refactoring tasks that touch many files</li>
+</ul>
+<hr />
+<h3 id="option-c-github-copilot--claude-hybrid">Option C: GitHub Copilot
++ Claude (Hybrid)</h3>
+<p>If your team uses GitHub Copilot, you can use it for autocomplete and
+Continue/Cline for chat.</p>
+<pre><code>GitHub Copilot → Inline autocomplete suggestions
+Continue/Cline → Chat, code review, test generation
+Claude Code CLI → Terminal tasks, batch operations</code></pre>
+<hr />
+<h2 id="6-vs-code-settings-for-ai-development">6. VS Code Settings for
+AI Development</h2>
+<p>Add to your VS Code <code>settings.json</code>
+(<code>Ctrl+Shift+P</code> → "Open User Settings JSON"):</p>
+<pre class="json"><code>{
+  // Better Claude Code terminal experience
+  &quot;terminal.integrated.fontSize&quot;: 14,
+  &quot;terminal.integrated.scrollback&quot;: 5000,
+  
+  // Git integration (helps AI tools understand changes)
+  &quot;git.autofetch&quot;: true,
+  &quot;git.confirmSync&quot;: false,
+  
+  // Editor settings that improve AI context
+  &quot;editor.formatOnSave&quot;: true,
+  &quot;editor.suggestSelection&quot;: &quot;first&quot;,
+  
+  // Files to exclude from AI context (sensitive/irrelevant)
+  &quot;files.exclude&quot;: {
+    &quot;**/.git&quot;: true,
+    &quot;**/node_modules&quot;: true,
+    &quot;**/.env&quot;: true,
+    &quot;**/dist&quot;: true
+  },
+  
+  // Recommended extensions for AI-assisted development
+  &quot;extensions.recommendations&quot;: [
+    &quot;continue.continue&quot;,
+    &quot;saoudrizwan.claude-dev&quot;,
+    &quot;dbaeumer.vscode-eslint&quot;,
+    &quot;esbenp.prettier-vscode&quot;
+  ]
+}</code></pre>
+<hr />
+<h2 id="7-environment-configuration-best-practices">7. Environment
+Configuration Best Practices</h2>
+<h3 id="project-level-api-key-management">Project-Level API Key
+Management</h3>
+<pre class="bash"><code># Create .env file (never commit this)
+touch .env
+echo &quot;ANTHROPIC_API_KEY=sk-ant-your-key-here&quot; &gt;&gt; .env
+
+# Add to .gitignore
+echo &quot;.env&quot; &gt;&gt; .gitignore
+echo &quot;.env.local&quot; &gt;&gt; .gitignore
+
+# Load in your shell session
+source .env</code></pre>
+<h3 id="using-a-secrets-manager-production-approach">Using a Secrets
+Manager (Production Approach)</h3>
+<pre class="bash"><code># Using direnv for per-project environment management
+brew install direnv
+echo &#39;eval &quot;$(direnv hook zsh)&quot;&#39; &gt;&gt; ~/.zshrc
+
+# Create .envrc in project root
+echo &#39;export ANTHROPIC_API_KEY=$(cat ~/.secrets/anthropic_key)&#39; &gt; .envrc
+direnv allow</code></pre>
+<hr />
+<h2 id="8-when-to-use-which-interface">8. When to Use Which
+Interface</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph INTERFACES["🔧 When to Use Which Interface"]
+        direction TB
+        A["🖥️ &lt;b&gt;Claude Code REPL&lt;/b&gt;&lt;br/&gt;Complex multi-file tasks&lt;br/&gt;Full codebase access&lt;br/&gt;⚡ Autonomous"] 
+        B["⌨️ &lt;b&gt;Single Command&lt;/b&gt;&lt;br/&gt;Quick tasks, CI/CD scripts&lt;br/&gt;Piped input&lt;br/&gt;⚡ Autonomous"]
+        C["💬 &lt;b&gt;Continue.dev Chat&lt;/b&gt;&lt;br/&gt;Interactive Q&amp;A&lt;br/&gt;Selected files + git&lt;br/&gt;🔒 Manual"]
+        D["✏️ &lt;b&gt;Continue.dev Inline&lt;/b&gt;&lt;br/&gt;In-place edits&lt;br/&gt;Current file only&lt;br/&gt;🔒 Manual"]
+        E["🤖 &lt;b&gt;Cline&lt;/b&gt;&lt;br/&gt;Full feature development&lt;br/&gt;Full project access&lt;br/&gt;⚡ Autonomous"]
+    end
+
+    style INTERFACES fill:#f8f9fa,stroke:#6c757d</code></pre>
+</figure>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Interface</th>
+<th style="text-align: left;">Best For</th>
+<th style="text-align: center;">Speed</th>
+<th style="text-align: left;">Context Access</th>
+<th style="text-align: center;">Autonomous?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Claude Code REPL</strong></td>
+<td style="text-align: left;">Complex multi-file tasks, architecture
+work</td>
+<td style="text-align: center;">🐢 Slow</td>
+<td style="text-align: left;">Full codebase</td>
+<td style="text-align: center;">✅ Yes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Claude Code — single
+command</strong></td>
+<td style="text-align: left;">Quick tasks, scripting, CI/CD
+pipelines</td>
+<td style="text-align: center;">⚡ Fast</td>
+<td style="text-align: left;">Piped input only</td>
+<td style="text-align: center;">✅ Yes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Continue.dev — chat</strong></td>
+<td style="text-align: left;">Interactive dev, Q&amp;A, code
+explanation</td>
+<td style="text-align: center;">🚀 Fast</td>
+<td style="text-align: left;">Selected files + git</td>
+<td style="text-align: center;">❌ No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Continue.dev —
+inline</strong></td>
+<td style="text-align: left;">In-place edits, targeted refactoring</td>
+<td style="text-align: center;">⚡ Fast</td>
+<td style="text-align: left;">Current file</td>
+<td style="text-align: center;">❌ No</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Cline</strong></td>
+<td style="text-align: left;">Autonomous multi-file feature
+development</td>
+<td style="text-align: center;">🔄 Varies</td>
+<td style="text-align: left;">Full project</td>
+<td style="text-align: center;">✅ Yes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>claude.ai (browser)</strong></td>
+<td style="text-align: left;">Exploration, non-code tasks, large
+documents</td>
+<td style="text-align: center;">🚀 Fast</td>
+<td style="text-align: left;">None (paste only)</td>
+<td style="text-align: center;">❌ No</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-model-selection-in-daily-workflow">9. Model Selection in Daily
+Workflow</h2>
+<p>Here's a practical model selection guide for your day:</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph MORNING["☀️ Morning — Planning"]
+        M1["🔍 PR Reviews&lt;br/&gt;&lt;b&gt;→ Sonnet&lt;/b&gt;"]
+        M2["📝 Task Planning&lt;br/&gt;&lt;b&gt;→ Haiku&lt;/b&gt;"]
+        M3["🏗️ Arch Prep&lt;br/&gt;&lt;b&gt;→ Opus&lt;/b&gt;"]
+    end
+    subgraph MIDDAY["💻 Feature Development"]
+        D1["⚡ Scaffolding&lt;br/&gt;&lt;b&gt;→ Sonnet&lt;/b&gt;"]
+        D2["🐛 Debugging&lt;br/&gt;&lt;b&gt;→ Sonnet → Opus&lt;/b&gt;"]
+        D3["🧪 Tests&lt;br/&gt;&lt;b&gt;→ Sonnet&lt;/b&gt;"]
+        D4["📖 Docs&lt;br/&gt;&lt;b&gt;→ Haiku/Sonnet&lt;/b&gt;"]
+    end
+    subgraph EOD["🌙 End of Day"]
+        E1["✅ Commits&lt;br/&gt;&lt;b&gt;→ Haiku&lt;/b&gt;"]
+        E2["📝 PR Description&lt;br/&gt;&lt;b&gt;→ Sonnet&lt;/b&gt;"]
+        E3["📋 Release Notes&lt;br/&gt;&lt;b&gt;→ Sonnet&lt;/b&gt;"]
+    end
+    
+    MORNING --&gt; MIDDAY --&gt; EOD
+
+    style MORNING fill:#fff3cd,stroke:#ffc107
+    style MIDDAY fill:#d4edda,stroke:#28a745
+    style EOD fill:#f0f4ff,stroke:#4a90d9</code></pre>
+</figure>
+
+<hr />
+<h2 id="10-verifying-your-setup">10. Verifying Your Setup</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TD
+    V1["1️⃣ claude --version&lt;br/&gt;Shows version?"] --&gt;|✅| V2["2️⃣ claude --model&lt;br/&gt;Shows current model?"]
+    V2 --&gt;|✅| V3["3️⃣ Short prompt test&lt;br/&gt;'Explain a for loop'"]
+    V3 --&gt;|✅| V4["4️⃣ File access test&lt;br/&gt;'Read package.json'"]
+    V4 --&gt;|✅| V5["5️⃣ MCP test&lt;br/&gt;'List files in .'"]
+    V5 --&gt;|✅| DONE["✅ Setup Complete!"]
+    
+    V1 --&gt;|❌| F1["Reinstall Claude Code&lt;br/&gt;Check Node.js version"]
+    V2 --&gt;|❌| F2["Check auth:&lt;br/&gt;claude auth login"]
+    V3 --&gt;|❌| F3["Check API key&lt;br/&gt;and network"]
+    V4 --&gt;|❌| F4["Check filesystem&lt;br/&gt;permissions"]
+    V5 --&gt;|❌| F5["Check .claude/settings.json&lt;br/&gt;MCP config"]
+
+    style DONE fill:#50c878,stroke:#3da360,color:#fff
+    style F1 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F2 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F3 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F4 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style F5 fill:#e74c3c,stroke:#c0392b,color:#fff</code></pre>
+</figure>
+
+<p>Run this checklist to confirm everything works:</p>
+<pre class="bash"><code># 1. Verify Claude Code CLI
+claude --version
+echo &quot;✓ Claude Code installed&quot;
+
+# 2. Verify API key
+claude &quot;Say &#39;API key works!&#39; and nothing else&quot;
+echo &quot;✓ Authentication working&quot;
+
+# 3. Test project context
+cd your-project
+claude &quot;List the main files in this project&quot;
+echo &quot;✓ Project context working&quot;
+
+# 4. Test piping
+echo &quot;function add(a, b) { return a + b }&quot; | claude &quot;Write a test for this&quot;
+echo &quot;✓ Piping working&quot;
+
+# 5. Verify VS Code extension (Continue)
+# Open VS Code → Cmd+L → Type &quot;hello&quot; → Confirm response
+echo &quot;✓ VS Code integration working&quot;</code></pre>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>You now have a fully configured Claude development environment:</p>
+<ul>
+<li><strong>Claude Code CLI</strong> for terminal-based agentic
+development</li>
+<li><strong>Continue.dev</strong> for VS Code chat and inline
+editing</li>
+<li><strong>Cline</strong> for autonomous multi-file tasks</li>
+<li><strong>Shell aliases</strong> for common AI-assisted workflows</li>
+<li><strong>Model selection strategy</strong> matched to task types</li>
+</ul>
+<p>In the next article, we'll explore how each role — developer, QA
+engineer, and business analyst — can build powerful workflows on top of
+this setup.</p>
+<hr />
+<p><em>Next: Article 6 — How to Utilise Claude for Every Role: DEVs,
+QAs, and BAs</em></p>
+
+</body>
+</html>

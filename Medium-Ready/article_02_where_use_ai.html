@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 2: Where Can We Use AI? A Comprehensive Map of AI Applications in Software Engineering</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: AI, Software Development, Developer Tools, Productivity, Engineering
+    6. Add subtitle: Beyond the hype — a practical, role-by-role breakdown of where AI delivers real value and where it still falls short.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    Split image: traditional dev workflow (left) vs AI-augmented workflow (right). Clean tech aesthetic.
+    ============================================================
+    RECOMMENDED TAGS:
+    AI, Software Development, Developer Tools, Productivity, Engineering
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 2: Where Can We Use AI? A Comprehensive Map of AI Applications in Software Engineering</h1>
+
+<p><em>Beyond the hype — a practical, role-by-role breakdown of where AI delivers real value and where it still falls short.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: Split image: traditional dev workflow (left) vs AI-augmented workflow (right). Clean tech aesthetic. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>Every week there's a new announcement: "AI can now do X." But knowing
+what AI <em>can</em> do and knowing where it <em>should</em> be used are
+two different skills. The developers who extract the most value from AI
+aren't the ones who throw everything at it — they're the ones who
+understand which problems AI solves well, which it solves partially, and
+which it shouldn't touch.</p>
+<p>This article maps the AI application landscape for software
+engineering teams — developers, QA engineers, and business analysts —
+with honest assessments of where the ROI is real.</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph PROD["🟢 Production-Ready (★★★★★)"]
+        D["📝 Documentation"]
+        TC["🧪 Test Case Gen"]
+        US["📋 User Stories"]
+    end
+    subgraph REVIEW["🟡 Ready with Review (★★★★☆)"]
+        CG["💻 Code Generation"]
+        CR["🔍 Code Review"]
+        DB["🐛 Debugging"]
+        RF["♻️ Refactoring"]
+        TD["📊 Test Data Gen"]
+        RE["📑 Requirements"]
+        GA["🔎 Gap Analysis"]
+        DA["📈 Data Analysis"]
+    end
+    subgraph ASSIST["🟠 Assisted (★★★☆☆)"]
+        AD["🏗️ Architecture"]
+        BT["📋 Bug Triage"]
+        AT["♿ Accessibility"]
+        PT["⚡ Perf Testing"]
+    end
+
+    style PROD fill:#d4edda,stroke:#28a745
+    style REVIEW fill:#fff3cd,stroke:#ffc107
+    style ASSIST fill:#ffe5cc,stroke:#fd7e14</code></pre>
+</figure>
+
+<hr />
+<h2 id="1-the-application-spectrum">1. The Application Spectrum</h2>
+<p>Think of AI applications on two axes:</p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>quadrantChart
+    title AI Application Spectrum for Software Engineering
+    x-axis "Low Autonomy" --&gt; "High Autonomy"
+    y-axis "Low Creativity" --&gt; "High Creativity"
+    quadrant-1 "🏗️ Architectural Design"
+    quadrant-2 "✍️ Content Generation"
+    quadrant-3 "📊 Data Extraction"
+    quadrant-4 "🧪 Automated Testing"
+    "System Design": [0.75, 0.85]
+    "Code Generation": [0.65, 0.55]
+    "Test Suites": [0.80, 0.30]
+    "Documentation": [0.50, 0.45]
+    "Code Review": [0.60, 0.40]</code></pre>
+</figure>
+
+<p>Most enterprise AI use cases cluster in the <strong>high autonomy,
+lower creativity</strong> quadrant — automation, classification, code
+generation following patterns.</p>
+<hr />
+<h2 id="2-software-development-use-cases">2. Software Development Use Cases</h2>
+<h3 id="21-code-generation">2.1 Code Generation</h3>
+<p><strong>Maturity: ★★★★☆ — Production-ready with review</strong></p>
+<p>AI excels at generating boilerplate, implementing well-defined
+patterns, and translating specifications into code. The sweet spot:</p>
+<ul>
+<li>CRUD endpoints from a schema</li>
+<li>Unit test scaffolding from a function signature</li>
+<li>Data transformation functions with clear input/output</li>
+<li>Regular expressions from natural language descriptions</li>
+<li>SQL queries from business requirements</li>
+<li>Type definitions and interfaces from JSON samples</li>
+</ul>
+<h3 id="22-code-review">2.2 Code Review</h3>
+<p><strong>Maturity: ★★★★☆ — Excellent as a first-pass reviewer</strong></p>
+<p>AI can scan a diff or file for:</p>
+<ul>
+<li>Common bugs (null pointer risks, off-by-one errors, race conditions)</li>
+<li>Security vulnerabilities (SQL injection, XSS, insecure deserialization)</li>
+<li>Code smell (long methods, deep nesting, missing error handling)</li>
+<li>Documentation gaps</li>
+</ul>
+<p><strong>Workflow:</strong> Use AI review before human review. It
+catches the low-hanging fruit so human reviewers focus on architecture
+and business logic.</p>
+<h3 id="23-debugging">2.3 Debugging and Root Cause Analysis</h3>
+<p><strong>Maturity: ★★★★☆</strong></p>
+<p>Paste an error, a stack trace, or a failing function. AI is
+remarkably good at:</p>
+<ul>
+<li>Identifying the likely cause from a stack trace</li>
+<li>Explaining what an error message means</li>
+<li>Suggesting fixes with explanation</li>
+<li>Identifying subtle issues like closure bugs, async/await misuse, type coercion</li>
+</ul>
+<h3 id="24-documentation">2.4 Documentation</h3>
+<p><strong>Maturity: ★★★★★ — One of the strongest use cases</strong></p>
+<p>AI writes documentation faster than any human. Use it for:</p>
+<ul>
+<li>JSDoc / docstrings from existing code</li>
+<li>README files from project structure</li>
+<li>API documentation from route handlers</li>
+<li>Architecture decision records (ADRs)</li>
+<li>Runbooks and operational procedures</li>
+</ul>
+<hr />
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph DEV_USE["👨‍💻 Dev Use Cases"]
+        D1["Code Gen ★★★★☆"]
+        D2["Code Review ★★★★☆"]
+        D3["Debugging ★★★★☆"]
+        D4["Refactoring ★★★★☆"]
+        D5["Docs ★★★★★"]
+    end
+    subgraph QA_USE["🧪 QA Use Cases"]
+        Q1["Test Cases ★★★★★"]
+        Q2["Test Data ★★★★☆"]
+        Q3["Bug Triage ★★★☆☆"]
+    end
+    subgraph BA_USE["📊 BA Use Cases"]
+        B1["Requirements ★★★★☆"]
+        B2["User Stories ★★★★★"]
+        B3["Gap Analysis ★★★★☆"]
+    end
+
+    style DEV_USE fill:#d4edda,stroke:#28a745
+    style QA_USE fill:#fff3cd,stroke:#ffc107
+    style BA_USE fill:#f0f4ff,stroke:#4a90d9</code></pre>
+</figure>
+
+<h2 id="3-qa-and-testing-use-cases">3. QA and Testing Use Cases</h2>
+<h3 id="31-test-case-generation">3.1 Test Case Generation</h3>
+<p><strong>Maturity: ★★★★★</strong></p>
+<p>Given a function, class, or user story, AI generates comprehensive
+test cases including:</p>
+<ul>
+<li>Happy path tests</li>
+<li>Edge cases (empty arrays, null values, max boundaries)</li>
+<li>Error cases and exception handling</li>
+<li>Security-focused tests (injection, boundary overflow)</li>
+</ul>
+<p>This is arguably the single highest-ROI use case for QA teams. A task
+that takes 2–3 hours is done in 10 minutes.</p>
+<h3 id="32-test-data-generation">3.2 Test Data Generation</h3>
+<p><strong>Maturity: ★★★★☆</strong></p>
+<p>Generating realistic, structured test data:</p>
+<ul>
+<li>Fake user profiles with realistic but random PII</li>
+<li>JSON/XML payloads for API testing</li>
+<li>Database seed data matching a schema</li>
+<li>Edge-case data sets (unicode characters, very long strings, negative numbers)</li>
+</ul>
+<h3 id="33-bug-triage">3.3 Bug Report Triage</h3>
+<p><strong>Maturity: ★★★☆☆</strong></p>
+<p>AI can help classify incoming bug reports:</p>
+<ul>
+<li>Duplicate detection</li>
+<li>Severity assessment</li>
+<li>Routing to the right team</li>
+<li>Extracting structured data from freeform text reports</li>
+</ul>
+<hr />
+<h2 id="4-business-analysis-use-cases">4. Business Analysis Use Cases</h2>
+<h3 id="41-requirements-extraction">4.1 Requirements Extraction and Structuring</h3>
+<p><strong>Maturity: ★★★★☆</strong></p>
+<p>Transform vague stakeholder notes into structured requirements:</p>
+<ul>
+<li>Convert meeting transcripts into user stories</li>
+<li>Identify functional vs. non-functional requirements</li>
+<li>Flag ambiguities and missing acceptance criteria</li>
+<li>Generate BDD-style Given/When/Then scenarios</li>
+</ul>
+<h3 id="42-user-story-writing">4.2 User Story Writing</h3>
+<p><strong>Maturity: ★★★★★</strong></p>
+<p>One of the highest-ROI BA tasks. Given a feature description, AI
+produces properly formatted user stories with acceptance criteria in minutes.</p>
+<h3 id="43-gap-analysis">4.3 Gap Analysis</h3>
+<p><strong>Maturity: ★★★★☆</strong></p>
+<p>Compare a requirements document against a technical spec or existing
+system to identify gaps, contradictions, or unaddressed scenarios.</p>
+<hr />
+<h2 id="5-devops-and-infrastructure">5. DevOps and Infrastructure</h2>
+<h3 id="51-cicd">5.1 CI/CD Pipeline Configuration</h3>
+<p>Generating GitHub Actions, GitLab CI, or Jenkins pipelines from project structure descriptions.</p>
+<h3 id="52-iac">5.2 Infrastructure as Code</h3>
+<p>Terraform, CloudFormation, and Kubernetes manifests from high-level descriptions. Review carefully — IAM and security configurations require extra scrutiny.</p>
+<h3 id="53-log-analysis">5.3 Log Analysis</h3>
+<p>Parsing large log files and identifying patterns, error spikes, or anomalies.</p>
+<hr />
+<h2 id="6-where-ai-does-not-belong">6. Where AI Does NOT Belong (Yet)</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Use Case</th>
+<th style="text-align: left;">Why AI Falls Short</th>
+<th style="text-align: left;">Safe Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Unreviewed production deploys</strong></td>
+<td style="text-align: left;">Non-deterministic output + no domain context</td>
+<td style="text-align: left;">Always require human sign-off before deploy</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Security-critical algorithm design</strong></td>
+<td style="text-align: left;">Hallucination risk in crypto/auth logic</td>
+<td style="text-align: left;">Use AI to explore options; expert signs off</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Database migrations on live data</strong></td>
+<td style="text-align: left;">Irreversible operations — one mistake = data loss</td>
+<td style="text-align: left;">AI drafts migration; DBA validates + dry-runs</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Legal/compliance decisions</strong></td>
+<td style="text-align: left;">Hallucinated rules can become real liability</td>
+<td style="text-align: left;">AI for first draft; legal counsel reviews</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Final architecture decisions</strong></td>
+<td style="text-align: left;">AI lacks your team skills and business context</td>
+<td style="text-align: left;">AI for trade-off analysis; team makes decision</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-the-8020-rule">7. The 80/20 Rule for AI Adoption</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph TOP5["🎯 Start Here — The 80/20 AI Wins"]
+        direction TB
+        A["📝 Documentation Writing&lt;br/&gt;⏱️ Saves 70-80% of time"]
+        B["🧪 Test Case Generation&lt;br/&gt;⏱️ Saves 60-70% of time"]
+        C["📋 User Story + AC Gen&lt;br/&gt;⏱️ Saves 50-60% of time"]
+        D["💻 Code Gen (Boilerplate)&lt;br/&gt;⏱️ Saves 30-40% of time"]
+        E["🐛 Bug Triage + Debugging&lt;br/&gt;⏱️ Saves 20-40% of time"]
+    end
+
+    style TOP5 fill:#d4edda,stroke:#28a745</code></pre>
+</figure>
+
+<p>The highest-ROI applications for most engineering teams:</p>
+<ol type="1">
+<li><strong>Code generation for boilerplate</strong> (saves 30–40% of typing)</li>
+<li><strong>Test case generation</strong> (saves 60–70% of test writing time)</li>
+<li><strong>Documentation writing</strong> (saves 70–80% of doc writing time)</li>
+<li><strong>User story and AC generation</strong> (saves 50–60% of BA writing time)</li>
+<li><strong>Bug triage and debugging assistance</strong> (saves 20–40% of debugging time)</li>
+</ol>
+<p>Start here. Get 10x value from these five use cases before expanding to more complex workflows.</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>AI is applicable across the entire software development lifecycle.
+The highest-value applications share three traits:</p>
+<ol type="1">
+<li>They involve <strong>well-defined inputs and outputs</strong></li>
+<li>They are <strong>high-volume and repetitive</strong> (high human cost)</li>
+<li>They <strong>benefit from human review</strong> before the output is used</li>
+</ol>
+<p>In the next article, we'll survey the landscape of available AI
+models — from OpenAI and Anthropic to open-source alternatives — so you
+can choose the right tool for each job.</p>
+<hr />
+<p><em>Next: Article 3 — Which AI Models Are Available? A Developer's Map of the LLM Landscape</em></p>
+
+</body>
+</html>

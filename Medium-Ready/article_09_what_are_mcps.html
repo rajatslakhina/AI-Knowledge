@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article 9: What Are MCPs? A Developer's Complete Guide to Model Context Protocol</title>
+  <!--
+    ============================================================
+    MEDIUM IMPORT INSTRUCTIONS
+    ============================================================
+    1. Go to: https://medium.com/p/import
+    2. Upload this HTML file — Medium will create a draft
+    3. Replace diagram placeholders with real images:
+       a. Copy the mermaid code from each placeholder
+       b. Paste at https://mermaid.live and render
+       c. Screenshot or download the SVG
+       d. In Medium, delete the code block and insert the image
+    4. Upload a cover image (see suggestion below)
+    5. Add tags: MCP, Model Context Protocol, Claude AI, AI Tools, APIs
+    6. Add subtitle: MCPs transform Claude from a chat interface into an agent that can read your files, query your databases, call your APIs, and interact with your tools — all within a single conversation.
+    7. Review and publish
+    ============================================================
+    COVER IMAGE SUGGESTION:
+    Plug-and-socket metaphor for MCP connections. Or: Claude as a hub with tools/APIs connected via cables.
+    ============================================================
+    RECOMMENDED TAGS:
+    MCP, Model Context Protocol, Claude AI, AI Tools, APIs
+    ============================================================
+  -->
+</head>
+<body>
+
+<h1>Article 9: What Are MCPs? A Developer's Complete Guide to Model Context Protocol</h1>
+
+<p><em>MCPs transform Claude from a chat interface into an agent that can read your files, query your databases, call your APIs, and interact with your tools — all within a single conversation.</em></p>
+
+<!-- COVER IMAGE SUGGESTION: Plug-and-socket metaphor for MCP connections. Or: Claude as a hub with tools/APIs connected via cables. -->
+<!-- TODO: Add cover image above this line in Medium editor -->
+<hr>
+
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>Imagine asking Claude: "What were the three most common error types
+in production last week, and create a JIRA ticket for the most critical
+one with the relevant stack traces attached?"</p>
+<p>Without MCPs, Claude can't do this — it has no access to your logs,
+your JIRA, or anything outside the conversation window. With the right
+MCPs configured, this becomes a single prompt that Claude executes
+end-to-end.</p>
+<p>MCPs — Model Context Protocol — are one of the most significant
+developments in practical AI tooling. They're what transforms Claude
+from a smart chat assistant into an autonomous agent that operates
+within your actual development environment.</p>
+<hr />
+<h2 id="1-what-is-model-context-protocol-mcp">1. What Is Model Context
+Protocol (MCP)?</h2>
+<p>Model Context Protocol is an <strong>open standard</strong> developed
+by Anthropic that defines how AI models communicate with external tools
+and data sources. It's essentially a universal adapter — a standardised
+interface that allows any AI model to connect to any external service,
+following a common protocol.</p>
+<p><strong>The core idea:</strong> Instead of hardcoding integrations
+between models and tools, MCP provides a standard so that any
+MCP-compliant tool can connect to any MCP-compliant model.</p>
+<p>Think of it like USB for AI tools:</p>
+<ul>
+<li>Before USB, every device had a proprietary connector</li>
+<li>USB standardised device communication</li>
+<li>MCP standardises AI tool communication</li>
+</ul>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    subgraph WITHOUT["❌ Without MCP — Custom Integrations"]
+        direction TB
+        C1["Claude"] --&gt;|"Custom API"| G1["GitHub"]
+        C1 --&gt;|"Custom API"| J1["JIRA"]
+        C1 --&gt;|"Custom API"| D1["Database"]
+        C1 --&gt;|"Custom API"| S1["Slack"]
+    end
+    
+    subgraph WITH["✅ With MCP — Universal Protocol"]
+        direction TB
+        C2["Claude"] --&gt;|"MCP Protocol"| MCP["🔌 MCP&lt;br/&gt;Standard"]
+        MCP --&gt; G2["GitHub&lt;br/&gt;Server"]
+        MCP --&gt; J2["JIRA&lt;br/&gt;Server"]
+        MCP --&gt; D2["DB&lt;br/&gt;Server"]
+        MCP --&gt; S2["Slack&lt;br/&gt;Server"]
+    end
+
+    style WITHOUT fill:#ffe5e5,stroke:#e74c3c
+    style WITH fill:#d4edda,stroke:#28a745
+    style MCP fill:#f5a623,stroke:#d4891a,color:#fff</code></pre>
+</figure>
+
+<hr />
+<h2 id="2-the-mcp-architecture">2. The MCP Architecture</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    CLIENT["🖥️ MCP CLIENT&lt;br/&gt;&lt;i&gt;Claude Code · Claude Desktop · Your App&lt;/i&gt;"]
+    
+    CLIENT --&gt;|"JSON-RPC"| SA["📁 MCP Server A&lt;br/&gt;&lt;b&gt;Filesystem&lt;/b&gt;"]
+    CLIENT --&gt;|"JSON-RPC"| SB["🐙 MCP Server B&lt;br/&gt;&lt;b&gt;GitHub API&lt;/b&gt;"]
+    CLIENT --&gt;|"JSON-RPC"| SC["🗄️ MCP Server C&lt;br/&gt;&lt;b&gt;Database&lt;/b&gt;"]
+    
+    subgraph TOOLS_A["Server A — Tools &amp; Resources"]
+        TA1["read_file"] 
+        TA2["write_file"]
+        TA3["list_dir"]
+        RA["📂 file://"]
+    end
+    subgraph TOOLS_B["Server B — Tools &amp; Resources"]
+        TB1["create_issue"]
+        TB2["list_prs"]
+        TB3["get_commit"]
+        RB["🔗 github://repo"]
+    end
+    subgraph TOOLS_C["Server C — Tools &amp; Resources"]
+        TC1["query"]
+        TC2["list_tables"]
+        RC["🗃️ postgres://"]
+    end
+    
+    SA --&gt; TOOLS_A
+    SB --&gt; TOOLS_B
+    SC --&gt; TOOLS_C
+
+    style CLIENT fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style SA fill:#4a90d9,stroke:#2d6cb4,color:#fff
+    style SB fill:#50c878,stroke:#3da360,color:#fff
+    style SC fill:#f5a623,stroke:#d4891a,color:#fff</code></pre>
+</figure>
+
+<p><strong>Three core primitives in MCP:</strong></p>
+<ol type="1">
+<li><strong>Tools</strong> — Actions Claude can execute (read file,
+create issue, run query)</li>
+<li><strong>Resources</strong> — Data sources Claude can read (files,
+database records, API responses)</li>
+<li><strong>Prompts</strong> — Pre-built prompt templates exposed by the
+server</li>
+</ol>
+<hr />
+<h2 id="3-types-of-mcp-servers">3. Types of MCP Servers</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph LOCAL["🏠 Type 1: Local (stdio)"]
+        L1["Runs on your machine&lt;br/&gt;⚡ Zero latency&lt;br/&gt;🔒 Private&lt;br/&gt;📁 Filesystem, Git, DB"]
+    end
+    subgraph REMOTE["🌐 Type 2: Remote (HTTP/SSE)"]
+        R1["Cloud-hosted server&lt;br/&gt;🔗 Network required&lt;br/&gt;🔑 Auth needed&lt;br/&gt;🐙 GitHub, Slack, Jira"]
+    end
+    subgraph CUSTOM["🔧 Type 3: Custom"]
+        CU1["You build it&lt;br/&gt;🎯 Your APIs/tools&lt;br/&gt;📦 FastMCP SDK&lt;br/&gt;🏢 Internal services"]
+    end
+
+    style LOCAL fill:#d4edda,stroke:#28a745
+    style REMOTE fill:#f0f4ff,stroke:#4a90d9
+    style CUSTOM fill:#fff3cd,stroke:#ffc107</code></pre>
+</figure>
+
+<h3 id="type-1-local-mcp-servers-stdio">Type 1: Local MCP Servers
+(stdio)</h3>
+<p>Local servers run as processes on the same machine as Claude Code.
+They communicate via standard input/output (stdio) — no network
+required.</p>
+<p><strong>How they work:</strong></p>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph LR
+    CC["🖥️ Claude Code&lt;br/&gt;Process"] --&gt;|"spawns"| MCP["🔧 MCP Server&lt;br/&gt;Process"]
+    CC &lt;--&gt;|"stdin/stdout&lt;br/&gt;(JSON-RPC)"| MCP
+
+    style CC fill:#7b68ee,stroke:#5a4dbd,color:#fff
+    style MCP fill:#4a90d9,stroke:#2d6cb4,color:#fff</code></pre>
+</figure>
+
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Run locally on developer's machine</li>
+<li>Fast (no network latency)</li>
+<li>Full access to local filesystem and resources</li>
+<li>No authentication needed for local resources</li>
+<li>Private — no data leaves the machine</li>
+</ul>
+<p><strong>Best for:</strong></p>
+<ul>
+<li>Filesystem access</li>
+<li>Local database connections</li>
+<li>Running local scripts and commands</li>
+<li>Local Docker containers</li>
+<li>Git repository access</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><code>@modelcontextprotocol/server-filesystem</code> — Read/write
+local files</li>
+<li><code>@modelcontextprotocol/server-git</code> — Git operations</li>
+<li><code>@modelcontextprotocol/server-sqlite</code> — SQLite database
+access</li>
+<li>Custom local scripts</li>
+</ul>
+<hr />
+<h3 id="type-2-remote-mcp-servers-httpsse">Type 2: Remote MCP Servers
+(HTTP/SSE)</h3>
+<p>Remote servers run on a separate host and communicate via HTTP with
+Server-Sent Events (SSE) for streaming. They can be anywhere —
+cloud-hosted, company-internal, or third-party services.</p>
+<p><strong>How they work:</strong></p>
+<pre><code>Claude Code → HTTPS request → Remote MCP Server → External API/Service
+             ← SSE stream  ←</code></pre>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Can be shared across team members</li>
+<li>Access to cloud services and APIs</li>
+<li>Require authentication (API keys, OAuth)</li>
+<li>Network latency (but usually acceptable)</li>
+<li>Can be hosted by third parties</li>
+</ul>
+<p><strong>Best for:</strong></p>
+<ul>
+<li>GitHub, GitLab, Bitbucket</li>
+<li>JIRA, Linear, Asana (project management)</li>
+<li>Slack, Teams (communication)</li>
+<li>AWS, GCP, Azure (cloud infrastructure)</li>
+<li>Databases (cloud-hosted)</li>
+<li>Third-party APIs</li>
+</ul>
+<hr />
+<h3 id="type-3-custom-mcp-servers">Type 3: Custom MCP Servers</h3>
+<p>You can build your own MCP servers for internal tools, proprietary
+systems, or unique workflows.</p>
+<p><strong>When to build custom MCP:</strong></p>
+<ul>
+<li>Your company has internal APIs not covered by existing MCPs</li>
+<li>You want to expose your database with domain-specific query
+tools</li>
+<li>You have proprietary data sources</li>
+<li>You want to enforce business rules in the MCP layer</li>
+</ul>
+<pre class="typescript"><code>// Simple custom MCP server example (TypeScript)
+import { Server } from &quot;@modelcontextprotocol/sdk/server/index.js&quot;;
+import { StdioServerTransport } from &quot;@modelcontextprotocol/sdk/server/stdio.js&quot;;
+
+const server = new Server(
+  { name: &quot;internal-api-server&quot;, version: &quot;1.0.0&quot; },
+  { capabilities: { tools: {} } }
+);
+
+// Define a tool
+server.setRequestHandler(ListToolsRequestSchema, async () =&gt; ({
+  tools: [{
+    name: &quot;get_customer_data&quot;,
+    description: &quot;Retrieve customer data from internal CRM&quot;,
+    inputSchema: {
+      type: &quot;object&quot;,
+      properties: {
+        customerId: { type: &quot;string&quot;, description: &quot;Customer UUID&quot; }
+      },
+      required: [&quot;customerId&quot;]
+    }
+  }]
+}));
+
+// Implement the tool
+server.setRequestHandler(CallToolRequestSchema, async (request) =&gt; {
+  if (request.params.name === &quot;get_customer_data&quot;) {
+    const { customerId } = request.params.arguments;
+    const data = await internalCRM.getCustomer(customerId);
+    return { content: [{ type: &quot;text&quot;, text: JSON.stringify(data) }] };
+  }
+});
+
+const transport = new StdioServerTransport();
+await server.connect(transport);</code></pre>
+<hr />
+<h2 id="4-the-mcp-ecosystem--available-servers">4. The MCP Ecosystem —
+Available Servers</h2>
+
+<figure style="border: 2px dashed #4a90d9; border-radius: 8px; padding: 16px; background: #f0f7ff; margin: 24px 0;">
+  <p style="margin: 0 0 8px 0; font-weight: bold; color: #2d6cb4;">📊 Diagram — render at <a href="https://mermaid.live" target="_blank">mermaid.live</a> and replace with image</p>
+  <pre style="background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>graph TB
+    subgraph OFFICIAL["🏢 Official Anthropic MCP Servers"]
+        O1["📁 Filesystem"]
+        O2["🔀 Git"]
+        O3["🐘 PostgreSQL"]
+        O4["🧠 Memory"]
+        O5["🌐 Puppeteer"]
+        O6["🗃️ SQLite"]
+    end
+    subgraph COMMUNITY["🌍 Community MCP Servers"]
+        C1["🐙 GitHub"]
+        C2["💬 Slack"]
+        C3["📋 Jira/Linear"]
+        C4["☁️ AWS"]
+        C5["🐳 Docker"]
+        C6["📊 Datadog"]
+    end
+    subgraph CUSTOM["🔧 Build Your Own"]
+        CU1["FastMCP SDK"]
+        CU2["Your internal APIs"]
+        CU3["Custom tools"]
+    end
+
+    style OFFICIAL fill:#d4edda,stroke:#28a745
+    style COMMUNITY fill:#f0f4ff,stroke:#4a90d9
+    style CUSTOM fill:#fff3cd,stroke:#ffc107</code></pre>
+</figure>
+
+<h3 id="official-anthropic-mcp-servers">Official Anthropic MCP
+Servers</h3>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server-filesystem</code></td>
+<td>Read/write local files, directory listings</td>
+</tr>
+<tr>
+<td><code>server-git</code></td>
+<td>Git log, diff, commits, branches</td>
+</tr>
+<tr>
+<td><code>server-github</code></td>
+<td>Issues, PRs, repos, code search</td>
+</tr>
+<tr>
+<td><code>server-gitlab</code></td>
+<td>Issues, MRs, repos</td>
+</tr>
+<tr>
+<td><code>server-slack</code></td>
+<td>Send messages, search, read channels</td>
+</tr>
+<tr>
+<td><code>server-postgres</code></td>
+<td>Query PostgreSQL databases</td>
+</tr>
+<tr>
+<td><code>server-sqlite</code></td>
+<td>Query SQLite databases</td>
+</tr>
+<tr>
+<td><code>server-puppeteer</code></td>
+<td>Browser automation</td>
+</tr>
+<tr>
+<td><code>server-brave-search</code></td>
+<td>Web search</td>
+</tr>
+<tr>
+<td><code>server-memory</code></td>
+<td>Persistent key-value memory</td>
+</tr>
+<tr>
+<td><code>server-fetch</code></td>
+<td>HTTP requests to any URL</td>
+</tr>
+</tbody>
+</table>
+<h3 id="community-mcp-servers">Community MCP Servers</h3>
+<p>The community has built hundreds more. Notable ones:</p>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mcp-server-jira</code></td>
+<td>Create/update JIRA tickets</td>
+</tr>
+<tr>
+<td><code>mcp-server-linear</code></td>
+<td>Linear issue management</td>
+</tr>
+<tr>
+<td><code>mcp-server-aws</code></td>
+<td>AWS resource management</td>
+</tr>
+<tr>
+<td><code>mcp-server-kubernetes</code></td>
+<td>K8s cluster operations</td>
+</tr>
+<tr>
+<td><code>mcp-server-datadog</code></td>
+<td>Query logs and metrics</td>
+</tr>
+<tr>
+<td><code>mcp-server-notion</code></td>
+<td>Notion page creation/read</td>
+</tr>
+<tr>
+<td><code>mcp-server-figma</code></td>
+<td>Read Figma designs</td>
+</tr>
+<tr>
+<td><code>mcp-server-stripe</code></td>
+<td>Stripe payment operations</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-benefits-of-mcps">5. Benefits of MCPs</h2>
+<h3 id="51-context-enrichment">5.1 Context Enrichment</h3>
+<p>Claude can pull real data into the conversation instead of relying on
+what you describe.</p>
+<pre><code>Without MCP: &quot;Here&#39;s the error from our logs [paste 100 lines]...&quot;
+With MCP: &quot;Check our Datadog logs for the payment service errors in the last hour&quot;</code></pre>
+<h3 id="52-closed-loop-action">5.2 Closed-Loop Action</h3>
+<p>Claude can not just suggest actions but execute them.</p>
+<pre><code>Without MCP: &quot;Here&#39;s how to create that JIRA ticket...&quot; [manual copy-paste]
+With MCP: &quot;Create a JIRA ticket for this bug with P1 priority and assign to the backend team&quot;</code></pre>
+<h3 id="53-cross-tool-workflows">5.3 Cross-Tool Workflows</h3>
+<p>MCPs enable multi-step workflows that span multiple tools in a single
+prompt.</p>
+<pre><code>&quot;Find all failing tests in the last 3 GitHub Actions runs, 
+create JIRA tickets for each unique failure, 
+and post a summary to the #qa-alerts Slack channel.&quot;</code></pre>
+<p>Without MCPs: This is a 30-minute manual task. With MCPs (GitHub +
+JIRA + Slack): Single prompt, ~30 seconds.</p>
+<h3 id="54-team-consistency">5.4 Team Consistency</h3>
+<p>Remote MCPs shared across a team mean everyone has the same tools and
+Claude behaves consistently for all team members.</p>
+<h3 id="55-reduced-context-switching">5.5 Reduced Context Switching</h3>
+<p>Instead of opening GitHub, JIRA, Slack, and your terminal separately,
+you interact with all of them through Claude Code in your terminal.</p>
+<hr />
+<h2 id="6-when-to-use-which-type">6. When to Use Which Type</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>MCP Type</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reading local project files</td>
+<td>Local (filesystem)</td>
+<td>No network, full access</td>
+</tr>
+<tr>
+<td>Querying your local dev DB</td>
+<td>Local (postgres/sqlite)</td>
+<td>Direct connection</td>
+</tr>
+<tr>
+<td>Viewing git history</td>
+<td>Local (git)</td>
+<td>Fastest, no auth needed</td>
+</tr>
+<tr>
+<td>Creating GitHub issues</td>
+<td>Remote (github)</td>
+<td>Needs GitHub API</td>
+</tr>
+<tr>
+<td>Posting to Slack</td>
+<td>Remote (slack)</td>
+<td>Needs Slack API</td>
+</tr>
+<tr>
+<td>Querying company data</td>
+<td>Custom local/remote</td>
+<td>Proprietary access</td>
+</tr>
+<tr>
+<td>Cloud infra management</td>
+<td>Remote (aws/gcp)</td>
+<td>Cloud API required</td>
+</tr>
+<tr>
+<td>Browser automation</td>
+<td>Local (puppeteer)</td>
+<td>Needs local browser</td>
+</tr>
+<tr>
+<td>Web research</td>
+<td>Remote (brave-search)</td>
+<td>External search API</td>
+</tr>
+<tr>
+<td>Persistent memory</td>
+<td>Local (memory)</td>
+<td>Privacy, speed</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-mcp-security-considerations">7. MCP Security
+Considerations</h2>
+<p>MCPs grant Claude <strong>real capabilities with real
+consequences</strong>. Before adding any MCP, ask: "If Claude used this
+incorrectly, what is the worst-case outcome?"</p>
+<h3 id="risk-rating-by-mcp-type">Risk Rating by MCP Type</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">MCP Type</th>
+<th style="text-align: center;">Risk Level</th>
+<th style="text-align: left;">Worst-Case Scenario</th>
+<th style="text-align: left;">Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Filesystem (read-only)</td>
+<td style="text-align: center;">🟢 Low</td>
+<td style="text-align: left;">Claude reads a file it shouldn't</td>
+<td style="text-align: left;">Scope to project directory only</td>
+</tr>
+<tr>
+<td style="text-align: left;">Filesystem (write access)</td>
+<td style="text-align: center;">🔴 High</td>
+<td style="text-align: left;">Claude deletes or corrupts files</td>
+<td style="text-align: left;">Add confirmation for destructive ops</td>
+</tr>
+<tr>
+<td style="text-align: left;">Production database (write)</td>
+<td style="text-align: center;">🔴 Critical</td>
+<td style="text-align: left;">Data loss or corruption</td>
+<td style="text-align: left;">Use read-only creds in dev; never prod
+write</td>
+</tr>
+<tr>
+<td style="text-align: left;">Development database (write)</td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Dev data corrupted</td>
+<td style="text-align: left;">Acceptable with backups</td>
+</tr>
+<tr>
+<td style="text-align: left;">GitHub (read)</td>
+<td style="text-align: center;">🟢 Low</td>
+<td style="text-align: left;">Claude reads private repos</td>
+<td style="text-align: left;">Use scoped personal access token</td>
+</tr>
+<tr>
+<td style="text-align: left;">GitHub (write)</td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Claude pushes unwanted commits</td>
+<td style="text-align: left;">Require PR review before merge</td>
+</tr>
+<tr>
+<td style="text-align: left;">Slack / Email</td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Claude sends unintended messages</td>
+<td style="text-align: left;">Review before posting; use draft mode</td>
+</tr>
+<tr>
+<td style="text-align: left;">AWS / Cloud (read)</td>
+<td style="text-align: center;">🟡 Medium</td>
+<td style="text-align: left;">Claude reads sensitive infra config</td>
+<td style="text-align: left;">Use read-only IAM role</td>
+</tr>
+<tr>
+<td style="text-align: left;">AWS / Cloud (write)</td>
+<td style="text-align: center;">🔴 Critical</td>
+<td style="text-align: left;">Infrastructure created/deleted</td>
+<td style="text-align: left;">Never grant; use read-only only</td>
+</tr>
+</tbody>
+</table>
+<h3 id="best-practices">Best Practices</h3>
+<ol type="1">
+<li><strong>Principle of Least Privilege</strong> — only install MCPs
+Claude actually needs</li>
+<li><strong>Read-only by default</strong> — use read-only credentials
+wherever possible</li>
+<li><strong>Scoped credentials</strong> — create dedicated API tokens
+for AI tool access with minimal scopes</li>
+<li><strong>Directory scoping</strong> — restrict filesystem MCP to
+project directories, not <code>~</code> or <code>/</code></li>
+<li><strong>Confirm before irreversible operations</strong> — Claude
+will ask; always verify before confirming</li>
+<li><strong>Audit trail</strong> — use MCPs that log actions (e.g.
+git-backed writes)</li>
+</ol>
+<hr />
+<h2 id="8-real-world-workflow-examples">8. Real-World Workflow
+Examples</h2>
+<h3 id="workflow-incident-response">Workflow: Incident Response</h3>
+<pre><code>MCPs required: Datadog (logs), GitHub (code), JIRA (tickets), Slack (comms)
+
+&quot;We have an incident — payment service is returning 500s. 
+1. Check Datadog for error patterns in the last 30 minutes
+2. Find the last 3 commits to the payment-service repo
+3. Identify which commit likely caused the issue
+4. Create a P0 JIRA incident ticket with findings
+5. Post incident status to #incidents Slack channel&quot;</code></pre>
+<h3 id="workflow-sprint-planning-assistance">Workflow: Sprint Planning
+Assistance</h3>
+<pre><code>MCPs required: GitHub (PRs, issues), JIRA (backlog), Confluence (specs)
+
+&quot;Prepare sprint planning materials:
+1. List all open JIRA tickets in the backlog, sorted by priority
+2. For each P0/P1 ticket, find related GitHub issues or PRs
+3. Summarise any associated technical specs from Confluence
+4. Suggest a sprint scope based on our team velocity of 40 points&quot;</code></pre>
+<h3 id="workflow-automated-code-review">Workflow: Automated Code
+Review</h3>
+<pre><code>MCPs required: GitHub (PRs, code), Slack (notifications)
+
+&quot;Review PR #247:
+1. Read the full diff
+2. Check if it has sufficient test coverage
+3. Look for security issues using our security checklist
+4. Post a detailed code review comment on the PR
+5. If critical issues found, notify @dev-lead in Slack&quot;</code></pre>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>MCPs are the technology that makes Claude agentic — capable of taking
+actions in the real world, not just generating text. Understanding the
+three types:</p>
+<ol type="1">
+<li><strong>Local MCPs (stdio)</strong> — For filesystem, local DB, git.
+Fast, private, no auth.</li>
+<li><strong>Remote MCPs (HTTP/SSE)</strong> — For cloud services
+(GitHub, JIRA, Slack, AWS). Shared across teams.</li>
+<li><strong>Custom MCPs</strong> — For proprietary internal systems.
+Built for your specific needs.</li>
+</ol>
+<p>The key question when evaluating an MCP is: "What actions does this
+enable, and do I want Claude to be able to take those actions
+autonomously?"</p>
+<p>In the final article, we'll get hands-on with MCP setup — exactly how
+to configure local and remote MCPs in Claude Code, including
+authentication, troubleshooting, and team deployment.</p>
+<hr />
+<p><em>Next: Article 10 — How to Set Up MCPs: Local and Remote
+Configuration Guide</em></p>
+
+</body>
+</html>
